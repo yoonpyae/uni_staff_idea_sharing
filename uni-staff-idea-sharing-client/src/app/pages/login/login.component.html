@@ -1,0 +1,106 @@
+<div class="flex min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-900 dark:to-gray-800">
+  <!-- Left Side - Branding -->
+  <div class="hidden lg:flex flex-1 bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 items-center justify-center relative overflow-hidden p-12">
+    <!-- Background Decorations -->
+    <div class="absolute inset-0 bg-[radial-gradient(circle_at_20%_30%,rgba(168,230,207,0.1)_0%,transparent_50%),radial-gradient(circle_at_80%_70%,rgba(168,230,207,0.15)_0%,transparent_50%)] dark:bg-[radial-gradient(circle_at_20%_30%,rgba(168,230,207,0.05)_0%,transparent_50%),radial-gradient(circle_at_80%_70%,rgba(168,230,207,0.08)_0%,transparent_50%)]"></div>
+    
+    <div [@fadeInUp] class="relative z-10 text-center max-w-[500px]">
+      <div class="mb-8">
+        <h1 class="text-[5rem] font-extrabold leading-[1.1] m-0 tracking-tight text-[#2c5f5d] dark:text-[#88d4ab] font-sans">
+          THINK
+        </h1>
+        <h1 class="text-[6rem] font-extrabold leading-[1.1] m-0 tracking-tight text-[#ff9f43] dark:text-[#fdba74] font-sans">
+          BIG
+        </h1>
+        <h1 class="text-[5rem] font-extrabold leading-[1.1] m-0 tracking-tight text-[#2c3e50] dark:text-white font-sans">
+          IDEAS
+        </h1>
+      </div>
+      
+      <!-- Lightbulb SVG -->
+      <div class="w-[200px] mx-auto drop-shadow-[0_10px_30px_rgba(0,0,0,0.1)] dark:drop-shadow-[0_10px_30px_rgba(0,0,0,0.3)]">
+        <svg viewBox="0 0 100 150" class="w-full h-auto">
+          <ellipse cx="50" cy="120" rx="25" ry="8" fill="#e0e0e0" opacity="0.3"/>
+          <path d="M 50 15 Q 30 30 30 55 Q 30 75 40 85 L 40 105 Q 40 115 50 115 Q 60 115 60 105 L 60 85 Q 70 75 70 55 Q 70 30 50 15 Z" fill="#f5f5f5" class="dark:fill-gray-700"/>
+          <rect x="42" y="105" width="16" height="8" fill="#d0d0d0" class="dark:fill-gray-600" rx="2"/>
+          <rect x="44" y="113" width="12" height="3" fill="#c0c0c0" class="dark:fill-gray-500"/>
+          
+          <!-- Animated Gear Icons -->
+          <g class="animate-[float_3s_ease-in-out_infinite]">
+            <circle cx="45" cy="50" r="8" fill="#FF6B6B" opacity="0.8"/>
+            <text x="45" y="55" font-size="10" text-anchor="middle" fill="white">A</text>
+          </g>
+          <g class="animate-[float_3s_ease-in-out_0.5s_infinite]">
+            <circle cx="55" cy="40" r="8" fill="#4ECDC4" opacity="0.8"/>
+            <text x="55" y="45" font-size="10" text-anchor="middle" fill="white">💡</text>
+          </g>
+          <g class="animate-[float_3s_ease-in-out_1s_infinite]">
+            <circle cx="50" cy="65" r="6" fill="#FFD93D" opacity="0.8"/>
+            <text x="50" y="69" font-size="8" text-anchor="middle" fill="white">⚙</text>
+          </g>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Side - Login Form -->
+  <div class="flex-1 bg-gradient-to-br from-[#a8e6cf] to-[#88d4ab] dark:from-[#1a3936] dark:to-[#122825] flex items-center justify-center p-6 md:p-12">
+    <div [@slideIn] class="bg-white dark:bg-gray-800 rounded-3xl p-8 md:p-12 shadow-[0_20px_60px_rgba(0,0,0,0.15)] dark:shadow-[0_20px_60px_rgba(0,0,0,0.5)] w-full max-w-[440px] border border-gray-200 dark:border-gray-700">
+      <h2 class="text-3xl md:text-4xl font-bold text-[#2c3e50] dark:text-white m-0 mb-2 text-center font-sans">
+        Welcome
+      </h2>
+      <p class="text-base text-[#2c3e50] dark:text-gray-300 m-0 mb-10 text-center font-medium">
+        Sign in with Email!
+      </p>
+
+      <form (ngSubmit)="onSubmit()" class="w-full">
+        <!-- Email Field -->
+        <div class="mb-7">
+          <label for="email" class="block text-[0.95rem] font-semibold text-[#2c3e50] dark:text-white mb-2">
+            Email
+          </label>
+          <input
+            id="email"
+            type="email"
+            [(ngModel)]="email"
+            name="email"
+            placeholder="Enter your email..."
+            required
+            class="w-full px-4 py-3.5 text-base border-2 border-gray-300 dark:border-gray-600 rounded-xl bg-gray-50 dark:bg-gray-700 text-[#2c3e50] dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-all duration-300 focus:outline-none focus:border-[#a8e6cf] dark:focus:border-[#88d4ab] focus:bg-white dark:focus:bg-gray-600 focus:shadow-[0_0_0_3px_rgba(168,230,207,0.1)] dark:focus:shadow-[0_0_0_3px_rgba(136,212,171,0.2)]" />
+        </div>
+
+        <!-- Password Field -->
+        <div class="mb-7">
+          <label for="password" class="block text-[0.95rem] font-semibold text-[#2c3e50] dark:text-white mb-2">
+            Password
+          </label>
+          <div class="relative">
+            <input
+              id="password"
+              [type]="showPassword ? 'text' : 'password'"
+              [(ngModel)]="password"
+              name="password"
+              placeholder="Enter your password..."
+              required
+              class="w-full px-4 py-3.5 text-base border-2 border-gray-300 dark:border-gray-600 rounded-xl bg-gray-50 dark:bg-gray-700 text-[#2c3e50] dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-all duration-300 focus:outline-none focus:border-[#a8e6cf] dark:focus:border-[#88d4ab] focus:bg-white dark:focus:bg-gray-600 focus:shadow-[0_0_0_3px_rgba(168,230,207,0.1)] dark:focus:shadow-[0_0_0_3px_rgba(136,212,171,0.2)]" />
+            <button
+              type="button"
+              (click)="togglePasswordVisibility()"
+              [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'"
+              class="absolute right-4 top-1/2 -translate-y-1/2 bg-transparent border-0 text-gray-500 dark:text-gray-400 cursor-pointer p-2 flex items-center justify-center transition-colors duration-200 hover:text-[#2c5f5d] dark:hover:text-[#a8e6cf]">
+              <i [class]="showPassword ? 'pi pi-eye-slash' : 'pi pi-eye'" class="text-lg"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <button
+          type="submit"
+          [disabled]="!email || !password"
+          class="w-full px-4 py-4 text-lg font-semibold bg-[#2c5f5d] dark:bg-[#a8e6cf] border-0 rounded-xl text-white dark:text-[#2c3e50] cursor-pointer transition-all duration-300 mt-4 uppercase tracking-wider disabled:opacity-50 disabled:cursor-not-allowed enabled:hover:bg-[#234a48] dark:enabled:hover:bg-[#88d4ab] enabled:hover:-translate-y-0.5 enabled:hover:shadow-[0_8px_20px_rgba(44,95,93,0.3)] dark:enabled:hover:shadow-[0_8px_20px_rgba(168,230,207,0.3)]">
+          Sign In
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
