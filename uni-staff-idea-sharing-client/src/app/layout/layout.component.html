@@ -1,0 +1,111 @@
+<div class="flex min-h-screen bg-gray-100 dark:bg-gray-900">
+  <!-- Sidebar -->
+  <aside 
+    [@slideInOut]="getSidebarState()"
+    class="bg-gradient-to-b from-[#a8e6cf] to-[#88d4ab] dark:from-[#1a3936] dark:to-[#122825] flex flex-col shadow-[4px_0_20px_rgba(0,0,0,0.08)] dark:shadow-[4px_0_20px_rgba(0,0,0,0.3)] fixed left-0 top-0 h-screen z-50 lg:relative transition-all duration-300"
+    [class.w-[260px]]="!isSidebarCollapsed"
+    [class.w-[80px]]="isSidebarCollapsed">
+    
+    <div class="flex flex-col h-full py-6">
+      <!-- Brand Section with Toggle Buttons -->
+      <div class="px-6 mb-8">
+        <div class="flex items-center justify-between mb-4">
+          <div class="overflow-hidden flex-1">
+            <h1 
+              [@fadeInOut]="getTextState()"
+              class="text-2xl font-bold text-[#2c3e50] dark:text-white whitespace-nowrap tracking-tight font-sans">
+              UniversityName
+            </h1>
+            <div 
+              [@fadeInOut]="getTextState()"
+              class="h-[3px] bg-[#2c5f5d] dark:bg-[#a8e6cf] rounded mt-3 w-[60px]"></div>
+          </div>
+        </div>
+
+        <!-- Action Buttons Row -->
+        <div class="flex items-center gap-2" [class.justify-center]="isSidebarCollapsed">
+          <!-- Theme Toggle Button -->
+          <button 
+            (click)="toggleTheme()"
+            class="p-2.5 rounded-lg bg-white/20 dark:bg-black/20 hover:bg-white/30 dark:hover:bg-black/30 transition-colors duration-200 text-[#2c5f5d] dark:text-[#a8e6cf]"
+            [title]="themeService.isDark() ? 'Switch to Light Mode' : 'Switch to Dark Mode'">
+            <i [class]="themeService.isDark() ? 'pi pi-sun' : 'pi pi-moon'" class="text-lg"></i>
+          </button>
+
+          <!-- Sidebar Toggle Button -->
+          <button 
+            (click)="toggleSidebar()"
+            class="p-2.5 rounded-lg bg-white/20 dark:bg-black/20 hover:bg-white/30 dark:hover:bg-black/30 transition-colors duration-200 text-[#2c5f5d] dark:text-[#a8e6cf] hidden lg:block"
+            [title]="isSidebarCollapsed ? 'Expand Sidebar' : 'Collapse Sidebar'">
+            <i [class]="isSidebarCollapsed ? 'pi pi-angle-right' : 'pi pi-angle-left'" class="text-lg"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Navigation Menu -->
+      <nav class="flex-1 overflow-y-auto overflow-x-hidden px-2">
+        <div *ngFor="let section of menuItems" class="mb-4">
+          <div *ngIf="section.items && section.items.length > 0">
+            <div *ngFor="let item of section.items" class="my-1">
+              <a
+                [routerLink]="item.routerLink"
+                routerLinkActive="bg-[#2c5f5d]/15 dark:bg-white/10 border-l-[#2c5f5d] dark:border-l-[#a8e6cf] font-semibold before:absolute before:right-0 before:top-1/2 before:-translate-y-1/2 before:w-1 before:h-[70%] before:bg-[#2c5f5d] dark:before:bg-[#a8e6cf] before:rounded-l"
+                class="flex items-center px-6 py-3.5 text-[#2c3e50] dark:text-gray-200 no-underline transition-all duration-200 relative font-medium border-l-4 border-transparent hover:bg-white/20 dark:hover:bg-white/5 hover:border-l-[#2c5f5d] dark:hover:border-l-[#a8e6cf] rounded-r-lg"
+                [class.justify-center]="isSidebarCollapsed"
+                [class.px-3]="isSidebarCollapsed">
+                <i [class]="item.icon" class="text-xl text-[#2c5f5d] dark:text-[#a8e6cf] min-w-[1.25rem]" [class.mr-0]="isSidebarCollapsed" [class.mr-4]="!isSidebarCollapsed"></i>
+                <span 
+                  [@fadeInOut]="getTextState()"
+                  class="text-[0.95rem] whitespace-nowrap">
+                  {{ item.label }}
+                </span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      <!-- User Profile -->
+      <div class="mt-auto px-6 pt-4 border-t-2 border-white/30 dark:border-white/10">
+        <div class="flex items-center mb-3">
+          <div class="w-10 h-10 rounded-full bg-[#2c5f5d] dark:bg-[#a8e6cf] flex items-center justify-center text-white dark:text-[#2c3e50] text-xl flex-shrink-0"
+               [class.mr-0]="isSidebarCollapsed"
+               [class.mr-3]="!isSidebarCollapsed">
+            <i class="pi pi-user"></i>
+          </div>
+          <div 
+            [@fadeInOut]="getTextState()"
+            class="flex-1 overflow-hidden">
+            <div class="text-[0.95rem] font-semibold text-[#2c3e50] dark:text-white whitespace-nowrap overflow-hidden text-ellipsis">
+              {{ currentUser.name }}
+            </div>
+            <div class="text-[0.8rem] text-[#2c5f5d] dark:text-[#88d4ab] font-medium">
+              {{ currentUser.role }}
+            </div>
+          </div>
+        </div>
+        
+        <button 
+          (click)="logout()"
+          class="w-full px-4 py-2.5 bg-[#2c5f5d]/10 dark:bg-white/10 border-2 border-[#2c5f5d]/30 dark:border-white/20 rounded-xl text-[#2c5f5d] dark:text-[#a8e6cf] font-semibold text-[0.9rem] cursor-pointer flex items-center justify-center gap-2 transition-all duration-200 hover:bg-[#2c5f5d]/20 dark:hover:bg-white/20 hover:border-[#2c5f5d] dark:hover:border-[#a8e6cf] hover:-translate-y-0.5"
+          title="Logout">
+          <i class="pi pi-sign-out text-base"></i>
+          <span [@fadeInOut]="getTextState()">Logout</span>
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Mobile Overlay -->
+  <div 
+    *ngIf="!isSidebarCollapsed"
+    (click)="toggleSidebar()"
+    class="fixed inset-0 bg-black/50 dark:bg-black/70 z-40 lg:hidden"></div>
+
+  <!-- Main Content Area -->
+  <main class="flex-1 overflow-y-auto bg-gray-100 dark:bg-gray-900 transition-all duration-300"
+        [class.lg:ml-0]="isSidebarCollapsed"
+        [class.ml-0]="true">
+    <router-outlet></router-outlet>
+  </main>
+</div>
