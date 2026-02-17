@@ -7,6 +7,7 @@ import { ThemeService } from '../core/services/themeService';
 import { AuthService } from '../core/services/auth.service';
 import { CookieService } from 'ngx-cookie-service';
 import { OnInit } from '@angular/core';
+import { MessageService } from 'primeng/api';
 import { environment } from '../../environments/environment';
 
 @Component({
@@ -60,7 +61,8 @@ export class AppLayoutComponent implements OnInit {
     private router: Router,
     public themeService: ThemeService,
     private authService: AuthService,
-    private cookieService: CookieService
+    private cookieService: CookieService,
+    private messageService: MessageService
   ) { }
 
   ngOnInit(): void {
@@ -94,11 +96,28 @@ export class AppLayoutComponent implements OnInit {
 
   logout(): void {
     this.authService.logout().subscribe({
-      next: () => {
+      next: (res: any) => {
+        // show backend message if present
+        if (res && res.message) {
+          this.messageService.add({
+            severity: res.success ? 'success' : 'info',
+            summary: res.success ? 'Logged out' : 'Notice',
+            detail: res.message,
+            key: environment.default_toastKey
+          });
+        }
+
         this.authService.logoutForce();
         this.router.navigate(['/login']);
       },
       error: (err) => {
+        const detail = err?.error?.message || err?.message || 'Logout failed';
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Logout Failed',
+          detail,
+          key: environment.default_toastKey
+        });
         console.error('Logout failed:', err);
         this.authService.logoutForce(); // fallback
         this.router.navigate(['/login']);
