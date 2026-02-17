@@ -6,36 +6,39 @@
         Statistics Dashboard
       </h1>
     </div>
-    
+
     <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
       <!-- Year Selector -->
       <div class="relative">
-        <select 
-          (change)="onYearChange($event)"
-          class="appearance-none bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600 rounded-xl px-4 pr-10 py-2.5 text-[0.95rem] font-semibold text-[#2c3e50] dark:text-white cursor-pointer transition-all duration-200 hover:border-[#a8e6cf] dark:hover:border-[#88d4ab] focus:outline-none focus:border-[#a8e6cf] dark:focus:border-[#88d4ab] focus:shadow-[0_0_0_3px_rgba(168,230,207,0.1)] dark:focus:shadow-[0_0_0_3px_rgba(136,212,171,0.2)] min-w-[100px]">
+        <select (change)="onYearChange($event)"
+          class="appearance-none bg-[#D9D9D9] dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600 rounded-xl px-4 pr-10 py-2.5 text-[0.95rem] font-semibold text-[#2c3e50] dark:text-white cursor-pointer transition-all duration-200 hover:border-[#a8e6cf] dark:hover:border-[#88d4ab] focus:outline-none focus:border-[#a8e6cf] dark:focus:border-[#88d4ab] focus:shadow-[0_0_0_3px_rgba(168,230,207,0.1)] dark:focus:shadow-[0_0_0_3px_rgba(136,212,171,0.2)] min-w-[100px]">
           <option *ngFor="let year of years" [value]="year">{{ year }}</option>
         </select>
-        <i class="pi pi-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400 pointer-events-none text-xs"></i>
+        <i
+          class="pi pi-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400 pointer-events-none text-xs"></i>
       </div>
 
-      <!-- Search Box -->
-      <div class="relative flex-1 sm:flex-initial">
-        <input 
-          type="text"
-          (input)="onSearch()"
-          placeholder="Search..."
-          class="w-full sm:min-w-[250px] px-4 pl-10 py-2.5 border-2 border-gray-300 dark:border-gray-600 rounded-xl text-[0.95rem] bg-white dark:bg-gray-800 text-[#2c3e50] dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-all duration-200 focus:outline-none focus:border-[#a8e6cf] dark:focus:border-[#88d4ab] focus:shadow-[0_0_0_3px_rgba(168,230,207,0.1)] dark:focus:shadow-[0_0_0_3px_rgba(136,212,171,0.2)]" />
-        <i class="pi pi-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400 text-[0.95rem]"></i>
-      </div>
+      <!-- Export Data Button -->
+      <button (click)="onExport()" class="flex items-center justify-center gap-3 px-6 py-3 rounded-2xl font-semibold text-[1rem] 
+         bg-[#E7D3B3] hover:bg-[#cbb38f]  dark:bg-gray-800 dark:border-gray-600
+         text-[#2c3e50] dark:text-white 
+         shadow-md hover:shadow-lg 
+         transition-all duration-200 
+         hover:-translate-y-0.5 
+         min-w-[200px]">
+
+        <i class="pi pi-upload text-lg"></i>
+        <span>Export Data</span>
+
+      </button>
+
     </div>
   </div>
 
   <!-- Statistics Cards -->
-  <div 
-    [@listAnimation]="stats.length"
+  <div [@listAnimation]="stats.length"
     class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-6 md:mb-8">
-    <div 
-      *ngFor="let stat of stats"
+    <div *ngFor="let stat of stats"
       class="bg-gradient-to-br from-[#a8e6cf] to-[#88d4ab] dark:from-[#2c5f5d] dark:to-[#1a3936] rounded-2xl p-6 md:p-7 shadow-[0_4px_15px_rgba(0,0,0,0.08)] dark:shadow-[0_4px_15px_rgba(0,0,0,0.3)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_8px_25px_rgba(0,0,0,0.12)] dark:hover:shadow-[0_8px_25px_rgba(0,0,0,0.4)] cursor-pointer">
       <div class="text-center">
         <div class="text-base md:text-lg font-semibold text-[#2c3e50] dark:text-white mb-3">
@@ -50,7 +53,8 @@
 
   <!-- Charts Section -->
   <div class="mt-6 md:mt-8">
-    <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 md:p-12 shadow-[0_4px_15px_rgba(0,0,0,0.08)] dark:shadow-[0_4px_15px_rgba(0,0,0,0.3)] min-h-[300px] md:min-h-[400px] flex items-center justify-center border border-gray-200 dark:border-gray-700">
+    <div
+      class="bg-white dark:bg-gray-800 rounded-2xl p-6 md:p-12 shadow-[0_4px_15px_rgba(0,0,0,0.08)] dark:shadow-[0_4px_15px_rgba(0,0,0,0.3)] min-h-[300px] md:min-h-[400px] flex items-center justify-center border border-gray-200 dark:border-gray-700">
       <div class="text-center text-gray-500 dark:text-gray-400">
         <i class="pi pi-chart-bar text-5xl md:text-6xl text-[#a8e6cf] dark:text-[#2c5f5d] mb-4 block"></i>
         <p class="text-lg md:text-xl font-semibold text-[#2c3e50] dark:text-white m-0 mb-2">
