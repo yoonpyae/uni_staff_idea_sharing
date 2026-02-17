@@ -1,2 +1,74 @@
 /* You can add global styles to this file, and also import other style files */
 @use './tailwind.css';
+
+@use 'primeicons/primeicons.css';
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #f5f5f5;
+  transition: background-color 0.3s ease;
+}
+
+.app-dark body {
+  background-color: #111827;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.app-dark ::-webkit-scrollbar-track {
+  background: #1f2937;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #a8e6cf;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #88d4ab;
+}
+
+.app-dark ::-webkit-scrollbar-thumb {
+  background: #2c5f5d;
+}
+
+.app-dark ::-webkit-scrollbar-thumb:hover {
+  background: #234a48;
+}
+
+/* Float animation for login page */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* Smooth transitions for theme changes */
+* {
+  transition-property: background-color, border-color, color, fill, stroke;
+  transition-duration: 150ms;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+*:where(:not(input):not(textarea):not(select)) {
+  transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform;
+}
