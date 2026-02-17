@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -6,6 +6,11 @@ import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
 import { ButtonModule } from 'primeng/button';
 import { trigger, transition, style, animate, state } from '@angular/animations';
+import { AuthService } from '../../core/services/auth.service';
+import { CookieService } from 'ngx-cookie-service';
+import { MessageService } from 'primeng/api';
+import { RootModel } from '../../core/models/root.model';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-login',
@@ -18,7 +23,7 @@ import { trigger, transition, style, animate, state } from '@angular/animations'
   ],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss',
-   animations: [
+  animations: [
     trigger('fadeInUp', [
       transition(':enter', [
         style({ opacity: 0, transform: 'translateY(20px)' }),
@@ -40,25 +45,57 @@ import { trigger, transition, style, animate, state } from '@angular/animations'
     ])
   ]
 })
-export class LoginComponent {
-email: string = '';
+export class LoginComponent implements OnInit {
+  email: string = '';
   password: string = '';
   showPassword: boolean = false;
+  isLoading: boolean = false;
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private authService: AuthService,
+    private messageService: MessageService,
+  ) { }
+
+  ngOnInit(): void {
+  }
 
   onSubmit(): void {
-    // TODO: Implement authentication logic
-    console.log('Login attempt:', { email: this.email });
-    
-    // For now, navigate to dashboard on any login attempt
-    // Replace this with actual authentication
-    if (this.email && this.password) {
-      this.router.navigate(['/dashboard']);
-    }
+    if (!this.email || !this.password) return;
+
+    this.isLoading = true;
+
+    this.authService.login(this.email, this.password).subscribe({
+      next: (res: RootModel) => {
+        this.isLoading = false;
+
+        this.messageService.add({
+          severity: res.success ? 'success' : 'info',
+          summary: res.success ? 'Success' : 'Info',
+          detail: res.message || 'Logged in',
+          key: environment.default_toastKey
+        });
+
+        if (res.success) {
+          this.router.navigate(['/dashboard']);
+        }
+      },
+      error: (err) => {
+        this.isLoading = false;
+
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Login Failed',
+          detail: err?.error?.message || err?.message || 'Unable to login',
+          key: environment.default_toastKey
+        });
+      }
+    });
   }
 
   togglePasswordVisibility(): void {
     this.showPassword = !this.showPassword;
   }
+
+
 }
