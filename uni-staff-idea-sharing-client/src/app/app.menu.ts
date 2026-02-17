@@ -22,7 +22,7 @@ export const NAVIGATION_MENU: Readonly<MenuItem[]> = [
       {
         label: 'Departments',
         icon: 'pi pi-fw pi-building',
-        routerLink: ['/departments'],
+        routerLink: ['/department'],
       },
       {
         label: 'Staff Accounts',
