@@ -21,7 +21,7 @@ import { trigger, transition, style, animate, query, stagger } from '@angular/an
   ]
 })
 export class DashboardComponent {
-   currentYear = new Date().getFullYear();
+  currentYear = new Date().getFullYear();
   selectedYear = this.currentYear;
   searchQuery = '';
 
@@ -43,7 +43,7 @@ export class DashboardComponent {
     console.log('Year changed to:', this.selectedYear);
   }
 
-  onSearch(): void {
-    console.log('Search query:', this.searchQuery);
+  onExport(): void {
+    console.log('Export clicked');
   }
 }
