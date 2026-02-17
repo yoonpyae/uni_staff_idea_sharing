@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { LoginComponent } from './pages/login/login.component';
 import { AppLayoutComponent } from './layout/layout.component';
 import { DashboardComponent } from './pages/dashboard/dashboard.component';
+import { DepartmentComponent } from './pages/department/department.component';
 
 export const routes: Routes = [
   { path: '', component: LoginComponent },
@@ -16,20 +17,14 @@ export const routes: Routes = [
       {
         path: 'dashboard',
         component: DashboardComponent,
-      },
-      {
-        path: '',
-        redirectTo: 'dashboard',
-        pathMatch: 'full',
+        data: { title: 'Dashboard' },
       },
       // Add more routes here as you create more components
-      // {
-      //   path: 'departments',
-      //   loadComponent: () =>
-      //     import('./components/departments/departments.component').then(
-      //       (m) => m.DepartmentsComponent
-      //     ),
-      // },
+      {
+        path: 'department',
+        component: DepartmentComponent,
+        data: { title: 'Department' },
+      },
       // {
       //   path: 'staff-accounts',
       //   loadComponent: () =>
@@ -38,9 +33,5 @@ export const routes: Routes = [
       //     ),
       // },
     ],
-  },
-  {
-    path: '**',
-    redirectTo: 'login',
-  },
+  }
 ];
