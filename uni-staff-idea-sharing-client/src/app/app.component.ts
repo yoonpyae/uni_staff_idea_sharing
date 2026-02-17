@@ -8,12 +8,11 @@ import { TitleService } from './Shared/services/title.service';
   selector: 'app-root',
   imports: [RouterOutlet, ToastModule],
   providers: [TitleService],
-  templateUrl: './app.component.html'
+  templateUrl: './app.component.html',
+  styleUrl: './app.component.scss'
 })
 export class AppComponent {
   title = 'uni-staff-idea-sharing-client';
-
-
   constructor(
     private titleService: TitleService,
     private router: Router,
@@ -23,23 +22,23 @@ export class AppComponent {
 
   ngOnInit(): void {
     this.router.events
-    .pipe(
-      filter((event) => event instanceof NavigationEnd),
-      startWith(true), // Ensure execution on refresh
-      map(() => this.activatedRoute),
-      map((route) => {
-        const titles: string[] = [];
-        while (route) {
-          if (route.snapshot.data['title']) {
-            titles.unshift(route.snapshot.data['title']);
+      .pipe(
+        filter((event) => event instanceof NavigationEnd),
+        startWith(true), // Ensure execution on refresh
+        map(() => this.activatedRoute),
+        map((route) => {
+          const titles: string[] = [];
+          while (route) {
+            if (route.snapshot.data['title']) {
+              titles.unshift(route.snapshot.data['title']);
+            }
+            route = route.firstChild!;
           }
-          route = route.firstChild!;
-        }
-        return titles;
-      })
-    )
-    .subscribe((titles) => {
-      this.titleService.setTitle(titles);
-    });
+          return titles;
+        })
+      )
+      .subscribe((titles) => {
+        this.titleService.setTitle(titles);
+      });
   }
 }
