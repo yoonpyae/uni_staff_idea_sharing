@@ -1,0 +1,187 @@
+<div class="h-screen flex flex-col">
+  <!-- Fixed Header -->
+  <header class="flex-shrink-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg border-b border-gray-200/50 dark:border-gray-700/50 shadow-sm z-10">
+    <div class="px-4 md:px-6 lg:px-8 py-4">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 max-w-[1200px] mx-auto">
+        <div class="flex items-center gap-4">
+          <button
+            (click)="goBack()"
+            class="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-all duration-200">
+            <i class="pi pi-arrow-left text-sm"></i>
+            <span class="font-medium">Go Back</span>
+          </button>
+          <h1 class="text-xl md:text-2xl font-bold text-[#2c3e50] dark:text-white">
+            {{ pageTitle }}
+          </h1>
+        </div>
+        
+        <button
+          *ngIf="!isCreateMode"
+          (click)="resetPassword()"
+          class="flex items-center gap-2 px-6 py-2.5 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 font-semibold rounded-xl hover:bg-red-200 dark:hover:bg-red-900/50 transition-all duration-200">
+          <i class="pi pi-key text-base"></i>
+          <span>Reset Password</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Scrollable Content -->
+  <div class="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-900">
+    <div class="p-4 md:p-6 lg:p-8 max-w-[1200px] w-full mx-auto">
+      <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-[0_4px_15px_rgba(0,0,0,0.08)] dark:shadow-[0_4px_15px_rgba(0,0,0,0.3)] border border-gray-200 dark:border-gray-700 p-6 md:p-8">
+        
+        <!-- User Avatar and Basic Info -->
+        <div class="flex flex-col md:flex-row gap-6 mb-8 pb-8 border-b border-gray-200 dark:border-gray-700">
+          <!-- Avatar -->
+          <div class="flex-shrink-0">
+            <div class="w-32 h-32 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center border-4 border-gray-100 dark:border-gray-600">
+              <i class="pi pi-user text-6xl text-gray-400 dark:text-gray-500"></i>
+            </div>
+          </div>
+
+          <!-- Basic Info Fields -->
+          <div class="flex-1 space-y-4">
+            <!-- Name -->
+            <div>
+              <label for="name" class="block text-sm font-semibold text-[#2c3e50] dark:text-white mb-2">
+                Name: <span class="text-red-500">*</span>
+              </label>
+              <input
+                id="name"
+                type="text"
+                [(ngModel)]="user.name"
+                [placeholder]="isCreateMode ? 'Enter full name' : 'Scott Summers'"
+                pInputText
+                class="w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-xl text-base bg-white dark:bg-gray-700 text-[#2c3e50] dark:text-white focus:border-[#a8e6cf] dark:focus:border-[#88d4ab] transition-all duration-200" />
+            </div>
+
+            <!-- Email -->
+            <div>
+              <label for="email" class="block text-sm font-semibold text-[#2c3e50] dark:text-white mb-2">
+                Email: <span class="text-red-500">*</span>
+              </label>
+              <input
+                id="email"
+                type="email"
+                [(ngModel)]="user.email"
+                [placeholder]="isCreateMode ? 'email@university.edu' : 'scottsummers123@gmail.com'"
+                pInputText
+                class="w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-xl text-base bg-white dark:bg-gray-700 text-[#2c3e50] dark:text-white focus:border-[#a8e6cf] dark:focus:border-[#88d4ab] transition-all duration-200" />
+            </div>
+
+            <!-- Phone -->
+            <div>
+              <label for="phone" class="block text-sm font-semibold text-[#2c3e50] dark:text-white mb-2">
+                Ph No:
+              </label>
+              <input
+                id="phone"
+                type="tel"
+                [(ngModel)]="user.phone"
+                [placeholder]="isCreateMode ? '+1234567890' : '+9595203443'"
+                pInputText
+                class="w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-xl text-base bg-white dark:bg-gray-700 text-[#2c3e50] dark:text-white focus:border-[#a8e6cf] dark:focus:border-[#88d4ab] transition-all duration-200" />
+            </div>
+          </div>
+        </div>
+
+        <!-- User Role Section -->
+        <div class="mb-8 pb-8 border-b border-gray-200 dark:border-gray-700">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+              <i class="pi pi-shield text-blue-600 dark:text-blue-400 text-lg"></i>
+            </div>
+            <div>
+              <h3 class="text-lg font-bold text-[#2c3e50] dark:text-white m-0">
+                User Role:
+              </h3>
+              <p class="text-sm text-gray-600 dark:text-gray-400 m-0">
+                Assign a role to this user <span class="text-red-500">*</span>
+              </p>
+            </div>
+          </div>
+
+          <!-- Role Buttons -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            <button
+              *ngFor="let role of availableRoles"
+              (click)="selectRole(role.name)"
+              [class.bg-[#a8e6cf]]="isRoleSelected(role.name)"
+              [class.dark:bg-[#2c5f5d]]="isRoleSelected(role.name)"
+              [class.text-[#2c3e50]]="isRoleSelected(role.name)"
+              [class.dark:text-white]="isRoleSelected(role.name)"
+              [class.border-[#a8e6cf]]="isRoleSelected(role.name)"
+              [class.dark:border-[#2c5f5d]]="isRoleSelected(role.name)"
+              [class.bg-white]="!isRoleSelected(role.name)"
+              [class.dark:bg-gray-700]="!isRoleSelected(role.name)"
+              [class.text-gray-700]="!isRoleSelected(role.name)"
+              [class.dark:text-gray-300]="!isRoleSelected(role.name)"
+              [class.border-gray-300]="!isRoleSelected(role.name)"
+              [class.dark:border-gray-600]="!isRoleSelected(role.name)"
+              class="px-6 py-3 border-2 rounded-xl font-semibold transition-all duration-200 hover:border-[#a8e6cf] dark:hover:border-[#88d4ab] relative">
+              {{ role.name }}
+              <i 
+                *ngIf="isRoleSelected(role.name)" 
+                class="pi pi-check absolute top-2 right-2 text-sm"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Department Assignment Section -->
+        <div class="mb-6">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
+              <i class="pi pi-building text-purple-600 dark:text-purple-400 text-lg"></i>
+            </div>
+            <div>
+              <h3 class="text-lg font-bold text-[#2c3e50] dark:text-white m-0">
+                Department:
+              </h3>
+              <p class="text-sm text-gray-600 dark:text-gray-400 m-0">
+                Assign departments to this user (select one or more) <span class="text-red-500">*</span>
+              </p>
+            </div>
+          </div>
+
+          <!-- Department Buttons -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+            <button
+              *ngFor="let dept of availableDepartments"
+              (click)="toggleDepartment(dept.name)"
+              [class.bg-[#a8e6cf]]="isDepartmentSelected(dept.name)"
+              [class.dark:bg-[#2c5f5d]]="isDepartmentSelected(dept.name)"
+              [class.text-[#2c3e50]]="isDepartmentSelected(dept.name)"
+              [class.dark:text-white]="isDepartmentSelected(dept.name)"
+              [class.border-[#a8e6cf]]="isDepartmentSelected(dept.name)"
+              [class.dark:border-[#2c5f5d]]="isDepartmentSelected(dept.name)"
+              [class.bg-white]="!isDepartmentSelected(dept.name)"
+              [class.dark:bg-gray-700]="!isDepartmentSelected(dept.name)"
+              [class.text-gray-700]="!isDepartmentSelected(dept.name)"
+              [class.dark:text-gray-300]="!isDepartmentSelected(dept.name)"
+              [class.border-gray-300]="!isDepartmentSelected(dept.name)"
+              [class.dark:border-gray-600]="!isDepartmentSelected(dept.name)"
+              class="px-6 py-3 border-2 rounded-xl font-semibold transition-all duration-200 hover:border-[#a8e6cf] dark:hover:border-[#88d4ab] relative">
+              {{ dept.name }}
+              <i 
+                *ngIf="isDepartmentSelected(dept.name)" 
+                class="pi pi-check absolute top-2 right-2 text-sm"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Save Button -->
+        <div class="flex justify-end pt-6 border-t border-gray-200 dark:border-gray-700">
+          <button
+            (click)="saveChanges()"
+            class="px-8 py-3 bg-[#a8e6cf] dark:bg-[#2c5f5d] text-[#2c3e50] dark:text-white font-bold text-lg rounded-xl hover:bg-[#88d4ab] dark:hover:bg-[#234a48] transition-all duration-200 shadow-md hover:shadow-lg hover:-translate-y-0.5">
+            {{ isCreateMode ? 'Create User' : 'Save Changes' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<p-toast position="top-right"></p-toast>
