@@ -68,22 +68,22 @@ export class AppLayoutComponent implements OnInit {
   ngOnInit(): void {
     const name = this.cookieService.get('staffName') || 'Guest';
     const role = this.cookieService.get('roleID') || 'Guest';
-      const profilePictureEncoded = this.cookieService.get('staffProfile') || '';
-      const profilePicture = profilePictureEncoded ? decodeURIComponent(profilePictureEncoded) : '';
-      this.currentUser = { name, role, profilePicture };
+    const profilePictureEncoded = this.cookieService.get('staffProfile') || '';
+    const profilePicture = profilePictureEncoded ? decodeURIComponent(profilePictureEncoded) : '';
+    this.currentUser = { name, role, profilePicture };
 
-      if (profilePicture) {
-        // if backend already returned a full URL, use it; otherwise extract the filename
-        if (profilePicture.startsWith('http') || profilePicture.startsWith('data:')) {
-          this.profilePictureUrl = profilePicture;
-        } else {
-          const parts = profilePicture.split('/').filter(Boolean);
-          const basename = parts.length ? parts[parts.length - 1] : profilePicture;
-          this.profilePictureUrl = `${environment.web_url.replace(/\/$/, '')}/uploads/staff_profiles/${basename}`;
-        }
+    if (profilePicture) {
+      // if backend already returned a full URL, use it; otherwise extract the filename
+      if (profilePicture.startsWith('http') || profilePicture.startsWith('data:')) {
+        this.profilePictureUrl = profilePicture;
       } else {
-        this.profilePictureUrl = '';
+        const parts = profilePicture.split('/').filter(Boolean);
+        const basename = parts.length ? parts[parts.length - 1] : profilePicture;
+        this.profilePictureUrl = `${environment.web_url.replace(/\/$/, '')}/uploads/staff_profiles/${basename}`;
       }
+    } else {
+      this.profilePictureUrl = '';
+    }
   }
 
   toggleSidebar(): void {
