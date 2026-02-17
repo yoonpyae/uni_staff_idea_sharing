@@ -1,7 +1,6 @@
-export interface Department {
-    id: number;
-    name: string;
-    qaCoordinator: string;
-    createdAt: Date;
-    updatedAt: Date;
+export interface DepartmentModel {
+    departmentID: number;
+    departmentName: string;
+    created_at: string;
+    updated_at: string;
 }
