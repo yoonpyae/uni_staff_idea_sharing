@@ -3,6 +3,7 @@ import { LoginComponent } from './pages/login/login.component';
 import { AppLayoutComponent } from './layout/layout.component';
 import { DashboardComponent } from './pages/dashboard/dashboard.component';
 import { DepartmentComponent } from './pages/department/department.component';
+import { UserAccountComponent } from './pages/user/user-account/user-account.component';
 
 export const routes: Routes = [
   { path: '', component: LoginComponent },
@@ -24,6 +25,11 @@ export const routes: Routes = [
         path: 'department',
         component: DepartmentComponent,
         data: { title: 'Department' },
+      },
+      {
+        path: 'staff-accounts',
+        component: UserAccountComponent,
+        data: { title: 'User Accounts' }
       },
       // {
       //   path: 'staff-accounts',
