@@ -10,8 +10,9 @@ import { ToastModule } from 'primeng/toast';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { SelectModule } from 'primeng/select';
 import { StaffModel, ViewStaffModel } from '../../../core/models/staff.model';
-import { RoleModel } from '../../../core/models/role.model';
 import { StaffService } from '../../../core/services/staff.service';
+import { DropdownModule } from 'primeng/dropdown';
+
 
 @Component({
   selector: 'app-user-account',
@@ -23,8 +24,10 @@ import { StaffService } from '../../../core/services/staff.service';
     InputTextModule,
     SelectModule,
     ConfirmDialogModule,
-    ToastModule
+    ToastModule,
+    DropdownModule
   ],
+  standalone: true,
   providers: [ConfirmationService, MessageService],
   templateUrl: './user-account.component.html',
   styleUrl: './user-account.component.scss'
@@ -35,7 +38,6 @@ export class UserAccountComponent implements OnInit {
   users: ViewStaffModel[] = [];
   selectedUser!: ViewStaffModel;
 
-  roles: RoleModel[] = [];
   searchQuery: string = '';
 
   // Pagination
@@ -66,7 +68,7 @@ export class UserAccountComponent implements OnInit {
   }
 
   openAssignment(user: ViewStaffModel): void {
-    this.router.navigate(['/user-assignment', user.staffID]);
+    this.router.navigate(['user-accounts/user-assignment', user.staffID]);
   }
 
   private loadUsers(): void {
@@ -91,12 +93,12 @@ export class UserAccountComponent implements OnInit {
     this.table.filterGlobal(value, 'contains');
   }
 
-  createUser(): void {
-    this.router.navigate(['/user-accounts/create']);
-  }
+  // createUser(): void {
+  //   this.router.navigate(['user-accounts/user-assignment', 'create']);
+  // }
 
   editUser(user: StaffModel): void {
-    this.router.navigate(['/user-accounts', user.staffID]);
+    this.router.navigate(['user-accounts/user-assignment', user.staffID], { queryParams: { mode: 'edit' } });
   }
 
   deleteUser(user: StaffModel): void {
@@ -207,5 +209,16 @@ export class UserAccountComponent implements OnInit {
 
   getDepartmentColor(dept: string): string {
     return 'text-blue-600 dark:text-blue-400';
+  }
+
+  // Add these to your component class
+  get roleOptions() {
+    const uniqueRoles = [...new Set(this.users.map(u => u.role?.roleName))].filter(Boolean);
+    return uniqueRoles.map(role => ({ label: role, value: role }));
+  }
+
+  get departmentOptions() {
+    const uniqueDepts = [...new Set(this.users.map(u => u.department?.departmentName))].filter(Boolean);
+    return uniqueDepts.map(dept => ({ label: dept, value: dept }));
   }
 }
