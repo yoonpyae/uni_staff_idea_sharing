@@ -21,7 +21,6 @@ export const routes: Routes = [
         component: DashboardComponent,
         data: { title: 'Dashboard' },
       },
-      // Add more routes here as you create more components
       {
         path: 'department',
         component: DepartmentComponent,
@@ -29,21 +28,13 @@ export const routes: Routes = [
       },
       {
         path: 'user-accounts',
-        component: UserAccountComponent,
-        data: { title: 'User Accounts' }
+        data: { title: 'User Accounts' },
+        children: [
+          { path: '', component: UserAccountComponent },
+          { path: 'user-assignment', component: UserAssignmentComponent, data: { title: 'User Assignment' } },
+          { path: 'user-assignment/:id', component: UserAssignmentComponent, data: { title: 'User Assignment' } }
+        ]
       },
-      {
-        path: 'user-assignment/:id',
-        component: UserAssignmentComponent,
-        data: { title: 'User Assignment' }
-      },
-      // {
-      //   path: 'staff-accounts',
-      //   loadComponent: () =>
-      //     import('./components/staff-accounts/staff-accounts.component').then(
-      //       (m) => m.StaffAccountsComponent
-      //     ),
-      // },
     ],
   }
 ];
