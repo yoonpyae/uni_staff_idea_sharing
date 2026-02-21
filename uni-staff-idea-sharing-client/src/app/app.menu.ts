@@ -25,29 +25,24 @@ export const NAVIGATION_MENU: Readonly<MenuItem[]> = [
         routerLink: ['/department'],
       },
       {
-        label: 'Staff Accounts',
-        icon: 'pi pi-fw pi-users',
-        routerLink: ['/staff-accounts'],
+        label: 'User Roles',
+        icon: 'pi pi-fw pi-cog',
+        routerLink: ['/user-roles'],
       },
       {
-        label: 'Submit Ideas',
-        icon: 'pi pi-fw pi-lightbulb',
-        routerLink: ['/submit-ideas'],
+        label: 'User Accounts',
+        icon: 'pi pi-fw pi-users',
+        routerLink: ['/user-accounts'],
       },
       {
         label: 'Closure Dates',
         icon: 'pi pi-fw pi-calendar',
         routerLink: ['/closure-dates'],
       },
-    ],
-  },
-  {
-    label: 'Settings',
-    items: [
       {
-        label: 'System Settings',
-        icon: 'pi pi-fw pi-cog',
-        routerLink: ['/system-settings'],
+        label: 'Submit Ideas',
+        icon: 'pi pi-fw pi-lightbulb',
+        routerLink: ['/submit-ideas'],
       },
     ],
   },
