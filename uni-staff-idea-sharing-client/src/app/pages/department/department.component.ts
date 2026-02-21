@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { DialogModule } from 'primeng/dialog';
@@ -6,6 +6,10 @@ import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { trigger, transition, style, animate, query, stagger } from '@angular/animations';
 import { DepartmentModel } from '../../core/models/department.model';
+import { DepartmentService } from '../../core/services/department.service';
+import { ConfirmationService, MessageService } from 'primeng/api';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { ToastModule } from 'primeng/toast';
 
 @Component({
   selector: 'app-department',
@@ -15,11 +19,15 @@ import { DepartmentModel } from '../../core/models/department.model';
     ReactiveFormsModule,
     DialogModule,
     ButtonModule,
-    InputTextModule
+    InputTextModule,
+    ConfirmDialogModule,
+    ToastModule,
   ],
+  standalone: true,
+  providers: [MessageService, ConfirmationService],
   templateUrl: './department.component.html',
   styleUrl: './department.component.scss',
-   animations: [
+  animations: [
     trigger('listAnimation', [
       transition('* => *', [
         query(':enter', [
@@ -38,102 +46,47 @@ export class DepartmentComponent implements OnInit {
   departments: DepartmentModel[] = [];
   filteredDepartments: DepartmentModel[] = [];
   searchQuery: string = '';
-  
+
   // Dialog
   displayDialog: boolean = false;
   dialogTitle: string = 'Add Department';
-  departmentForm!: FormGroup;
   editingDepartment: DepartmentModel | null = null;
 
-  constructor(private fb: FormBuilder) {
-    this.initializeForm();
-  }
+  constructor(
+    private departmentService: DepartmentService,
+    private messageService: MessageService,
+    private confirmationService: ConfirmationService
+  ) { }
+
+
+  private formBuilder = inject(FormBuilder);
+  public departmentForm: FormGroup = this.formBuilder.group({
+    departmentId: [0],
+    departmentName: ['', Validators.required],
+    create_at: [''],
+    updated_at: ['']
+  });
+
 
   ngOnInit(): void {
     this.loadDepartments();
   }
 
-  private initializeForm(): void {
-    this.departmentForm = this.fb.group({
-      departmentName: ['', [Validators.required, Validators.minLength(2)]],
-      qaCoordinator: ['', [Validators.required, Validators.minLength(3)]]
+  loadDepartments(): void {
+    this.departmentService.get().subscribe({
+      next: (res) => {
+        this.departments = res.data as DepartmentModel[];
+        this.filteredDepartments = [...this.departments];
+      },
+      error: (err) => {
+        console.error('Failed to load departments:', err);
+      }
     });
-  }
-
-  private loadDepartments(): void {
-    // Sample data - replace with actual API call
-    // this.departments = [
-    //   {
-    //     departmentID: 1,
-    //     departmentName: 'IT',
-    //     qaCoordinator: 'Mike Wheeler',
-    //     created_at: new Date('2026-02-13 15:41:22'),
-    //     updatedAt: new Date('2026-03-22 09:15:48')
-    //   },
-    //   {
-    //     departmentID: 2,
-    //     departmentName: 'Fine Arts',
-    //     qaCoordinator: 'Steve Harrington',
-    //     created_at: new Date('2026-02-13 15:41:22'),
-    //     updatedAt: new Date('2026-03-22 09:15:48')
-    //   },
-    //   {
-    //     departmentID: 3,
-    //     departmentName: 'Music',
-    //     qaCoordinator: 'Robin Buckley',
-    //     created_at: new Date('2026-02-13 15:41:22'),
-    //     updatedAt: new Date('2026-03-22 09:15:48')
-    //   },
-    //   {
-    //     departmentID: 4,
-    //     departmentName: 'Literature',
-    //     qaCoordinator: 'Will Byers',
-    //     created_at: new Date('2026-02-13 15:41:22'),
-    //     updatedAt: new Date('2026-03-22 09:15:48')
-    //   },
-    //   {
-    //     departmentID: 5,
-    //     departmentName: 'English',
-    //     qaCoordinator: 'Lucas Sinclair',
-    //     created_at: new Date('2026-02-13 15:41:22'),
-    //     updatedAt: new Date('2026-03-22 09:15:48')
-    //   },
-    //   {
-    //     departmentID: 6,
-    //     departmentName: 'History',
-    //     qaCoordinator: 'Max Mayfield',
-    //     created_at: new Date('2026-02-13 15:41:22'),
-    //     updatedAt: new Date('2026-03-22 09:15:48')
-    //   },
-    //   {
-    //     departmentID: 7,
-    //     departmentName: 'Science',
-    //     qaCoordinator: 'Dustin Henderson',
-    //     created_at: new Date('2026-02-13 15:41:22'),
-    //     updatedAt: new Date('2026-03-22 09:15:48')
-    //   },
-    //   {
-    //     departmentID: 8,
-    //     departmentName: 'Business',
-    //     qaCoordinator: 'Nancy Wheeler',
-    //     created_at: new Date('2026-02-13 15:41:22'),
-    //     updatedAt: new Date('2026-03-22 09:15:48')
-    //   },
-    //   {
-    //     departmentID: 9,
-    //     departmentName: 'Engineering',
-    //     qaCoordinator: 'Jonathan Byers',
-    //     created_at: new Date('2026-02-13 15:41:22'),
-    //     updatedAt: new Date('2026-03-22 09:15:48')
-    //   }
-    // ];
-    
-    this.filteredDepartments = [...this.departments];
   }
 
   onSearch(): void {
     const query = this.searchQuery.toLowerCase().trim();
-    
+
     if (!query) {
       this.filteredDepartments = [...this.departments];
       return;
@@ -176,51 +129,58 @@ export class DepartmentComponent implements OnInit {
       return;
     }
 
-    const formValue = this.departmentForm.value;
+    let model = this.departmentForm.value as DepartmentModel;
 
     if (this.editingDepartment) {
-      // Update existing department
-      const index = this.departments.findIndex(d => d.departmentID === this.editingDepartment!.departmentID);
-      if (index !== -1) {
-        this.departments[index] = {
-          ...this.departments[index],
-          departmentName: formValue.departmentName,
-          // qaCoordinator: formValue.qaCoordinator,
-          // updated_at: new Date()
-        };
-      }
+      this.departmentService.update(this.editingDepartment.departmentID, model).subscribe({
+        next: (res) => {
+          this.messageService.add({ severity: 'success', summary: 'Success', detail: res.message });
+          this.loadDepartments();
+          this.closeDialog();
+        },
+        error: (err) => {
+          console.error('Update department failed:', err);
+          this.messageService.add({ severity: 'error', summary: 'Update Failed', detail: err?.error?.message || 'Failed to update department' });
+        }
+      });
     } else {
-      // Add new department
-      const newDepartment: any = {
-        departmentID: Math.max(...this.departments.map(d => d.departmentID), 0) + 1,
-        departmentName: formValue.departmentName,
-        qaCoordinator: formValue.qaCoordinator,
-        created_at: new Date(),
-        updatedAt: new Date()
-      };
-      this.departments.push(newDepartment);
+      const payload: any = { departments: [{ departmentName: model.departmentName }] };
+      console.log('Create payload:', payload);
+      this.departmentService.create(payload).subscribe({
+        next: (res) => {
+          this.messageService.add({ severity: 'success', summary: 'Success', detail: res.message });
+          this.loadDepartments();
+          this.closeDialog();
+        },
+        error: (err) => {
+          console.error('Create department failed:', err);
+          this.messageService.add({ severity: 'error', summary: 'Create Failed', detail: err?.error?.message || 'Failed to create department' });
+        }
+      });
     }
 
-    this.filteredDepartments = [...this.departments];
-    this.closeDialog();
+    // dialog is closed after successful API responses in subscriptions
   }
 
   deleteDepartment(department: DepartmentModel): void {
-    if (confirm(`Are you sure you want to delete the ${department.departmentName} department?`)) {
-      this.departments = this.departments.filter(d => d.departmentID !== department.departmentID);
-      this.filteredDepartments = [...this.departments];
-    }
-  }
-
-  formatDate(date: Date): string {
-    return new Date(date).toLocaleString('en-US', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-      hour12: true
+    this.confirmationService.confirm({
+      message: `Are you sure you want to delete ${department.departmentName}?`,
+      header: 'Delete Confirmation',
+      icon: 'pi pi-exclamation-triangle',
+      acceptButtonStyleClass: 'p-button-danger',
+      accept: () => {
+        this.departmentService.delete(department.departmentID).subscribe({
+          next: (res) => {
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Deleted',
+              detail: `Department ${department.departmentName} has been deleted`,
+              life: 3000
+            });
+            this.loadDepartments();
+          }
+        });
+      }
     });
   }
 
