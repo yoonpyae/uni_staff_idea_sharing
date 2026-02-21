@@ -1,6 +1,6 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, inject, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, FormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Table, TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
@@ -9,11 +9,13 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { SelectModule } from 'primeng/select';
-import { StaffModel } from '../../../core/models/staff.model';
+import { StaffModel, ViewStaffModel } from '../../../core/models/staff.model';
+import { RoleModel } from '../../../core/models/role.model';
+import { StaffService } from '../../../core/services/staff.service';
 
 @Component({
   selector: 'app-user-account',
-   imports: [
+  imports: [
     CommonModule,
     FormsModule,
     TableModule,
@@ -27,12 +29,15 @@ import { StaffModel } from '../../../core/models/staff.model';
   templateUrl: './user-account.component.html',
   styleUrl: './user-account.component.scss'
 })
-export class UserAccountComponent  implements OnInit {
- @ViewChild('dt') table!: Table;
-  
-  users: StaffModel[] = [];
+export class UserAccountComponent implements OnInit {
+  @ViewChild('dt') table!: Table;
+
+  users: ViewStaffModel[] = [];
+  selectedUser!: ViewStaffModel;
+
+  roles: RoleModel[] = [];
   searchQuery: string = '';
-  
+
   // Pagination
   rows: number = 10;
   rowsPerPageOptions = [5, 10, 20, 50];
@@ -40,125 +45,41 @@ export class UserAccountComponent  implements OnInit {
   constructor(
     private router: Router,
     private confirmationService: ConfirmationService,
-    private messageService: MessageService
-  ) {}
+    private messageService: MessageService,
+    private staffService: StaffService,
+  ) { }
+
+  private formBuilder = inject(FormBuilder);
+  public staffForm: FormGroup = this.formBuilder.group({
+    staffName: ['', Validators.required],
+    staffEmail: ['', [Validators.required, Validators.email]],
+    staffPhone: [''],
+    staffDOB: [''],
+    staffAddress: [''],
+    staffProfile: [''],
+    departmentID: [0, Validators.required],
+    roleID: [0, Validators.required],
+  });
 
   ngOnInit(): void {
     this.loadUsers();
   }
 
   private loadUsers(): void {
-    // Sample data - 12 users
-    // this.users = [
-    //   {
-    //     id: 1,
-    //     name: 'William Jones',
-    //     email: 'williamjones@university.edu',
-    //     phone: '+1234567890',
-    //     role: 'Administrator',
-    //     department: 'Management',
-    //     status: 'Active'
-    //   },
-    //   {
-    //     id: 2,
-    //     name: 'Steve Rogers',
-    //     email: 'srogers@university.edu',
-    //     phone: '+1234567891',
-    //     role: 'QA Manager',
-    //     department: 'Management',
-    //     status: 'Active'
-    //   },
-    //   {
-    //     id: 3,
-    //     name: 'Tony Stark',
-    //     email: 'tstark@university.edu',
-    //     phone: '+1234567892',
-    //     role: 'QA Coordinator',
-    //     department: 'Computer Science',
-    //     status: 'Active'
-    //   },
-    //   {
-    //     id: 4,
-    //     name: 'Natasha Romanoff',
-    //     email: 'nromanoff@university.edu',
-    //     phone: '+1234567893',
-    //     role: 'QA Coordinator',
-    //     department: 'Social Studies',
-    //     status: 'Active'
-    //   },
-    //   {
-    //     id: 5,
-    //     name: 'Bruce Banner',
-    //     email: 'bbanner@university.edu',
-    //     phone: '+1234567894',
-    //     role: 'QA Coordinator',
-    //     department: 'Physics',
-    //     status: 'Active'
-    //   },
-    //   {
-    //     id: 6,
-    //     name: 'Reed Richards',
-    //     email: 'rrichards@university.edu',
-    //     phone: '+1234567895',
-    //     role: 'Staff',
-    //     department: 'IT',
-    //     status: 'Active'
-    //   },
-    //   {
-    //     id: 7,
-    //     name: 'Carol Denvers',
-    //     email: 'cdenvers@university.edu',
-    //     phone: '+1234567896',
-    //     role: 'Staff',
-    //     department: 'Fine Arts',
-    //     status: 'Active'
-    //   },
-    //   {
-    //     id: 8,
-    //     name: 'Wanda Maximoff',
-    //     email: 'wmaximoff@university.edu',
-    //     phone: '+1234567897',
-    //     role: 'Staff',
-    //     department: 'Literature',
-    //     status: 'Active'
-    //   },
-    //   {
-    //     id: 9,
-    //     name: 'Peter Parker',
-    //     email: 'pparker@university.edu',
-    //     phone: '+1234567898',
-    //     role: 'Staff',
-    //     department: 'Engineering',
-    //     status: 'Active'
-    //   },
-    //   {
-    //     id: 10,
-    //     name: 'Scott Summers',
-    //     email: 'ssummers@university.edu',
-    //     phone: '+1234567899',
-    //     role: 'Staff',
-    //     department: 'English',
-    //     status: 'Active'
-    //   },
-    //   {
-    //     id: 11,
-    //     name: 'Peggy Carter',
-    //     email: 'pcarter@university.edu',
-    //     phone: '+1234567800',
-    //     role: 'Staff',
-    //     department: 'Music',
-    //     status: 'Active'
-    //   },
-    //   {
-    //     id: 12,
-    //     name: 'Marc Spector',
-    //     email: 'mspector@university.edu',
-    //     phone: '+1234567801',
-    //     role: 'Staff',
-    //     department: 'History',
-    //     status: 'Active'
-    //   }
-    // ];
+    this.staffService.get().subscribe({
+      next: (res) => {
+        this.users = res.data as ViewStaffModel[];
+      },
+      error: (err) => {
+        console.error('Error loading users:', err);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Load Error',
+          detail: 'Failed to load user accounts',
+          life: 3000
+        });
+      }
+    });
   }
 
   onGlobalFilter(event: Event) {
@@ -182,7 +103,7 @@ export class UserAccountComponent  implements OnInit {
       acceptButtonStyleClass: 'p-button-danger',
       accept: () => {
         this.users = this.users.filter(u => u.staffID !== user.staffID);
-        
+
         this.messageService.add({
           severity: 'success',
           summary: 'Deleted',
@@ -219,7 +140,7 @@ export class UserAccountComponent  implements OnInit {
   //   import('jspdf').then((jsPDF) => {
   //     import('jspdf-autotable').then(() => {
   //       const doc = new jsPDF.default();
-        
+
   //       const exportColumns = [
   //         { title: 'Name', dataKey: 'name' },
   //         { title: 'Email', dataKey: 'email' },
@@ -237,7 +158,7 @@ export class UserAccountComponent  implements OnInit {
   //       });
 
   //       doc.save('users.pdf');
-        
+
   //       this.messageService.add({
   //         severity: 'success',
   //         summary: 'Export Success',
@@ -260,7 +181,7 @@ export class UserAccountComponent  implements OnInit {
         data,
         fileName + '_export_' + new Date().getTime() + EXCEL_EXTENSION
       );
-      
+
       this.messageService.add({
         severity: 'success',
         summary: 'Export Success',
