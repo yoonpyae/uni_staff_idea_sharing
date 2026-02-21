@@ -108,13 +108,15 @@ export class UserAccountComponent implements OnInit {
       icon: 'pi pi-exclamation-triangle',
       acceptButtonStyleClass: 'p-button-danger',
       accept: () => {
-        this.users = this.users.filter(u => u.staffID !== user.staffID);
-
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Deleted',
-          detail: `User ${user.staffName} has been deleted`,
-          life: 3000
+        this.staffService.delete(user.staffID).subscribe({
+          next: (res) => {
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Deleted',
+              detail: `User ${user.staffName} has been deleted`,
+              life: 3000
+            });
+          }
         });
       }
     });
