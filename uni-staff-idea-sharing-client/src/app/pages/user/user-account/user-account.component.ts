@@ -65,6 +65,10 @@ export class UserAccountComponent implements OnInit {
     this.loadUsers();
   }
 
+  openAssignment(user: ViewStaffModel): void {
+    this.router.navigate(['/user-assignment', user.staffID]);
+  }
+
   private loadUsers(): void {
     this.staffService.get().subscribe({
       next: (res) => {
