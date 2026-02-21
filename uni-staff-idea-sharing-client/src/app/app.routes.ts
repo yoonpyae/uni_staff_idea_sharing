@@ -27,7 +27,7 @@ export const routes: Routes = [
         data: { title: 'Department' },
       },
       {
-        path: 'staff-accounts',
+        path: 'user-accounts',
         component: UserAccountComponent,
         data: { title: 'User Accounts' }
       },
