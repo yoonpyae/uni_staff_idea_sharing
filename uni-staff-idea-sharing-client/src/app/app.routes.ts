@@ -4,6 +4,7 @@ import { AppLayoutComponent } from './layout/layout.component';
 import { DashboardComponent } from './pages/dashboard/dashboard.component';
 import { DepartmentComponent } from './pages/department/department.component';
 import { UserAccountComponent } from './pages/user/user-account/user-account.component';
+import { UserAssignmentComponent } from './pages/user/user-assignment/user-assignment.component';
 
 export const routes: Routes = [
   { path: '', component: LoginComponent },
@@ -30,6 +31,11 @@ export const routes: Routes = [
         path: 'user-accounts',
         component: UserAccountComponent,
         data: { title: 'User Accounts' }
+      },
+      {
+        path: 'user-assignment/:id',
+        component: UserAssignmentComponent,
+        data: { title: 'User Assignment' }
       },
       // {
       //   path: 'staff-accounts',
