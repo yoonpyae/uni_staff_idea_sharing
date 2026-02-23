@@ -36,7 +36,7 @@
           <div class="flex-shrink-0">
             <div
               class="w-32 h-32 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center border-4 border-gray-100 dark:border-gray-600">
-              <img *ngIf="user.staffProfile; else defaultUserIcon" [src]="user.staffProfile" alt="Profile Photo"
+             <img *ngIf="user.staffProfile; else defaultUserIcon" [src]="getProfileUrl(user.staffProfile)" alt="Profile Photo"
                 class="w-full h-full object-cover" />
               <ng-template #defaultUserIcon>
                 <i class="pi pi-user text-gray-600 dark:text-gray-300"></i>
