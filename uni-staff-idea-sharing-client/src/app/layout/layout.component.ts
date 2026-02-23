@@ -67,7 +67,7 @@ export class AppLayoutComponent implements OnInit {
 
   ngOnInit(): void {
     const name = this.cookieService.get('staffName') || 'Guest';
-    const role = this.cookieService.get('roleID') || 'Guest';
+    const role = this.cookieService.get('roleName') || 'Guest';
     const profilePictureEncoded = this.cookieService.get('staffProfile') || '';
     const profilePicture = profilePictureEncoded ? decodeURIComponent(profilePictureEncoded) : '';
     this.currentUser = { name, role, profilePicture };
