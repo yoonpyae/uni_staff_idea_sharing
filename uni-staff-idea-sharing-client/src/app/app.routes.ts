@@ -5,6 +5,7 @@ import { DashboardComponent } from './pages/dashboard/dashboard.component';
 import { DepartmentComponent } from './pages/department/department.component';
 import { UserAccountComponent } from './pages/user/user-account/user-account.component';
 import { UserAssignmentComponent } from './pages/user/user-assignment/user-assignment.component';
+import { RoleComponent } from './pages/role/role.component';
 
 export const routes: Routes = [
   { path: '', component: LoginComponent },
@@ -25,6 +26,11 @@ export const routes: Routes = [
         path: 'department',
         component: DepartmentComponent,
         data: { title: 'Department' },
+      },
+      {
+        path: 'role',
+        component: RoleComponent,
+        data: { title: 'Role' },
       },
       {
         path: 'user-accounts',
