@@ -52,12 +52,12 @@ export class AuthService {
     if (staff) {
       const id = staff.staffID || staff.id;
       const name = staff.staffName || staff.name;
-      const role = staff.roleID || staff.role;
+      const role = staff.role.roleName || staff.role;
       const profilePicture = staff.staffProfile;
 
       if (id) this.cookieService.set('staffID', String(id));
       if (name) this.cookieService.set('staffName', String(name));
-      if (role) this.cookieService.set('roleID', String(role));
+      if (role) this.cookieService.set('roleName', String(role));
       if (profilePicture) this.cookieService.set('staffProfile', String(profilePicture));
     }
 
@@ -97,7 +97,7 @@ export class AuthService {
     this.cookieService.delete('authorized_status');
     this.cookieService.delete('staffID');
     this.cookieService.delete('staffName');
-    this.cookieService.delete('roleID');
+    this.cookieService.delete('roleName');
     this.cookieService.delete('staffProfile');
 
     localStorage.removeItem(this.tokenKey);
