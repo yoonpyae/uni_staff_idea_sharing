@@ -27,7 +27,7 @@ export const NAVIGATION_MENU: Readonly<MenuItem[]> = [
       {
         label: 'User Roles',
         icon: 'pi pi-fw pi-cog',
-        routerLink: ['/user-roles'],
+        routerLink: ['/role'],
       },
       {
         label: 'User Accounts',
