@@ -12,6 +12,7 @@ import { SelectModule } from 'primeng/select';
 import { StaffModel, ViewStaffModel } from '../../../core/models/staff.model';
 import { StaffService } from '../../../core/services/staff.service';
 import { DropdownModule } from 'primeng/dropdown';
+import { environment } from '../../../../environments/environment';
 
 
 @Component({
@@ -197,6 +198,15 @@ export class UserAccountComponent implements OnInit {
         life: 3000
       });
     });
+  }
+
+  getProfileUrl(profilePath: string | null | undefined): string {
+    if (!profilePath) return '';
+    if (/^(https?:)?\/\//.test(profilePath)) return profilePath;
+    const trimmed = profilePath.replace(/^\/+/, '');
+    let base = (environment.main_url ?? '').replace(/\/+$/, '');
+    base = base.replace(/\/api$/, ''); // strip accidental "/api"
+    return base ? `${base}/${trimmed}` : `/${trimmed}`;
   }
 
   getRoleColor(role: string): string {
