@@ -35,6 +35,7 @@ export interface Role {
     roleName: string;
     created_at: string;
     updated_at: string;
+    permissions: any[];
 }
 
 export interface Department {
