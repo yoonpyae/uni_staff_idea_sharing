@@ -41,8 +41,6 @@ import { ToastModule } from 'primeng/toast';
   ]
 })
 export class DepartmentComponent implements OnInit {
-
-  //Please Updaet Your Department Model
   departments: DepartmentModel[] = [];
   filteredDepartments: DepartmentModel[] = [];
   searchQuery: string = '';
