@@ -12,6 +12,7 @@ import { RoleService } from '../../../core/services/role.service';
 import { DepartmentService } from '../../../core/services/department.service';
 import { RoleModel } from '../../../core/models/role.model';
 import { DepartmentModel } from '../../../core/models/department.model';
+import { environment } from '../../../../environments/environment';
 
 
 @Component({
@@ -187,6 +188,15 @@ export class UserAssignmentComponent implements OnInit {
                 }
             });
         }
+    }
+
+    getProfileUrl(profilePath: string | null | undefined): string {
+        if (!profilePath) return '';
+        if (/^(https?:)?\/\//.test(profilePath)) return profilePath;
+        const trimmed = profilePath.replace(/^\/+/, '');
+        let base = (environment.main_url ?? '').replace(/\/+$/, '');
+        base = base.replace(/\/api$/, ''); // ensure we don't keep a trailing /api
+        return base ? `${base}/${trimmed}` : `/${trimmed}`;
     }
 
     resetPassword(): void {
