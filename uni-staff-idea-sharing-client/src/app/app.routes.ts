@@ -7,6 +7,8 @@ import { UserAccountComponent } from './pages/user/user-account/user-account.com
 import { UserAssignmentComponent } from './pages/user/user-assignment/user-assignment.component';
 import { RoleComponent } from './pages/role/role.component';
 import { PermissionComponent } from './pages/role/permission/permission.component';
+import { ClosureSettingComponent } from './pages/closure-setting/closure-setting.component';
+import { AccountDetailsComponent } from './pages/account-details/account-details.component';
 
 export const routes: Routes = [
   { path: '', component: LoginComponent },
@@ -22,6 +24,11 @@ export const routes: Routes = [
         path: 'dashboard',
         component: DashboardComponent,
         data: { title: 'Dashboard' },
+      },
+      {
+        path: 'account-details',
+        component: AccountDetailsComponent,
+        data: { title: 'Account Details' },
       },
       {
         path: 'department',
@@ -46,6 +53,11 @@ export const routes: Routes = [
           { path: 'user-assignment/:id', component: UserAssignmentComponent, data: { title: 'User Assignment' } }
         ]
       },
+      {
+        path: 'closure-settings',
+        component: ClosureSettingComponent,
+        data: { title: 'Closure Settings' }
+      }
     ],
   }
 ];
