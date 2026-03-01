@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { roleGuard } from './core/guards/role.guard';
 import { LoginComponent } from './pages/login/login.component';
 import { AppLayoutComponent } from './layout/layout.component';
 import { DashboardComponent } from './pages/dashboard/dashboard.component';
@@ -33,11 +34,13 @@ export const routes: Routes = [
       {
         path: 'department',
         component: DepartmentComponent,
-        data: { title: 'Department' },
+        canActivate: [roleGuard],
+        data: { title: 'Department', roles: ['Administrator'] }
       },
       {
         path: 'role',
-        data: { title: 'Role' },
+        canActivate: [roleGuard],
+        data: { title: 'Role', roles: ['Administrator'] },
         children: [
           { path: '', component: RoleComponent },
           { path: 'permissions', component: PermissionComponent, data: { title: 'Role Permissions' } },
@@ -46,7 +49,8 @@ export const routes: Routes = [
       },
       {
         path: 'user-accounts',
-        data: { title: 'User Accounts' },
+        canActivate: [roleGuard],
+        data: { title: 'User Accounts', roles: ['Administrator'] },
         children: [
           { path: '', component: UserAccountComponent },
           { path: 'user-assignment', component: UserAssignmentComponent, data: { title: 'User Assignment' } },
@@ -56,7 +60,7 @@ export const routes: Routes = [
       {
         path: 'closure-settings',
         component: ClosureSettingComponent,
-        data: { title: 'Closure Settings' }
+        data: { title: 'Closure Settings', roles: ['Administrator'] }
       }
     ],
   }
