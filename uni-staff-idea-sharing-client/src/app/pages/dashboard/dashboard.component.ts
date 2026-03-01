@@ -1,7 +1,8 @@
 import { AfterViewInit, Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { trigger, transition, style, animate, query, stagger } from '@angular/animations';
-import { Chart, ChartConfiguration, registerables } from 'chart.js';
+import { Chart, registerables } from 'chart.js';
+import { CookieService } from 'ngx-cookie-service';
 
 Chart.register(...registerables);
 
@@ -26,47 +27,62 @@ Chart.register(...registerables);
 export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   currentYear = new Date().getFullYear();
   selectedYear = this.currentYear;
-  searchQuery = '';
+  
+  // Role & View Management
+  userRole: string = '';
+  userDepartment: string = '';
+  isGlobalView: boolean = true;
 
   // Charts
   barChart: Chart | null = null;
   donutChart: Chart | null = null;
   horizontalBarChart: Chart | null = null;
 
-  stats = [
-    { label: 'Total Ideas', value: 250, icon: 'pi-lightbulb' },
-    { label: 'Total Contributors', value: 150, icon: 'pi-users' },
-    { label: 'Anonymous Ideas', value: 66, icon: 'pi-eye-slash' },
-    { label: 'Ideas without Cmts', value: 25, icon: 'pi-comment' },
-  ];
+  stats: any[] = [];
+  years = [this.currentYear, this.currentYear - 1, this.currentYear - 2];
+  chartColors = ['#8B5CF6', '#EF4444', '#06B6D4', '#F59E0B', '#F97316', '#22C55E', '#3B82F6', '#EC4899', '#14B8A6', '#FACC15'];
 
-  years = [
-    this.currentYear,
-    this.currentYear - 1,
-    this.currentYear - 2,
-  ];
-
-  // Department data
-  departments = [
-    'Dep 1', 'Dep 2', 'Dep 3', 'Dep 4', 'Dep 5',
-    'Dep 6', 'Dep 7', 'Dep 8', 'Dep 9', 'Dep 10'
-  ];
-
+  // --- MOCK DATA: GLOBAL VIEW (Admin / QA Manager) ---
+  departments = ['Dep 1', 'Dep 2', 'Dep 3', 'Dep 4', 'Dep 5', 'Dep 6', 'Dep 7', 'Dep 8', 'Dep 9', 'Dep 10'];
   ideasPerDepartment = [55, 25, 32, 12, 28, 45, 92, 27, 75, 18];
   contributorsPerDepartment = [38, 42, 26, 12, 48, 35, 24, 12, 36, 44];
 
-  // Chart colors
-  chartColors = [
-    '#8B5CF6', '#EF4444', '#06B6D4', '#F59E0B', '#F97316',
-    '#22C55E', '#3B82F6', '#EC4899', '#14B8A6', '#FACC15'
-  ];
+  // --- MOCK DATA: DEPARTMENT VIEW (QA Coordinator) ---
+  months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  ideasPerMonth = [3, 2, 2, 3, 2, 4, 1, 0, 3, 2, 0, 5];
+  contributorsPerMonth = [3, 1, 2, 2, 1, 2, 1, 0, 2, 1, 0, 3];
+  categories = ['Infrastructure', 'Staff Welfare', 'Digital Transform', 'Student Exp', 'Workload', 'Internal Comm', 'Health & Safety', 'Data Protection'];
+  ideasByCategory = [3, 19, 9, 11, 16, 23, 13, 6];
+
+  constructor(private cookieService: CookieService) {}
 
   ngOnInit(): void {
-    // Component initialization
+    // Get user context
+    this.userRole = this.cookieService.get('roleName') || 'Guest';
+    this.userDepartment = this.cookieService.get('departmentName') || 'Social Studies Department';
+    
+    // Determine if user sees global stats or department stats
+    this.isGlobalView = ['Administrator', 'QA Manager'].includes(this.userRole);
+
+    // Set stats cards based on role
+    if (this.isGlobalView) {
+      this.stats = [
+        { label: 'Total Ideas', value: 250 },
+        { label: 'Total Contributors', value: 150 },
+        { label: 'Anonymous Ideas', value: 66 },
+        { label: 'Ideas without Cmts', value: 25 },
+      ];
+    } else {
+      this.stats = [
+        { label: 'Total Ideas', value: 27 },
+        { label: 'Total Contributors', value: 18 },
+        { label: 'Anonymous Ideas', value: 4 },
+        { label: 'Ideas without Cmts', value: 6 },
+      ];
+    }
   }
 
   ngAfterViewInit(): void {
-    // Initialize charts after view is ready
     setTimeout(() => {
       this.initBarChart();
       this.initDonutChart();
@@ -75,7 +91,6 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    // Cleanup charts
     this.barChart?.destroy();
     this.donutChart?.destroy();
     this.horizontalBarChart?.destroy();
@@ -83,105 +98,48 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
 
   onYearChange(event: any): void {
     this.selectedYear = parseInt(event.target.value);
-    console.log('Year changed to:', this.selectedYear);
-    // Optionally reload chart data here
   }
 
-  onExport(): void {
-    console.log('Export clicked');
-  }
+  onExport(): void {}
 
   private initBarChart(): void {
     const canvas = document.getElementById('barChart') as HTMLCanvasElement;
     if (!canvas) return;
-
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
     const isDark = document.documentElement.classList.contains('app-dark');
+    
+    // Dynamic Data Assignment
+    const chartLabels = this.isGlobalView ? this.departments : this.months;
+    const chartData = this.isGlobalView ? this.ideasPerDepartment : this.ideasPerMonth;
+    const chartTitle = this.isGlobalView ? 'Number of Ideas per Department' : 'Number of Ideas per Month';
 
     this.barChart = new Chart(ctx, {
       type: 'bar',
       data: {
-        labels: this.departments,
+        labels: chartLabels,
         datasets: [{
           label: 'Number of Ideas',
-          data: this.ideasPerDepartment,
-          backgroundColor: 'rgba(136, 212, 171, 0.8)',
-          borderColor: 'rgba(136, 212, 171, 1)',
+          data: chartData,
+          backgroundColor: this.isGlobalView ? 'rgba(136, 212, 171, 0.8)' : 'rgba(59, 130, 246, 0.8)',
+          borderColor: this.isGlobalView ? 'rgba(136, 212, 171, 1)' : 'rgba(59, 130, 246, 1)',
           borderWidth: 2,
           borderRadius: 8,
-          barThickness: 40,
+          barThickness: this.isGlobalView ? 40 : 25,
         }]
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        animation: {
-          duration: 1500,
-          easing: 'easeInOutQuart',
-          delay: (context) => {
-            let delay = 0;
-            if (context.type === 'data' && context.mode === 'default') {
-              delay = context.dataIndex * 100;
-            }
-            return delay;
-          }
-        },
         plugins: {
-          legend: {
-            display: false
-          },
+          legend: { display: false },
           title: {
             display: true,
-            text: 'Number of Ideas per Department',
+            text: chartTitle,
             color: isDark ? '#fff' : '#2c3e50',
-            font: {
-              size: 16,
-              weight: 'bold'
-            },
-            padding: {
-              bottom: 20
-            }
-          },
-          tooltip: {
-            backgroundColor: isDark ? 'rgba(0, 0, 0, 0.9)' : 'rgba(255, 255, 255, 0.9)',
-            titleColor: isDark ? '#fff' : '#2c3e50',
-            bodyColor: isDark ? '#fff' : '#2c3e50',
-            borderColor: isDark ? 'rgba(136, 212, 171, 0.5)' : 'rgba(168, 230, 207, 0.5)',
-            borderWidth: 1,
-            padding: 12,
-            displayColors: true,
-            callbacks: {
-              label: (context) => `Ideas: ${context.parsed.y}`
-            }
-          }
-        },
-        scales: {
-          y: {
-            beginAtZero: true,
-            max: 100,
-            ticks: {
-              stepSize: 25,
-              color: isDark ? '#9ca3af' : '#6b7280',
-              font: {
-                size: 12
-              }
-            },
-            grid: {
-              color: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
-            }
-          },
-          x: {
-            ticks: {
-              color: isDark ? '#9ca3af' : '#6b7280',
-              font: {
-                size: 12
-              }
-            },
-            grid: {
-              display: false,
-            }
+            font: { size: 16, weight: 'bold' },
+            padding: { bottom: 20 }
           }
         }
       }
@@ -191,90 +149,38 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   private initDonutChart(): void {
     const canvas = document.getElementById('donutChart') as HTMLCanvasElement;
     if (!canvas) return;
-
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
     const isDark = document.documentElement.classList.contains('app-dark');
 
+    // Dynamic Data Assignment
+    const chartLabels = this.isGlobalView ? this.departments : this.categories;
+    const chartData = this.isGlobalView ? this.ideasPerDepartment : this.ideasByCategory;
+    const chartTitle = this.isGlobalView ? 'Percentage of Ideas per Department' : 'Percentage of Ideas by Category';
+
     this.donutChart = new Chart(ctx, {
       type: 'doughnut',
       data: {
-        labels: this.departments,
+        labels: chartLabels,
         datasets: [{
-          data: this.ideasPerDepartment,
+          data: chartData,
           backgroundColor: this.chartColors,
           borderColor: isDark ? '#1f2937' : '#ffffff',
           borderWidth: 3,
-          hoverOffset: 15
         }]
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        animation: {
-          animateRotate: true,
-          animateScale: true,
-          duration: 2000,
-          easing: 'easeInOutQuart'
-        },
         plugins: {
-          legend: {
-            display: true,
-            position: 'right',
-            labels: {
-              color: isDark ? '#fff' : '#2c3e50',
-              padding: 15,
-              font: {
-                size: 12
-              },
-              generateLabels: (chart) => {
-                const data = chart.data;
-                if (data.labels && data.datasets.length) {
-                  return data.labels.map((label, i) => {
-                    const value = data.datasets[0].data[i] as number;
-                    const total = (data.datasets[0].data as number[]).reduce((a, b) => a + b, 0);
-                    const percentage = ((value / total) * 100).toFixed(0);
-                    return {
-                      text: `${label}: ${percentage}%`,
-                      fillStyle: (data.datasets[0].backgroundColor as string[])[i],
-                      hidden: false,
-                      index: i
-                    };
-                  });
-                }
-                return [];
-              }
-            }
-          },
+          legend: { display: true, position: 'right' },
           title: {
             display: true,
-            text: 'Percentage of Ideas per Department',
+            text: chartTitle,
             color: isDark ? '#fff' : '#2c3e50',
-            font: {
-              size: 16,
-              weight: 'bold'
-            },
-            padding: {
-              bottom: 20
-            }
-          },
-          tooltip: {
-            backgroundColor: isDark ? 'rgba(0, 0, 0, 0.9)' : 'rgba(255, 255, 255, 0.9)',
-            titleColor: isDark ? '#fff' : '#2c3e50',
-            bodyColor: isDark ? '#fff' : '#2c3e50',
-            borderColor: isDark ? 'rgba(136, 212, 171, 0.5)' : 'rgba(168, 230, 207, 0.5)',
-            borderWidth: 1,
-            padding: 12,
-            callbacks: {
-              label: (context) => {
-                const label = context.label || '';
-                const value = context.parsed;
-                const total = (context.dataset.data as number[]).reduce((a, b) => a + b, 0);
-                const percentage = ((value / total) * 100).toFixed(1);
-                return `${label}: ${value} ideas (${percentage}%)`;
-              }
-            }
+            font: { size: 16, weight: 'bold' },
+            padding: { bottom: 20 }
           }
         }
       }
@@ -284,21 +190,25 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   private initHorizontalBarChart(): void {
     const canvas = document.getElementById('horizontalBarChart') as HTMLCanvasElement;
     if (!canvas) return;
-
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
     const isDark = document.documentElement.classList.contains('app-dark');
 
+    // Dynamic Data Assignment
+    const chartLabels = this.isGlobalView ? this.departments : this.months;
+    const chartData = this.isGlobalView ? this.contributorsPerDepartment : this.contributorsPerMonth;
+    const chartTitle = this.isGlobalView ? 'Number of Contributors per Department' : 'Number of Contributors per Month';
+
     this.horizontalBarChart = new Chart(ctx, {
       type: 'bar',
       data: {
-        labels: this.departments,
+        labels: chartLabels,
         datasets: [{
           label: 'Number of Contributors',
-          data: this.contributorsPerDepartment,
-          backgroundColor: 'rgba(239, 138, 138, 0.8)',
-          borderColor: 'rgba(239, 138, 138, 1)',
+          data: chartData,
+          backgroundColor: this.isGlobalView ? 'rgba(239, 138, 138, 0.8)' : 'rgba(234, 179, 8, 0.8)',
+          borderColor: this.isGlobalView ? 'rgba(239, 138, 138, 1)' : 'rgba(234, 179, 8, 1)',
           borderWidth: 2,
           borderRadius: 8,
           barThickness: 25,
@@ -308,71 +218,14 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
         indexAxis: 'y',
         responsive: true,
         maintainAspectRatio: false,
-        animation: {
-          duration: 1500,
-          easing: 'easeInOutQuart',
-          delay: (context) => {
-            let delay = 0;
-            if (context.type === 'data' && context.mode === 'default') {
-              delay = context.dataIndex * 80;
-            }
-            return delay;
-          }
-        },
         plugins: {
-          legend: {
-            display: false
-          },
+          legend: { display: false },
           title: {
             display: true,
-            text: 'Number of Contributors per Department',
+            text: chartTitle,
             color: isDark ? '#fff' : '#2c3e50',
-            font: {
-              size: 16,
-              weight: 'bold'
-            },
-            padding: {
-              bottom: 20
-            }
-          },
-          tooltip: {
-            backgroundColor: isDark ? 'rgba(0, 0, 0, 0.9)' : 'rgba(255, 255, 255, 0.9)',
-            titleColor: isDark ? '#fff' : '#2c3e50',
-            bodyColor: isDark ? '#fff' : '#2c3e50',
-            borderColor: isDark ? 'rgba(239, 138, 138, 0.5)' : 'rgba(255, 182, 193, 0.5)',
-            borderWidth: 1,
-            padding: 12,
-            displayColors: true,
-            callbacks: {
-              label: (context) => `Contributors: ${context.parsed.x}`
-            }
-          }
-        },
-        scales: {
-          x: {
-            beginAtZero: true,
-            max: 60,
-            ticks: {
-              stepSize: 10,
-              color: isDark ? '#9ca3af' : '#6b7280',
-              font: {
-                size: 12
-              }
-            },
-            grid: {
-              color: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
-            }
-          },
-          y: {
-            ticks: {
-              color: isDark ? '#9ca3af' : '#6b7280',
-              font: {
-                size: 12
-              }
-            },
-            grid: {
-              display: false,
-            }
+            font: { size: 16, weight: 'bold' },
+            padding: { bottom: 20 }
           }
         }
       }
