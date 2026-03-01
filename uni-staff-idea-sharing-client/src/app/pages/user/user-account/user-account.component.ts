@@ -11,6 +11,8 @@ import { ConfirmationService, MessageService } from 'primeng/api';
 import { SelectModule } from 'primeng/select';
 import { StaffModel, ViewStaffModel } from '../../../core/models/staff.model';
 import { StaffService } from '../../../core/services/staff.service';
+import { RoleService } from '../../../core/services/role.service';
+import { DepartmentService } from '../../../core/services/department.service';
 import { DropdownModule } from 'primeng/dropdown';
 import { environment } from '../../../../environments/environment';
 
@@ -45,11 +47,17 @@ export class UserAccountComponent implements OnInit {
   rows: number = 10;
   rowsPerPageOptions = [5, 10, 20, 50];
 
+  // filter dropdown options fetched from server
+  roleFilterOptions: Array<{ label: string; value: string }> = [];
+  departmentFilterOptions: Array<{ label: string; value: string }> = [];
+
   constructor(
     private router: Router,
     private confirmationService: ConfirmationService,
     private messageService: MessageService,
     private staffService: StaffService,
+    private roleService: RoleService,
+    private departmentService: DepartmentService,
   ) { }
 
   private formBuilder = inject(FormBuilder);
@@ -66,6 +74,7 @@ export class UserAccountComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadUsers();
+    this.loadFilterLists();
   }
 
   openAssignment(user: ViewStaffModel): void {
@@ -94,9 +103,9 @@ export class UserAccountComponent implements OnInit {
     this.table.filterGlobal(value, 'contains');
   }
 
-  // createUser(): void {
-  //   this.router.navigate(['user-accounts/user-assignment', 'create']);
-  // }
+  createUser(): void {
+    this.router.navigate(['user-accounts/user-assignment', 'create']);
+  }
 
   editUser(user: StaffModel): void {
     this.router.navigate(['user-accounts/user-assignment', user.staffID], { queryParams: { mode: 'edit' } });
@@ -224,13 +233,37 @@ export class UserAccountComponent implements OnInit {
   }
 
   // Add these to your component class
+  /**
+   * Previously computed from users list – replaced by server-loaded values.
+   * Keep getters in case something else still uses them, but they now fall back
+   * to the server options so behavior is consistent.
+   */
   get roleOptions() {
-    const uniqueRoles = [...new Set(this.users.map(u => u.role?.roleName))].filter(Boolean);
-    return uniqueRoles.map(role => ({ label: role, value: role }));
+    return this.roleFilterOptions;
   }
 
   get departmentOptions() {
-    const uniqueDepts = [...new Set(this.users.map(u => u.department?.departmentName))].filter(Boolean);
-    return uniqueDepts.map(dept => ({ label: dept, value: dept }));
+    return this.departmentFilterOptions;
+  }
+
+  private loadFilterLists(): void {
+    this.roleService.get().subscribe({
+      next: (res) => {
+        const data = res.data as any[];
+        if (Array.isArray(data)) {
+          this.roleFilterOptions = data.map(r => ({ label: r.roleName, value: r.roleName }));
+        }
+      },
+      error: () => { }
+    });
+    this.departmentService.get().subscribe({
+      next: (res) => {
+        const data = res.data as any[];
+        if (Array.isArray(data)) {
+          this.departmentFilterOptions = data.map(d => ({ label: d.departmentName, value: d.departmentName }));
+        }
+      },
+      error: () => { }
+    });
   }
 }
