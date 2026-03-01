@@ -185,7 +185,7 @@ export class RoleComponent implements OnInit {
   }
 
   goToPermissions(role: any): void {
-    this.router.navigate(['/permissions', role.roleID]);
+    this.router.navigate(['/role/permissions', role.roleID]);
   }
 
   getFieldError(fieldRoleName: string): string {
