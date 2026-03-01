@@ -35,9 +35,9 @@ export const NAVIGATION_MENU: Readonly<MenuItem[]> = [
         routerLink: ['/user-accounts'],
       },
       {
-        label: 'Closure Dates',
+        label: 'Closure Settings',
         icon: 'pi pi-fw pi-calendar',
-        routerLink: ['/closure-dates'],
+        routerLink: ['/closure-settings'],
       },
       {
         label: 'Submit Ideas',
