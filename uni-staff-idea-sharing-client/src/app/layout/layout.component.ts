@@ -56,7 +56,7 @@ export class AppLayoutComponent implements OnInit {
   };
   profilePictureUrl: string = '';
   isSidebarCollapsed = false;
-
+  isMobileMenuOpen = false;
   constructor(
     private router: Router,
     public themeService: ThemeService,
@@ -88,6 +88,18 @@ export class AppLayoutComponent implements OnInit {
 
   toggleSidebar(): void {
     this.isSidebarCollapsed = !this.isSidebarCollapsed;
+  }
+
+  toggleMobileMenu(): void {
+    this.isMobileMenuOpen = !this.isMobileMenuOpen;
+    // Ensure mini-sidebar mode is disabled when opening on mobile
+    if (this.isMobileMenuOpen) {
+      this.isSidebarCollapsed = false;
+    }
+  }
+
+  closeMobileMenu(): void {
+    this.isMobileMenuOpen = false;
   }
 
   toggleTheme(): void {
