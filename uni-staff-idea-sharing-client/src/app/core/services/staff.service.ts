@@ -20,11 +20,11 @@ export class StaffService {
     return this.httpClient.get<RootModel>(`${environment.main_url}/staffs/${id}`);
   }
 
-  create(model: StaffModel): Observable<RootModel> {
+  create(model: any): Observable<RootModel> {
     return this.httpClient.post<RootModel>(`${environment.main_url}/staffs`, model);
   }
 
-  update(id: number, model: StaffModel): Observable<RootModel> {
+  update(id: number, model: any): Observable<RootModel> {
     return this.httpClient.post<RootModel>(`${environment.main_url}/staffs/${id}`, model);
   }
 
