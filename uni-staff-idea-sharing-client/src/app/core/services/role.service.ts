@@ -28,6 +28,10 @@ export class RoleService {
     return this.httpClient.post<RootModel>(`${environment.main_url}/roles/${id}`, model);
   }
 
+  assignPermissions(roleId: number, payload: any): Observable<any> {
+    return this.httpClient.post(`${environment.main_url}/roles/${roleId}/permissions`, payload);
+  }
+
   delete(id: number): Observable<RootModel> {
     return this.httpClient.delete<RootModel>(`${environment.main_url}/roles/${id}`);
   }
