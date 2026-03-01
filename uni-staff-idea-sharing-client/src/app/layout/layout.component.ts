@@ -84,6 +84,23 @@ export class AppLayoutComponent implements OnInit {
     } else {
       this.profilePictureUrl = '';
     }
+    this.filterMenuByRole(role);
+  }
+
+  filterMenuByRole(userRole: string): void {
+    // Create a deep copy of the menu to avoid mutating the original constant
+    const fullMenu = JSON.parse(JSON.stringify(NAVIGATION_MENU));
+
+    this.menuItems = fullMenu.map((section: any) => {
+      // Filter out items where the user's role is not in the allowed roles array
+      section.items = section.items.filter((item: any) => {
+        if (!item.roles || item.roles.length === 0) {
+          return true; // No roles restricted, everyone sees it
+        }
+        return item.roles.includes(userRole);
+      });
+      return section;
+    });
   }
 
   toggleSidebar(): void {
