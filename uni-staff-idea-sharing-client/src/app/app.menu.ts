@@ -3,6 +3,7 @@ export interface MenuItem {
   icon?: string;
   routerLink?: string[];
   items?: MenuItem[];
+  roles?: string[];
 }
 
 export const NAVIGATION_MENU: Readonly<MenuItem[]> = [
@@ -23,16 +24,19 @@ export const NAVIGATION_MENU: Readonly<MenuItem[]> = [
         label: 'Departments',
         icon: 'pi pi-fw pi-building',
         routerLink: ['/department'],
+        roles: ['Administrator']
       },
       {
         label: 'User Roles',
         icon: 'pi pi-fw pi-cog',
         routerLink: ['/role'],
+        roles: ['Administrator']
       },
       {
         label: 'User Accounts',
         icon: 'pi pi-fw pi-users',
         routerLink: ['/user-accounts'],
+        roles: ['Administrator']
       },
       {
         label: 'Closure Settings',
@@ -43,6 +47,7 @@ export const NAVIGATION_MENU: Readonly<MenuItem[]> = [
         label: 'Submit Ideas',
         icon: 'pi pi-fw pi-lightbulb',
         routerLink: ['/submit-ideas'],
+        roles: ['Administrator']
       },
     ],
   },
