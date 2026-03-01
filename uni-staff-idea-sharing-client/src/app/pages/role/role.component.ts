@@ -11,6 +11,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { ToastModule } from 'primeng/toast';
 import { RoleModel } from '../../core/models/role.model';
 import { RoleService } from '../../core/services/role.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-role',
@@ -54,7 +55,8 @@ export class RoleComponent implements OnInit {
   constructor(
     private roleService: RoleService,
     private messageService: MessageService,
-    private confirmationService: ConfirmationService
+    private confirmationService: ConfirmationService,
+    private router: Router
   ) { }
 
   private formBuilder = inject(FormBuilder);
@@ -180,6 +182,10 @@ export class RoleComponent implements OnInit {
         });
       }
     });
+  }
+
+  goToPermissions(role: any): void {
+    this.router.navigate(['/permissions', role.id]);
   }
 
   getFieldError(fieldRoleName: string): string {
