@@ -33,7 +33,7 @@
 
                 <p-columnFilter field="role.roleName" matchMode="equals" [showMenu]="false">
                   <ng-template pTemplate="filter" let-value let-filter="filterCallback">
-                    <p-dropdown [options]="roleOptions" [ngModel]="value" placeholder="All Roles"
+                    <p-dropdown [options]="roleFilterOptions" [ngModel]="value" placeholder="All Roles"
                       (onChange)="filter($event.value)" [showClear]="true" styleClass="filter-dropdown">
                     </p-dropdown>
                   </ng-template>
@@ -41,7 +41,7 @@
 
                 <p-columnFilter field="department.departmentName" matchMode="equals" [showMenu]="false">
                   <ng-template pTemplate="filter" let-value let-filter="filterCallback">
-                    <p-dropdown [options]="departmentOptions" [ngModel]="value" placeholder="All Depts"
+                    <p-dropdown [options]="departmentFilterOptions" [ngModel]="value" placeholder="All Depts"
                       (onChange)="filter($event.value)" [showClear]="true" styleClass="filter-dropdown">
                     </p-dropdown>
                   </ng-template>
@@ -164,11 +164,11 @@
   </div>
 
   <!-- Floating Add Button -->
-  <!-- <button (click)="createUser()"
+  <button (click)="createUser()"
     class="fixed bottom-8 right-8 w-14 h-14 flex items-center justify-center bg-[#a8e6cf] dark:bg-[#2c5f5d] text-[#2c3e50] dark:text-white rounded-full shadow-[0_8px_25px_rgba(0,0,0,0.15)] hover:shadow-[0_12px_35px_rgba(0,0,0,0.2)] hover:-translate-y-1 transition-all duration-200 z-20"
     title="Add New User">
     <i class="pi pi-plus text-2xl"></i>
-  </button> -->
+  </button>
 </div>
 
 <!-- Confirm Dialog -->
