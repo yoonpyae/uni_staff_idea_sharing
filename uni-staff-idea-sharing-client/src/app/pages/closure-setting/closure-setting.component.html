@@ -1,0 +1,137 @@
+<div class="h-screen flex flex-col bg-white dark:bg-gray-900 transition-colors duration-200">
+
+    <ng-container *ngIf="!showForm">
+        <header
+            class="flex-shrink-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg border-b border-gray-200/50 dark:border-gray-700/50 shadow-sm z-10">
+            <div class="px-6 py-4 flex flex-col md:flex-row justify-between items-center gap-4 max-w-7xl mx-auto">
+                <h1 class="text-[26px] font-bold text-[#2c3e50] dark:text-white m-0">Closure Dates</h1>
+
+                <div class="flex items-center gap-4 w-full md:w-auto">
+                    <button (click)="openAddForm()"
+                        class="flex items-center justify-center gap-2 px-6 py-2.5 bg-[#6FCBF0] hover:bg-[#5dbfe4] text-gray-900 font-bold rounded-full transition-all shadow-sm flex-shrink-0">
+                        <i class="pi pi-plus-circle text-lg"></i>
+                        <span>Add Closure Date</span>
+                    </button>
+
+                    <div class="relative w-full md:w-64">
+                        <input type="text" [(ngModel)]="searchQuery" (input)="onSearch()" placeholder="Search..."
+                            class="w-full px-4 py-2.5 pl-4 pr-10 bg-gray-200 dark:bg-gray-700 border-none rounded-md text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-[#6FCBF0] transition-all" />
+                        <i
+                            class="pi pi-search absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400"></i>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main class="flex-1 overflow-y-auto p-6 md:p-8">
+            <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+                <div *ngFor="let setting of filteredSettings"
+                    class="bg-[#eaf8f5] dark:bg-gray-800 rounded-2xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow relative">
+
+                    <div class="flex justify-between items-start mb-6">
+                        <h2 class="text-xl font-bold text-[#2c3e50] dark:text-white m-0">{{ setting.academicYear }}</h2>
+                        <div class="flex gap-2">
+                            <button (click)="openEditForm(setting)"
+                                class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-600 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-700 transition-colors">
+                                <i class="pi pi-pencil"></i>
+                            </button>
+                            <button (click)="deleteSetting(setting)"
+                                class="w-8 h-8 flex items-center justify-center rounded-lg text-red-500 hover:bg-white dark:hover:bg-gray-700 transition-colors">
+                                <i class="pi pi-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div>
+                            <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Title:</p>
+                            <p class="font-semibold text-gray-800 dark:text-gray-200">{{ setting.title }}</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Idea Closure Date:</p>
+                            <p class="font-bold text-gray-800 dark:text-gray-200">{{ setting.closureDate }}</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Final Closure Date:</p>
+                            <p class="font-bold text-gray-800 dark:text-gray-200">{{ setting.finalclosureDate }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div *ngIf="filteredSettings.length === 0"
+                    class="col-span-full flex flex-col items-center justify-center py-12">
+                    <p class="text-gray-500 dark:text-gray-400 text-lg">No closure dates found.</p>
+                </div>
+
+            </div>
+        </main>
+    </ng-container>
+
+    <ng-container *ngIf="showForm">
+        <header
+            class="flex-shrink-0 px-8 py-6 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <button (click)="closeForm()"
+                    class="flex items-center justify-center w-9 h-9 border-[2px] border-[#2c3e50] dark:border-gray-400 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+                    <i class="pi pi-angle-left text-lg text-[#2c3e50] dark:text-gray-300 font-bold pr-[2px]"></i>
+                </button>
+                <h1 class="text-[26px] font-bold text-[#2c3e50] dark:text-white">{{ isEditMode ? 'Edit Closure Date' :
+                    'Add New Closure Date' }}</h1>
+            </div>
+        </header>
+
+        <main class="flex-1 overflow-y-auto flex justify-center py-12">
+            <form [formGroup]="closureForm" (ngSubmit)="saveSetting()" class="w-full max-w-lg space-y-6 px-6">
+
+                <div>
+                    <label class="block text-base font-bold text-gray-800 dark:text-gray-200 mb-2">Title:</label>
+                    <input type="text" formControlName="title" placeholder="Enter title for the closure date..."
+                        class="w-full px-4 py-3 bg-[#e8e8e8] dark:bg-gray-700 text-gray-800 dark:text-white rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-[#6FCBF0] transition-all" />
+                </div>
+
+                <div>
+                    <label class="block text-base font-bold text-gray-800 dark:text-gray-200 mb-2">Idea Closure
+                        Date:</label>
+                    <p-date-picker formControlName="closureDate" [showIcon]="true" dateFormat="yy-mm-dd"
+                        placeholder="Pick closure date for an idea..." styleClass="w-full shadow-sm"
+                        [style]="{'width':'100%'}"
+                        class="block w-full rounded-xl focus-within:ring-2 focus-within:ring-[#6FCBF0] transition-all [&_.p-inputtext]:bg-[#e8e8e8] dark:[&_.p-inputtext]:bg-gray-700 [&_.p-inputtext]:text-gray-800 dark:[&_.p-inputtext]:text-white [&_.p-inputtext]:border-none [&_.p-inputtext]:py-3 [&_.p-inputtext]:px-4 [&_.p-inputtext]:rounded-l-xl [&_.p-datepicker-trigger]:bg-[#e8e8e8] dark:[&_.p-datepicker-trigger]:bg-gray-700 [&_.p-datepicker-trigger]:border-none [&_.p-datepicker-trigger]:rounded-r-xl [&_.p-datepicker-trigger]:text-gray-600 dark:[&_.p-datepicker-trigger]:text-gray-300">
+                    </p-date-picker>
+                </div>
+
+                <div>
+                    <label class="block text-base font-bold text-gray-800 dark:text-gray-200 mb-2">Final Closure
+                        Date:</label>
+                    <p-date-picker formControlName="finalclosureDate" [showIcon]="true" dateFormat="yy-mm-dd"
+                        placeholder="Pick final closure date..." styleClass="w-full shadow-sm"
+                        [style]="{'width':'100%'}"
+                        class="block w-full rounded-xl focus-within:ring-2 focus-within:ring-[#6FCBF0] transition-all [&_.p-inputtext]:bg-[#e8e8e8] dark:[&_.p-inputtext]:bg-gray-700 [&_.p-inputtext]:text-gray-800 dark:[&_.p-inputtext]:text-white [&_.p-inputtext]:border-none [&_.p-inputtext]:py-3 [&_.p-inputtext]:px-4 [&_.p-inputtext]:rounded-l-xl [&_.p-datepicker-trigger]:bg-[#e8e8e8] dark:[&_.p-datepicker-trigger]:bg-gray-700 [&_.p-datepicker-trigger]:border-none [&_.p-datepicker-trigger]:rounded-r-xl [&_.p-datepicker-trigger]:text-gray-600 dark:[&_.p-datepicker-trigger]:text-gray-300">
+                    </p-date-picker>
+                </div>
+
+                <div>
+                    <label class="block text-base font-bold text-gray-800 dark:text-gray-200 mb-2">Academic
+                        Year:</label>
+                    <input type="text" formControlName="academicYear" placeholder="eg., 2026 - 2027"
+                        class="w-full px-4 py-3 bg-[#e8e8e8] dark:bg-gray-700 text-gray-800 dark:text-white rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-[#6FCBF0] transition-all" />
+                </div>
+
+                <div class="flex justify-center gap-4 pt-6">
+                    <button type="submit"
+                        class="w-32 py-3 bg-[#6FCBF0] hover:bg-[#5dbfe4] text-gray-900 font-bold rounded-xl shadow-sm transition-colors">
+                        {{ isEditMode ? 'Update' : 'Save' }}
+                    </button>
+                    <button type="button" (click)="closeForm()"
+                        class="w-32 py-3 bg-[#ff9b9b] hover:bg-[#ff8282] text-gray-900 font-bold rounded-xl shadow-sm transition-colors">
+                        Cancel
+                    </button>
+                </div>
+
+            </form>
+        </main>
+    </ng-container>
+</div>
+
+<p-toast position="top-right"></p-toast>
+<p-confirmDialog styleClass="custom-confirm-dialog"></p-confirmDialog>
