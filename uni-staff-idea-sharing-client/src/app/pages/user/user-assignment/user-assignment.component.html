@@ -199,7 +199,7 @@
               <label class="w-32 font-bold text-base">Department:</label>
               <p-select [options]="availableDepartments" [(ngModel)]="user.department"
                 (onChange)="selectDepartment($event.value)" optionLabel="departmentName" dataKey="departmentID"
-                placeholder="Select Department" [filter]="true" [showClear]="true"
+                placeholder="Select Department" [filter]="true" [showClear]="true" appendTo="body"
                 [ngModelOptions]="{ standalone: true }"
                 styleClass="flex-1 rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-[#7cd2ef] appearance-none"
                 class="flex-1" > </p-select>
@@ -224,7 +224,7 @@
 
           <p-select [options]="availableRoles" [(ngModel)]="user.role" (onChange)="selectRole($event.value)"
             optionLabel="roleName" dataKey="roleID" placeholder="Select Role" [filter]="true" [showClear]="true"
-            [ngModelOptions]="{ standalone: true }"
+            [ngModelOptions]="{ standalone: true }" appendTo="body"
             styleClass="flex-1 rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-[#7cd2ef] appearance-none"
             class="flex-1"> </p-select>
         </div>
