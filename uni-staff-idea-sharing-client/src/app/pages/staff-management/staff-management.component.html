@@ -1,0 +1,187 @@
+<div class="h-screen flex flex-col">
+    <!-- Fixed Header -->
+    <header
+        class="flex-shrink-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg border-b border-gray-200/50 dark:border-gray-700/50 shadow-sm z-10">
+        <div class="px-4 md:px-6 lg:px-8 py-4">
+            <div class="flex flex-col gap-4 max-w-[1400px] mx-auto">
+                <!-- Title and Search Row -->
+                <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+                    <div>
+                        <h1 class="text-2xl md:text-3xl font-bold text-[#2c3e50] dark:text-white m-0 font-sans">
+                            Staff Assignment
+                        </h1>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Scrollable Content -->
+    <div class="flex-1 overflow-y-auto">
+
+        <div class="p-4 md:px-6 lg:px-8 max-w-[1400px] w-full mx-auto">
+            <!-- Table Container -->
+            <div
+                class="bg-white dark:bg-gray-800 rounded-2xl shadow-[0_4px_15px_rgba(0,0,0,0.08)] dark:shadow-[0_4px_15px_rgba(0,0,0,0.3)] border border-gray-200 dark:border-gray-700 overflow-hidden">
+                <p-table #dt [value]="users" [paginator]="true" [rows]="rows" [rowsPerPageOptions]="rowsPerPageOptions"
+                    [showCurrentPageReport]="true"
+                    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+                    [globalFilterFields]="['staffName', 'staffEmail', 'roleName', 'departmentName', 'staffPhNo','role.roleName', 'department.departmentName']"
+                    [tableStyle]="{ 'min-width': '50rem' }" styleClass="custom-table">
+                    <ng-template pTemplate="caption">
+                        <div class="flex flex-col lg:flex-row justify-end items-center gap-4 py-2">
+                            <div class="flex flex-wrap items-center gap-3 w-full lg:w-auto">
+
+                                <p-columnFilter field="role.roleName" matchMode="equals" [showMenu]="false">
+                                    <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                        <p-dropdown [options]="roleFilterOptions" [ngModel]="value"
+                                            placeholder="All Roles" (onChange)="filter($event.value)" [showClear]="true"
+                                            styleClass="filter-dropdown">
+                                        </p-dropdown>
+                                    </ng-template>
+                                </p-columnFilter>
+
+                                <p-columnFilter field="department.departmentName" matchMode="equals" [showMenu]="false">
+                                    <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                        <p-dropdown [options]="departmentFilterOptions" [ngModel]="value"
+                                            placeholder="All Depts" (onChange)="filter($event.value)" [showClear]="true"
+                                            styleClass="filter-dropdown">
+                                        </p-dropdown>
+                                    </ng-template>
+                                </p-columnFilter>
+
+                                <div class="relative flex-1 sm:min-w-[300px]">
+                                    <input type="text" (input)="onGlobalFilter($event)" placeholder="Search..."
+                                        class="w-full px-4 pl-10 py-2.5 border-2 border-gray-300 dark:border-gray-600 rounded-xl text-[0.95rem] bg-white dark:bg-gray-700 text-[#2c3e50] dark:text-white transition-all focus:outline-none focus:border-[#a8e6cf]" />
+                                    <i class="pi pi-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </ng-template>
+                    <ng-template pTemplate="header">
+                        <tr class="bg-gray-50 dark:bg-gray-700/50">
+                            <th
+                                class="px-6 py-4 text-left text-sm font-bold text-gray-700 dark:text-gray-200 border-b border-gray-200 dark:border-gray-600">
+                                No.
+                            </th>
+                            <th
+                                class="px-6 py-4 text-left text-sm font-bold text-gray-700 dark:text-gray-200 border-b border-gray-200 dark:border-gray-600">
+                                Name
+                            </th>
+                            <th
+                                class="px-6 py-4 text-left text-sm font-bold text-gray-700 dark:text-gray-200 border-b border-gray-200 dark:border-gray-600">
+                                Role
+                            </th>
+                            <th
+                                class="px-6 py-4 text-left text-sm font-bold text-gray-700 dark:text-gray-200 border-b border-gray-200 dark:border-gray-600">
+                                Department
+                            </th>
+                            <th
+                                class="px-6 py-4 text-left text-sm font-bold text-gray-700 dark:text-gray-200 border-b border-gray-200 dark:border-gray-600">
+                                Email
+                            </th>
+                            <th
+                                class="px-6 py-4 text-center text-sm font-bold text-gray-700 dark:text-gray-200 border-b border-gray-200 dark:border-gray-600">
+                                Action
+                            </th>
+                        </tr>
+                    </ng-template>
+
+                    <ng-template pTemplate="body" let-user let-rowIndex="rowIndex">
+                        <tr
+                            class="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors duration-150 border-b border-gray-200 dark:border-gray-700 last:border-b-0">
+                            <td class="px-6 py-4 text-sm text-gray-700 dark:text-gray-300">
+                                {{ rowIndex + 1 }}.
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="flex items-center gap-3">
+                                    <div
+                                        class="w-10 h-10 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center flex-shrink-0 overflow-hidden">
+                                        <img *ngIf="user.staffProfile; else defaultUserIcon"
+                                            [src]="getProfileUrl(user.staffProfile)" alt="Profile Photo"
+                                            class="w-full h-full object-cover" />
+                                        <ng-template #defaultUserIcon>
+                                            <i class="pi pi-user text-gray-600 dark:text-gray-300"></i>
+                                        </ng-template>
+                                    </div>
+                                    <span class="text-sm font-medium text-gray-900 dark:text-white">
+                                        {{ user.staffName }}
+                                    </span>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <span [class]="getRoleColor(user.roleName)" class="text-sm font-semibold">
+                                    {{ user.role.roleName }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4">
+                                <span [class]="getDepartmentColor(user.departmentName)" class="text-sm font-semibold">
+                                    {{ user.department.departmentName }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4">
+                                <span class="text-sm font-medium text-gray-900 dark:text-white">
+                                    {{ user.staffEmail }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="flex flex-col gap-3">
+
+                                    <div class="flex items-center justify-between pr-4">
+                                        <span class="text-red-600 dark:text-red-500 font-bold text-[13.5px]">Disable
+                                            Account</span>
+                                        <label class="relative inline-flex items-center cursor-pointer">
+                                            <input type="checkbox" [(ngModel)]="user.isDisabled" class="sr-only peer">
+                                            <div
+                                                class="w-11 h-6 bg-gray-300 dark:bg-gray-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#7cd2ef] dark:peer-checked:bg-[#3498db]">
+                                            </div>
+                                        </label>
+                                    </div>
+
+                                    <div class="flex items-center justify-between pr-4">
+                                        <span class="text-red-600 dark:text-red-500 font-bold text-[13.5px]">Hide Ideas
+                                            and Comments</span>
+                                        <label class="relative inline-flex items-center cursor-pointer">
+                                            <input type="checkbox" [(ngModel)]="user.isHidden" class="sr-only peer">
+                                            <div
+                                                class="w-11 h-6 bg-gray-300 dark:bg-gray-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#7cd2ef] dark:peer-checked:bg-[#3498db]">
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </ng-template>
+
+                    <ng-template pTemplate="emptymessage">
+                        <tr>
+                            <td colspan="6" class="text-center py-12">
+                                <div class="flex flex-col items-center">
+                                    <i class="pi pi-users text-6xl text-gray-300 dark:text-gray-600 mb-4"></i>
+                                    <h3 class="text-xl font-semibold text-gray-500 dark:text-gray-400 mb-2">
+                                        No users found
+                                    </h3>
+                                    <p class="text-gray-400 dark:text-gray-500">
+                                        Try adjusting your search or filters
+                                    </p>
+                                </div>
+                            </td>
+                        </tr>
+                    </ng-template>
+
+                    <ng-template pTemplate="paginatorleft">
+                        <span class="text-sm text-gray-600 dark:text-gray-400">
+                            Total: {{ users.length }} users
+                        </span>
+                    </ng-template>
+                </p-table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Confirm Dialog -->
+<p-confirmDialog styleClass="custom-confirm-dialog"></p-confirmDialog>
+
+<!-- Toast -->
+<p-toast position="top-right"></p-toast>
