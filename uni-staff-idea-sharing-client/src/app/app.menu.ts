@@ -42,12 +42,24 @@ export const NAVIGATION_MENU: Readonly<MenuItem[]> = [
         label: 'Closure Settings',
         icon: 'pi pi-fw pi-calendar',
         routerLink: ['/closure-settings'],
+        roles: ['Administrator']
       },
       {
-        label: 'Submit Ideas',
+        label: 'Categories',
+        icon: 'pi pi-fw pi-list',
+        routerLink: ['/idea-categories'],
+        roles: ['QA Manager']
+      },
+      {
+        label: 'Ideas',
         icon: 'pi pi-fw pi-lightbulb',
         routerLink: ['/submit-ideas'],
-        roles: ['Administrator']
+      },
+      {
+        label: 'Staff Management',
+        icon: 'pi pi-fw pi-users',
+        routerLink: ['/staff-management'],
+        roles: ['QA Manager']
       },
     ],
   },
