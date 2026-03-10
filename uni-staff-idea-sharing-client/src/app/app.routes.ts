@@ -11,6 +11,10 @@ import { PermissionComponent } from './pages/role/permission/permission.componen
 import { ClosureSettingComponent } from './pages/closure-setting/closure-setting.component';
 import { AccountDetailsComponent } from './pages/account-details/account-details.component';
 import { StaffManagementComponent } from './pages/staff-management/staff-management.component';
+import { CategoryComponent } from './pages/category/category.component';
+import { IdeaFeedComponent } from './pages/ideas/idea-feed/idea-feed.component';
+import { ShareIdeaComponent } from './pages/ideas/share-idea/share-idea.component';
+import { IdeaDeatilComponent } from './pages/ideas/idea-deatil/idea-deatil.component';
 
 export const routes: Routes = [
   { path: '', component: LoginComponent },
@@ -64,9 +68,27 @@ export const routes: Routes = [
         data: { title: 'Closure Settings', roles: ['Administrator'] }
       },
       {
+        path: 'idea-categories',
+        canActivate: [roleGuard],
+        data: { title: 'Categories', roles: ['QA Manager'] },
+        component: CategoryComponent,
+      },
+      {
+        path: 'submit-ideas',
+        canActivate: [roleGuard],
+        data: { title: 'Ideas' },
+        children: [
+          { path: '', component: IdeaFeedComponent },
+          { path: 'idea-detail', component: IdeaDeatilComponent, data: { title: 'Idea Details' } },
+          { path: 'idea-detail/:id', component: IdeaDeatilComponent, data: { title: 'Idea Details' } },
+          { path: 'share-idea', component: ShareIdeaComponent, data: { title: 'Share New Idea' } },
+        ]
+      },
+      {
         path: 'staff-management',
         component: StaffManagementComponent,
-        data: { title: 'Staff Management', roles:['QA Manager']}
+        canActivate: [roleGuard],
+        data: { title: 'Staff Management', roles: ['QA Manager'] }
       },
     ],
   }
