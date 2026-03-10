@@ -10,6 +10,7 @@ import { RoleComponent } from './pages/role/role.component';
 import { PermissionComponent } from './pages/role/permission/permission.component';
 import { ClosureSettingComponent } from './pages/closure-setting/closure-setting.component';
 import { AccountDetailsComponent } from './pages/account-details/account-details.component';
+import { StaffManagementComponent } from './pages/staff-management/staff-management.component';
 
 export const routes: Routes = [
   { path: '', component: LoginComponent },
@@ -61,7 +62,12 @@ export const routes: Routes = [
         path: 'closure-settings',
         component: ClosureSettingComponent,
         data: { title: 'Closure Settings', roles: ['Administrator'] }
-      }
+      },
+      {
+        path: 'staff-management',
+        component: StaffManagementComponent,
+        data: { title: 'Staff Management', roles:['QA Manager']}
+      },
     ],
   }
 ];
