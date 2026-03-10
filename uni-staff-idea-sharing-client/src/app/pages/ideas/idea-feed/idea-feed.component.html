@@ -1,0 +1,167 @@
+<div class="min-h-screen bg-white text-gray-800 font-sans p-8 max-w-6xl mx-auto">
+
+    <header class="flex items-center justify-between mb-8">
+        <h1 class="text-3xl font-bold text-gray-900">Hello, {{ name }}!</h1>
+
+        <div class="flex items-center gap-4">
+            <button (click)="goToShareIdea()"
+                class="px-6 py-2.5 bg-[#6FCBF0] hover:bg-[#5bb8db] text-gray-900 font-semibold rounded-full shadow-sm transition-colors">
+                Share New Idea
+            </button>
+
+            <div class="relative">
+                <input type="text" [(ngModel)]="searchQuery" (input)="applyFilters()" placeholder="Search..."
+                    class="w-64 px-4 py-2.5 pl-4 pr-10 bg-gray-200 border-none rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-300" />
+                <i class="pi pi-search absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"></i>
+            </div>
+        </div>
+    </header>
+
+    <div class="flex items-center justify-center mb-10">
+        <div class="inline-flex bg-gray-200 rounded-lg p-1 items-center gap-1 shadow-sm">
+
+            <button (click)="setFilter('All')"
+                [ngClass]="activeFilter === 'All' ? 'bg-[#a8e6cf] text-gray-900 shadow-sm' : 'text-gray-600 hover:bg-gray-300'"
+                class="px-6 py-2 rounded-md font-medium transition-colors">
+                All
+            </button>
+            <button (click)="setFilter('Popular')"
+                [ngClass]="activeFilter === 'Popular' ? 'bg-[#a8e6cf] text-gray-900 shadow-sm' : 'text-gray-600 hover:bg-gray-300'"
+                class="px-6 py-2 rounded-md font-medium transition-colors">
+                Popular
+            </button>
+            <button (click)="setFilter('Latest')"
+                [ngClass]="activeFilter === 'Latest' ? 'bg-[#a8e6cf] text-gray-900 shadow-sm' : 'text-gray-600 hover:bg-gray-300'"
+                class="px-6 py-2 rounded-md font-medium transition-colors">
+                Latest
+            </button>
+            <button (click)="setFilter('Most Viewed')"
+                [ngClass]="activeFilter === 'Most Viewed' ? 'bg-[#a8e6cf] text-gray-900 shadow-sm' : 'text-gray-600 hover:bg-gray-300'"
+                class="px-6 py-2 rounded-md font-medium transition-colors">
+                Most Viewed
+            </button>
+
+            <div class="px-2 border-l border-gray-300 ml-1 flex gap-2">
+                <div class="relative flex items-center">
+                    <select [(ngModel)]="selectedDept" (change)="applyFilters()"
+                        class="bg-transparent text-gray-800 font-medium py-2 pl-3 pr-8 focus:outline-none cursor-pointer hover:bg-gray-300 rounded-md appearance-none relative z-10 w-full">
+                        <option *ngFor="let d of departments" [value]="d.value">{{ d.label }}</option>
+                    </select>
+                    <i class="pi pi-angle-down absolute right-2 text-gray-600 pointer-events-none font-bold"></i>
+                </div>
+
+                <div class="relative flex items-center">
+                    <select [(ngModel)]="selectedCat" (change)="applyFilters()"
+                        class="bg-transparent text-gray-800 font-medium py-2 pl-3 pr-8 focus:outline-none cursor-pointer hover:bg-gray-300 rounded-md appearance-none relative z-10 w-full">
+                        <option *ngFor="let c of categories" [value]="c.value">{{ c.label }}</option>
+                    </select>
+                    <i class="pi pi-angle-down absolute right-2 text-gray-600 pointer-events-none font-bold"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="space-y-6">
+        <div *ngIf="filteredIdeas.length === 0" class="text-center py-12 text-gray-500">
+            <i class="pi pi-inbox text-4xl mb-3 text-gray-400"></i>
+            <p class="text-lg">No ideas found.</p>
+        </div>
+
+        <div *ngFor="let idea of filteredIdeas" class="border-b border-gray-200 pb-8 last:border-0 relative">
+
+            <div class="flex justify-between items-start mb-4">
+                <div class="flex items-center gap-3">
+
+                    <div
+                        class="w-10 h-10 rounded-full border-2 border-gray-800 flex items-center justify-center bg-gray-100 dark:bg-gray-800 flex-shrink-0 overflow-hidden">
+
+                        <img *ngIf="!idea.isAnonymous && idea.staff?.staffProfile; else defaultUserIcon"
+                            [src]="getProfileUrl(idea.staff?.staffProfile)" alt="Profile Photo"
+                            class="w-full h-full object-cover" />
+
+                        <ng-template #defaultUserIcon>
+                            <i class="pi pi-user text-gray-600 dark:text-gray-300"></i>
+                        </ng-template>
+
+                    </div>
+
+                    <div class="flex flex-col">
+                        <div class="flex items-center gap-3">
+
+                            <span class="font-bold text-[17px]"
+                                [ngClass]="idea.isAnonymous ? 'text-orange-500' : 'text-gray-900 dark:text-white'">
+                                {{ idea.isAnonymous ? 'Anonymous' : idea.staff?.staffName || 'Unknown Staff' }}
+                            </span>
+
+                            <span *ngIf="idea.categories && idea.categories.length > 0"
+                                class="px-3 py-0.5 border border-gray-400 text-gray-600 dark:text-gray-300 rounded-full text-xs font-medium">
+                                {{ idea.categories[0].categoryname }}
+                            </span>
+
+                        </div>
+                        <span class="text-xs text-gray-500 dark:text-gray-400 font-medium">
+                            {{ idea.created_at | date:'mediumDate' }}
+                        </span>
+                    </div>
+
+                </div>
+
+                <div class="relative">
+                    <button (click)="toggleMenu(idea.ideaID, $event)"
+                        class="text-gray-900 hover:text-black p-1 transition-colors">
+                        <i class="pi pi-ellipsis-h text-xl font-extrabold"></i>
+                    </button>
+
+                    <div *ngIf="activeMenuId === idea.ideaID"
+                        class="absolute right-0 top-full mt-1 w-44 bg-[#e8e8e8] rounded-xl shadow-md border border-gray-200 z-20 py-2"
+                        (click)="$event.stopPropagation()">
+                        <button (click)="removeIdea(idea)"
+                            class="w-full text-left px-5 py-2.5 flex items-center gap-3 text-gray-800 hover:bg-gray-300 transition-colors font-medium text-[15px]">
+                            <i class="pi pi-trash text-gray-700"></i>
+                            Remove Idea
+                        </button>
+                        <button (click)="hideIdea(idea)"
+                            class="w-full text-left px-5 py-2.5 flex items-center gap-3 text-gray-800 hover:bg-gray-300 transition-colors font-medium text-[15px]">
+                            <i class="pi pi-eye-slash text-gray-700"></i>
+                            Hide Idea
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+
+            <h3 class="text-lg font-bold text-gray-900 mb-2 cursor-pointer hover:text-blue-600 transition-colors"
+                [routerLink]="['/submit-ideas/idea-detail', idea.ideaID]">
+                {{ idea.title }}
+            </h3>
+            <p class="text-[15px] text-gray-700 leading-relaxed mb-4 whitespace-pre-line">
+                {{ idea.description }}
+            </p>
+
+            <div class="flex items-center gap-6 text-gray-600 font-medium text-sm">
+                <div class="flex items-center gap-2 cursor-pointer hover:text-blue-600 transition-colors"
+                    (click)="vote(idea, 'Like')">
+                    <i class="pi pi-thumbs-up text-lg"></i>
+                    <span>{{ idea.likesCount }}</span>
+                </div>
+
+                <div class="flex items-center gap-2 cursor-pointer hover:text-red-600 transition-colors"
+                    (click)="vote(idea, 'Unlike')">
+                    <i class="pi pi-thumbs-down text-lg"></i>
+                    <span>{{ idea.unlikesCount }}</span>
+                </div>
+
+                <div class="flex items-center gap-2 cursor-pointer hover:text-gray-900">
+                    <i class="pi pi-comment text-lg"></i>
+                    <span>{{ idea.commentsCount }}</span>
+                </div>
+                <div class="flex items-center gap-2 text-gray-500">
+                    <i class="pi pi-eye text-lg"></i>
+                    <span>{{ idea.viewsCount }}</span>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
