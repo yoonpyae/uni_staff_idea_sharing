@@ -29,18 +29,6 @@ import { Router } from '@angular/router';
   providers: [MessageService, ConfirmationService],
   templateUrl: './role.component.html',
   styleUrl: './role.component.scss',
-  // animations: [
-  //   trigger('listAnimation', [
-  //     transition('* => *', [
-  //       query(':enter', [
-  //         style({ opacity: 0, transform: 'scale(0.95)' }),
-  //         stagger(50, [
-  //           animate('300ms ease-out', style({ opacity: 1, transform: 'scale(1)' }))
-  //         ])
-  //       ], { optional: true })
-  //     ])
-  //   ])
-  // ]
 })
 export class RoleComponent implements OnInit {
   roles: RoleModel[] = [];
