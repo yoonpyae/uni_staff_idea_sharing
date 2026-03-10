@@ -1,0 +1,159 @@
+<div class="h-screen flex flex-col">
+    <header
+        class="flex-shrink-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg border-b border-gray-200/50 dark:border-gray-700/50 shadow-sm z-10">
+        <div class="px-4 md:px-6 lg:px-8 py-4">
+            <div
+                class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 max-w-[1400px] mx-auto">
+                <div>
+                    <h1 class="text-2xl md:text-3xl font-bold text-[#2c3e50] dark:text-white m-0 font-sans">
+                        Categories for Ideas
+                    </h1>
+                </div>
+
+                <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+                    <button (click)="openAddDialog()"
+                        class="flex items-center justify-center gap-2 px-6 py-2.5 bg-[#6FCBF0] dark:bg-[#2c555f] text-[#2c3e50] dark:text-white font-semibold rounded-xl hover:bg-[#88d4ab] dark:hover:bg-[#234a48] transition-all duration-200 shadow-sm hover:shadow-md hover:-translate-y-0.5">
+                        <i class="pi pi-plus-circle text-lg"></i>
+                        <span>Add Category</span>
+                    </button>
+
+                    <div class="relative flex-1 sm:flex-initial">
+                        <input type="text" [(ngModel)]="searchQuery" (input)="onSearch()" placeholder="Search..."
+                            class="w-full sm:min-w-[250px] px-4 pl-10 py-2.5 border-2 border-gray-300 dark:border-gray-600 rounded-xl text-[0.95rem] bg-white dark:bg-gray-700 text-[#2c3e50] dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-all duration-200 focus:outline-none focus:border-[#a8e6cf] dark:focus:border-[#88d4ab] focus:shadow-[0_0_0_3px_rgba(168,230,207,0.1)] dark:focus:shadow-[0_0_0_3px_rgba(136,212,171,0.2)]" />
+                        <i
+                            class="pi pi-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400 text-[0.95rem]"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="flex-1 overflow-y-auto">
+        <div class="p-4 md:p-6 lg:p-8 max-w-[1400px] w-full mx-auto">
+            <div [@listAnimation]="filteredCategories.length"
+                class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pb-6">
+
+                <div *ngFor="let category of filteredCategories"
+                    class="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-[0_4px_15px_rgba(0,0,0,0.08)] dark:shadow-[0_4px_15px_rgba(0,0,0,0.3)] border-2 border-gray-200 dark:border-gray-700 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_8px_25px_rgba(0,0,0,0.12)] dark:hover:shadow-[0_8px_25px_rgba(0,0,0,0.4)] hover:border-[#a8e6cf] dark:hover:border-[#88d4ab]">
+
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="flex-1">
+                            <div
+                                class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
+                                Category:
+                            </div>
+                            <h3 class="text-xl font-bold text-[#2c3e50] dark:text-white m-0">
+                                {{ category.categoryname }}
+                            </h3>
+                        </div>
+
+                        <div class="flex gap-2 ml-3">
+                            <button (click)="openEditDialog(category)"
+                                class="w-9 h-9 flex items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-[#a8e6cf] dark:hover:bg-[#2c5f5d] hover:text-[#2c3e50] dark:hover:text-white transition-all duration-200"
+                                title="Edit Category">
+                                <i class="pi pi-pencil text-sm"></i>
+                            </button>
+                            <button (click)="deleteCategory(category)"
+                                class="w-9 h-9 flex items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-red-500 hover:text-white transition-all duration-200"
+                                title="Delete Category">
+                                <i class="pi pi-trash text-sm"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="mb-4 pb-4 border-b border-gray-200 dark:border-gray-700">
+                        <div
+                            class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">
+                            Status:
+                        </div>
+                        <div class="text-sm font-bold">
+                            <span *ngIf="category.status.toLowerCase() === 'inactive'"
+                                class="px-2 py-1 bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 rounded-md">
+                                Inactive
+                            </span>
+
+                            <span *ngIf="category.status.toLowerCase() !== 'inactive'"
+                                class="px-2 py-1 bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 rounded-md">
+                                Active
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="space-y-2">
+                        <div>
+                            <div
+                                class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-0.5">
+                                Created at:
+                            </div>
+                            <div class="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                                {{ category.created_at | date:'yyyy-MM-dd HH:mm:ss a'}}
+                            </div>
+                        </div>
+                        <div>
+                            <div
+                                class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-0.5">
+                                Updated at:
+                            </div>
+                            <div class="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                                {{ category.updated_at | date:'yyyy-MM-dd HH:mm:ss a'}}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div *ngIf="filteredCategories.length === 0"
+                    class="col-span-full flex flex-col items-center justify-center py-16 text-center">
+                    <i class="pi pi-folder-open text-6xl text-gray-300 dark:text-gray-600 mb-4"></i>
+                    <h3 class="text-xl font-semibold text-gray-500 dark:text-gray-400 mb-2">
+                        No category found
+                    </h3>
+                    <p class="text-gray-400 dark:text-gray-500 mb-6">
+                        {{ searchQuery ? 'Try adjusting your search' : 'Get started by adding your first category' }}
+                    </p>
+                    <button *ngIf="!searchQuery" (click)="openAddDialog()"
+                        class="flex items-center gap-2 px-6 py-3 bg-[#6FCBF0] dark:bg-[#2c555f] text-[#2c3e50] dark:text-white font-semibold rounded-xl hover:bg-[#88d4ab] dark:hover:bg-[#234a48] transition-all duration-200">
+                        <i class="pi pi-plus-circle"></i>
+                        <span>Add First Category</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<p-dialog [(visible)]="displayDialog" [header]="dialogTitle" [modal]="true" [closable]="true" [draggable]="false"
+    [resizable]="false" [style]="{ width: '90vw', maxWidth: '500px' }" (onHide)="closeDialog()"
+    styleClass="custom-dialog">
+
+    <form [formGroup]="categoryForm" (ngSubmit)="savecategory()" class="space-y-6">
+        <div>
+            <label for="categoryname" class="block text-sm font-semibold text-[#2c3e50] dark:text-white mb-2">
+                Category Name <span class="text-red-500">*</span>
+            </label>
+            <input id="categoryname" type="text" formControlName="categoryname" placeholder="Enter category name"
+                pInputText class="w-full px-4 py-3 border-2 rounded-xl text-base transition-all duration-200" [ngClass]="{
+          'border-gray-300 dark:border-gray-600 focus:border-[#a8e6cf] dark:focus:border-[#88d4ab]': !isFieldInvalid('categoryname'),
+          'border-red-500 focus:border-red-500': isFieldInvalid('categoryname')
+        }" />
+            <small *ngIf="isFieldInvalid('categoryname')" class="text-red-500 text-xs mt-1 block">
+                {{ getFieldError('categoryname') }}
+            </small>
+        </div>
+
+        <div class="flex justify-end gap-3 pt-4 border-t border-gray-100 dark:border-gray-700">
+            <button type="button" (click)="closeDialog()"
+                class="px-6 py-2.5 border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-semibold rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200 cursor-pointer">
+                Cancel
+            </button>
+            <button type="submit"
+                class="px-6 py-2.5 bg-[#6FCBF0] dark:bg-[#2c555f] text-[#2c3e50] dark:text-white font-semibold rounded-xl hover:bg-[#5bb8db] dark:hover:bg-[#234a48] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                [disabled]="categoryForm.invalid">
+                {{ editingCategory ? 'Update' : 'Save' }}
+            </button>
+        </div>
+    </form>
+</p-dialog>
+
+<p-confirmDialog styleClass="custom-confirm-dialog"></p-confirmDialog>
+
+<p-toast position="top-right"></p-toast>
