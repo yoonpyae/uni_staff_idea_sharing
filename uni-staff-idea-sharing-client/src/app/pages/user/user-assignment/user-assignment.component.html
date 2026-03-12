@@ -1,240 +1,254 @@
-<div class="h-screen flex flex-col font-sans text-gray-800 dark:text-gray-200 overflow-hidden">
+<div class="flex flex-col w-full relative h-full font-sans text-gray-800 dark:text-gray-200">
 
-  <header class="flex-shrink-0 flex items-center justify-between px-8 py-6 border-b border-gray-100">
-    <div class="flex items-center gap-4">
-      <div *ngIf="isCreateMode" class="flex items-center gap-3">
-        <button (click)="goBack()"
-          class="flex items-center justify-center w-9 h-9 border-[2.5px] border-[#2c3e50] dark:border-gray-200 rounded-full hover:bg-gray-100 transition-colors">
-          <i class="pi pi-angle-left text-lg text-[#2c3e50] dark:text-gray-100 font-bold pr-[2px]"></i>
+  <header
+    class="sticky top-0 z-20 flex-shrink-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg border-b border-gray-200 dark:border-gray-700 shadow-sm transition-all">
+    <div class="px-4 md:px-8 py-3 md:py-5 flex items-center justify-between max-w-6xl mx-auto w-full">
+
+      <div class="flex items-center gap-3 md:gap-4">
+        <div *ngIf="isCreateMode" class="flex items-center gap-2 md:gap-3">
+          <button (click)="goBack()"
+            class="flex items-center justify-center w-8 h-8 md:w-9 md:h-9 border-[2px] border-[#2c3e50] dark:border-gray-400 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors flex-shrink-0">
+            <i class="pi pi-angle-left text-base md:text-lg text-[#2c3e50] dark:text-gray-300 font-bold pr-[2px]"></i>
+          </button>
+          <h1 class="text-xl md:text-[26px] font-bold text-[#2c3e50] dark:text-white truncate">Staff Registration</h1>
+        </div>
+
+        <button *ngIf="!isCreateMode" (click)="goBack()"
+          class="flex items-center justify-center gap-2 w-10 h-10 sm:w-auto sm:h-auto sm:px-5 sm:py-2.5 bg-gray-200 dark:bg-gray-800 rounded-full font-semibold hover:bg-gray-300 dark:hover:bg-gray-700 transition-colors text-gray-800 dark:text-gray-200 flex-shrink-0 shadow-sm">
+          <i class="pi pi-angle-left text-lg sm:text-base"></i>
+          <span class="hidden sm:inline text-sm md:text-base font-semibold">Go Back</span>
         </button>
-        <h1 class="text-[26px] font-bold text-[#2c3e50] dark:text-gray-100">Staff Registration</h1>
       </div>
 
-      <button *ngIf="!isCreateMode" (click)="goBack()"
-        class="flex items-center gap-2 px-5 py-2 bg-gray-200 dark:bg-[#2c3e50] rounded-full font-semibold hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">
-        <i class="pi pi-angle-left"></i> Go Back
-      </button>
-    </div>
-
-    <div class="flex items-center gap-4">
-      <button *ngIf="!isCreateMode" (click)="resetPassword()"
-        class="flex items-center gap-2 px-6 py-2 bg-[#ff9b9b] dark:bg-[#ff6b6b] text-gray-900 font-semibold rounded-full shadow-sm hover:bg-[#ff8282] transition-colors">
-        <i class="pi pi-key"></i> Reset Password
-      </button>
-
-      <!-- <div class="relative">
-        <input type="text" placeholder="Search..."
-          class="w-64 px-4 py-2 pl-4 pr-10 bg-gray-200 border-none rounded-md focus:outline-none focus:ring-2 focus:ring-gray-300" />
-        <i class="pi pi-search absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"></i>
-      </div> -->
+      <div class="flex items-center gap-3 md:gap-4">
+        <button *ngIf="!isCreateMode" (click)="resetPassword()"
+          class="flex items-center justify-center gap-2 w-10 h-10 sm:w-auto sm:h-auto sm:px-6 sm:py-2.5 bg-[#ff9b9b] dark:bg-[#d66b6b] text-gray-900 dark:text-white font-semibold rounded-full shadow-sm hover:bg-[#ff8282] dark:hover:bg-[#b85656] transition-colors flex-shrink-0">
+          <i class="pi pi-key text-lg sm:text-base"></i>
+          <span class="hidden sm:inline text-sm md:text-base">Reset Password</span>
+        </button>
+      </div>
     </div>
   </header>
 
-  <main class="flex-1 overflow-y-auto w-full">
-    <div class="max-w-5xl mx-auto p-8 pb-20">
+  <main class="w-full">
+    <div class="max-w-5xl mx-auto px-4 md:px-8 py-6 md:py-8 pb-20">
 
-      <!-- global hidden file input used by both create and edit sections -->
       <input type="file" accept="image/*" #fileInput class="hidden" (change)="onProfileSelected($event)" />
 
-      <div *ngIf="isCreateMode" class="mt-4">
-        <div class="grid grid-cols-2 gap-x-12 gap-y-8">
+      <div *ngIf="isCreateMode" class="mt-2 md:mt-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6 md:gap-y-8">
 
-          <div class="col-span-1">
-            <label class="block text-base font-bold mb-2 text-gray-800 dark:text-gray-100">Profile:</label>
-            <div class="flex items-center gap-4">
+          <div class="col-span-1 md:col-span-2">
+            <label class="block text-sm md:text-base font-bold mb-2 text-gray-800 dark:text-gray-200">Profile:</label>
+            <div class="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
               <button (click)="fileInput.click()"
-                class="px-6 py-2 border border-gray-300 rounded-lg font-medium shadow-sm hover:bg-gray-200 dark:text-gray-400">Choose
-                File</button>
-              <span class="text-gray-600 dark:text-gray-300 font-medium">{{profileFileName}}</span>
+                class="px-6 py-2.5 border-2 border-gray-300 dark:border-gray-600 rounded-lg font-semibold shadow-sm bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors w-full sm:w-auto">
+                Choose File
+              </button>
+              <span class="text-sm md:text-base text-gray-600 dark:text-gray-400 font-medium truncate max-w-xs">
+                {{profileFileName || 'No file chosen'}}
+              </span>
             </div>
           </div>
-          <div class="col-span-1"></div>
-          <div class="space-y-6">
+
+          <div class="space-y-5 md:space-y-6">
             <div>
-              <label class="block text-base font-bold mb-2 text-gray-800 dark:text-gray-100">Name:</label>
+              <label
+                class="block text-sm md:text-base font-bold mb-1.5 md:mb-2 text-gray-800 dark:text-gray-200">Name:</label>
               <input type="text" [(ngModel)]="user.name" placeholder="Enter staff's name..."
-                class="w-full px-4 py-3 rounded-xl bg-white dark:bg-gray-700 text-gray-800 dark:text-white border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-[#7cd2ef]" />
+                class="w-full px-4 py-3 rounded-xl bg-white dark:bg-gray-800 text-gray-800 dark:text-white border-2 border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-0 focus:border-[#7cd2ef] dark:focus:border-[#5aa8c7] transition-colors" />
             </div>
             <div>
-              <label class="block text-base font-bold mb-2 text-gray-800 dark:text-gray-100">Phone Number:</label>
+              <label class="block text-sm md:text-base font-bold mb-1.5 md:mb-2 text-gray-800 dark:text-gray-200">Phone
+                Number:</label>
               <input type="text" [(ngModel)]="user.phone" placeholder="Enter staff's phone number..."
-                class="w-full px-4 py-3 rounded-xl bg-white dark:bg-gray-700 text-gray-800 dark:text-white border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-[#7cd2ef]" />
+                class="w-full px-4 py-3 rounded-xl bg-white dark:bg-gray-800 text-gray-800 dark:text-white border-2 border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-0 focus:border-[#7cd2ef] dark:focus:border-[#5aa8c7] transition-colors" />
             </div>
             <div>
-              <label class="block text-base font-bold mb-2 text-gray-800 dark:text-gray-100">Email:</label>
+              <label
+                class="block text-sm md:text-base font-bold mb-1.5 md:mb-2 text-gray-800 dark:text-gray-200">Email:</label>
               <input type="email" [(ngModel)]="user.email" placeholder="Enter staff's email..."
-                class="w-full px-4 py-3 rounded-xl bg-white dark:bg-gray-700 text-gray-800 dark:text-white border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-[#7cd2ef]" />
+                class="w-full px-4 py-3 rounded-xl bg-white dark:bg-gray-800 text-gray-800 dark:text-white border-2 border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-0 focus:border-[#7cd2ef] dark:focus:border-[#5aa8c7] transition-colors" />
             </div>
             <div>
-              <label class="block text-base font-bold mb-2 text-gray-800 dark:text-gray-100">Role:</label>
+              <label
+                class="block text-sm md:text-base font-bold mb-1.5 md:mb-2 text-gray-800 dark:text-gray-200">Role:</label>
               <p-select [options]="availableRoles" [(ngModel)]="user.role" (onChange)="selectRole($event.value)"
                 optionLabel="roleName" dataKey="roleID" placeholder="Select Role" [filter]="true" [showClear]="true"
                 [ngModelOptions]="{ standalone: true }"
-                class="w-full px-4 py-3 rounded-xl bg-white dark:bg-gray-700 text-gray-800 dark:text-white border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-[#7cd2ef] appearance-none">
+                class="block w-full rounded-xl focus-within:ring-2 focus-within:ring-[#7cd2ef] transition-all [&_.p-select-label]:bg-white dark:[&_.p-select-label]:bg-gray-800 [&_.p-select-label]:py-3 [&_.p-select-label]:px-4 [&_.p-select-label]:rounded-l-xl [&_.p-select-trigger]:bg-white dark:[&_.p-select-trigger]:bg-gray-800 [&_.p-select-trigger]:rounded-r-xl border-2 border-gray-200 dark:border-gray-700">
               </p-select>
             </div>
           </div>
 
-          <div class="space-y-6">
+          <div class="space-y-5 md:space-y-6">
             <div>
-              <label class="block text-base font-bold mb-2 text-gray-800 dark:text-gray-100">Date of Birth:</label>
-              <div class="relative">
+              <label class="block text-sm md:text-base font-bold mb-1.5 md:mb-2 text-gray-800 dark:text-gray-200">Date
+                of Birth:</label>
+              <div class="relative w-full">
                 <p-date-picker [(ngModel)]="user.staffDOB" [showIcon]="true" [dateFormat]="'yy-mm-dd'"
                   [showTime]="false" [style]="{ width: '100%' }"
-                  class="w-full rounded-xl bg-white dark:bg-gray-700 text-gray-800 dark:text-white border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-[#7cd2ef]">
+                  class="block w-full rounded-xl focus-within:ring-2 focus-within:ring-[#7cd2ef] transition-all [&_.p-inputtext]:bg-white dark:[&_.p-inputtext]:bg-gray-800 [&_.p-inputtext]:border-none [&_.p-inputtext]:py-3 [&_.p-inputtext]:px-4 [&_.p-inputtext]:rounded-l-xl [&_.p-datepicker-trigger]:bg-white dark:[&_.p-datepicker-trigger]:bg-gray-800 [&_.p-datepicker-trigger]:border-none [&_.p-datepicker-trigger]:rounded-r-xl border-2 border-gray-200 dark:border-gray-700">
                 </p-date-picker>
               </div>
             </div>
 
-
             <div>
-              <label class="block text-base font-bold mb-2 text-gray-800 dark:text-gray-100">Address:</label>
+              <label
+                class="block text-sm md:text-base font-bold mb-1.5 md:mb-2 text-gray-800 dark:text-gray-200">Address:</label>
               <input type="text" [(ngModel)]="user.address" placeholder="Enter staff's address..."
-                class="w-full px-4 py-3 rounded-xl bg-white dark:bg-gray-700 text-gray-800 dark:text-white border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-[#7cd2ef]" />
+                class="w-full px-4 py-3 rounded-xl bg-white dark:bg-gray-800 text-gray-800 dark:text-white border-2 border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-0 focus:border-[#7cd2ef] dark:focus:border-[#5aa8c7] transition-colors" />
             </div>
             <div>
-              <label class="block text-base font-bold mb-2 text-gray-800 dark:text-gray-100">Status:</label>
-              <p-select [options]="availableStatuses" [(ngModel)]="user.status" placeholder="Choose the status..."
-                [showClear]="true" [filter]="true" [ngModelOptions]="{ standalone: true }" optionLabel=""
-                class="w-full px-4 py-3 rounded-xl bg-white dark:bg-gray-700 text-gray-800 dark:text-white border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-[#7cd2ef] appearance-none">
-                <ng-template let-option pTemplate="item">
-                  {{ option }}
-                </ng-template>
-              </p-select>
-            </div>
-            <div>
-              <label class="block text-base font-bold mb-2 text-gray-800 dark:text-gray-100">Department:</label>
+              <label
+                class="block text-sm md:text-base font-bold mb-1.5 md:mb-2 text-gray-800 dark:text-gray-200">Department:</label>
               <p-select [options]="availableDepartments" [(ngModel)]="user.department"
                 (onChange)="selectDepartment($event.value)" optionLabel="departmentName" dataKey="departmentID"
                 placeholder="Select Department" [filter]="true" [showClear]="true"
                 [ngModelOptions]="{ standalone: true }"
-                class="w-full px-4 py-3 rounded-xl bg-white dark:bg-gray-700 text-gray-800 dark:text-white border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-[#7cd2ef] appearance-none">
+                class="block w-full rounded-xl focus-within:ring-2 focus-within:ring-[#7cd2ef] transition-all [&_.p-select-label]:bg-white dark:[&_.p-select-label]:bg-gray-800 [&_.p-select-label]:py-3 [&_.p-select-label]:px-4 [&_.p-select-label]:rounded-l-xl [&_.p-select-trigger]:bg-white dark:[&_.p-select-trigger]:bg-gray-800 [&_.p-select-trigger]:rounded-r-xl border-2 border-gray-200 dark:border-gray-700">
               </p-select>
             </div>
           </div>
         </div>
 
-        <div class="flex justify-end gap-4 mt-12">
+        <div class="flex flex-col sm:flex-row justify-end gap-3 sm:gap-4 mt-10 md:mt-12 w-full">
           <button (click)="createStaff()"
-            class="px-10 py-3 bg-[#7cd2ef] dark:bg-[#5aa8c7] text-gray-900 dark:text-white font-bold rounded-xl shadow-sm hover:bg-[#62bddd] transition-colors">Register</button>
+            class="w-full sm:w-auto px-10 py-3.5 sm:py-3 bg-[#7cd2ef] dark:bg-[#5aa8c7] text-gray-900 dark:text-white font-bold rounded-xl shadow-sm hover:bg-[#62bddd] transition-colors order-1 sm:order-2">
+            Register
+          </button>
           <button (click)="clearForm()"
-            class="px-10 py-3 bg-[#ff9b9b] dark:bg-[#ff6b6b] text-gray-900 dark:text-white font-bold rounded-xl shadow-sm hover:bg-[#ff8282] transition-colors">Clear</button>
+            class="w-full sm:w-auto px-10 py-3.5 sm:py-3 bg-[#ff9b9b] dark:bg-[#d66b6b] text-gray-900 dark:text-white font-bold rounded-xl shadow-sm hover:bg-[#ff8282] dark:hover:bg-[#b85656] transition-colors order-2 sm:order-1">
+            Clear
+          </button>
         </div>
       </div>
 
+      <div *ngIf="!isCreateMode" class="mt-2 md:mt-4">
 
-      <div *ngIf="!isCreateMode" class="mt-4">
-        <div class="flex flex-col md:flex-row gap-12">
+        <div class="flex flex-col md:flex-row gap-8 md:gap-12">
+          <div class="flex flex-col items-center gap-5 w-full md:w-[250px] flex-shrink-0">
 
-          <div class="flex flex-col items-center gap-6 w-[250px] flex-shrink-0">
             <div
-              class="w-36 h-36 rounded-full border-[5px] border-[#2c3e50] overflow-hidden flex items-center justify-center bg-transparent relative">
-
+              class="w-32 h-32 md:w-36 md:h-36 rounded-full border-[4px] md:border-[5px] border-[#2c3e50] dark:border-gray-400 overflow-hidden flex items-center justify-center bg-gray-100 dark:bg-gray-800 relative">
               <img *ngIf="user.staffProfile; else defaultUserIcon" [src]="getProfileUrl(user.staffProfile)"
                 alt="Profile Photo" class="w-full h-full object-cover" />
-
               <ng-template #defaultUserIcon>
-                <i class="pi pi-user text-gray-600 dark:text-gray-300"></i>
+                <i class="pi pi-user text-4xl text-gray-400 dark:text-gray-500"></i>
               </ng-template>
 
               <button (click)="fileInput.click()"
-                class="absolute bottom-0 right-0 bg-white rounded-full p-1 shadow hover:bg-gray-100">
-                <i class="pi pi-pencil text-sm"></i>
+                class="absolute bottom-1 right-1 md:bottom-2 md:right-2 bg-white dark:bg-gray-700 rounded-full p-2 shadow hover:bg-gray-100 dark:hover:bg-gray-600 border border-gray-200 dark:border-gray-600 transition-colors">
+                <i class="pi pi-pencil text-sm text-gray-700 dark:text-gray-300"></i>
               </button>
             </div>
 
-            <button (click)="deactivateAccount()"
-              class="w-full py-3 bg-[#ff9b9b] dark:bg-[#ff6b6b] font-bold text-gray-900 rounded-full shadow-sm hover:bg-[#ff8282] transition-colors">
-              Deactivate Account
+            <button (click)="deactivateAccount()" [ngClass]="{
+    'bg-[#ff9b9b] dark:bg-[#d66b6b] hover:bg-[#ff8282]': user.account_status !== 'Inactive',
+    'bg-green-500 dark:bg-green-600 hover:bg-green-400': user.account_status === 'Inactive'
+  }" class="w-full max-w-[250px] py-3 font-bold text-gray-900 dark:text-white rounded-xl shadow-sm transition-colors">
+              {{ user.account_status === 'Inactive' ? 'Activate Account' : 'Deactivate Account' }}
             </button>
           </div>
 
-          <div class="flex-1 space-y-4">
-            <div class="flex items-center">
-              <label class="w-32 font-bold text-base">Name:</label>
+          <div class="flex-1 space-y-4 md:space-y-5">
+
+            <div class="flex flex-col md:flex-row md:items-center gap-1 md:gap-0">
+              <label
+                class="w-full md:w-32 font-bold text-sm md:text-base text-gray-700 dark:text-gray-200">Name:</label>
               <input type="text" [(ngModel)]="user.staffName"
-                class="flex-1 px-4 py-2 border border-[#2c3e50] rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-[#7cd2ef]" />
+                class="w-full md:flex-1 px-4 py-2.5 md:py-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[#7cd2ef] transition-all" />
             </div>
 
-            <div class="flex items-center">
-              <label class="w-32 font-bold text-base">Ph No:</label>
+            <div class="flex flex-col md:flex-row md:items-center gap-1 md:gap-0">
+              <label class="w-full md:w-32 font-bold text-sm md:text-base text-gray-700 dark:text-gray-200">Ph
+                No:</label>
               <input type="text" [(ngModel)]="user.staffPhNo"
-                class="flex-1 px-4 py-2 border border-[#2c3e50] rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-[#7cd2ef]" />
+                class="w-full md:flex-1 px-4 py-2.5 md:py-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[#7cd2ef] transition-all" />
             </div>
 
-            <div class="flex items-center">
-              <label class="w-32 font-bold text-base">Email:</label>
+            <div class="flex flex-col md:flex-row md:items-center gap-1 md:gap-0">
+              <label
+                class="w-full md:w-32 font-bold text-sm md:text-base text-gray-700 dark:text-gray-200">Email:</label>
               <input type="email" [(ngModel)]="user.staffEmail"
-                class="flex-1 px-4 py-2 border border-[#2c3e50] rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-[#7cd2ef]" />
+                class="w-full md:flex-1 px-4 py-2.5 md:py-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[#7cd2ef] transition-all" />
             </div>
 
-            <div class="flex items-center">
-              <label class="w-32 font-bold text-base">Password:</label>
-              <div class="flex-1 relative">
+            <div class="flex flex-col md:flex-row md:items-center gap-1 md:gap-0">
+              <label
+                class="w-full md:w-32 font-bold text-sm md:text-base text-gray-700 dark:text-gray-200">Password:</label>
+              <div class="w-full md:flex-1 relative">
                 <input [type]="showPassword ? 'text' : 'password'" [(ngModel)]="user.password"
-                  class="w-full px-4 py-2 border border-[#2c3e50] rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-[#7cd2ef]" />
+                  class="w-full px-4 py-2.5 md:py-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[#7cd2ef] transition-all pr-10" />
                 <button (click)="togglePasswordVisibility()"
-                  class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-600 hover:text-gray-900">
+                  class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-white">
                   <i class="pi" [ngClass]="showPassword ? 'pi-eye' : 'pi-eye-slash'"></i>
                 </button>
               </div>
             </div>
 
-            <div class="flex items-center">
-              <label class="w-32 font-bold text-base">DOB:</label>
-              <div class="flex-1 relative">
+            <div class="flex flex-col md:flex-row md:items-center gap-1 md:gap-0">
+              <label class="w-full md:w-32 font-bold text-sm md:text-base text-gray-700 dark:text-gray-200">DOB:</label>
+              <div class="w-full md:flex-1 relative">
                 <input type="text" [(ngModel)]="user.staffDOB"
-                  class="w-full px-4 py-2 border border-[#2c3e50] rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-[#7cd2ef]" />
-                <i class="pi pi-calendar absolute right-3 top-1/2 -translate-y-1/2 text-gray-600"></i>
+                  class="w-full px-4 py-2.5 md:py-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[#7cd2ef] transition-all pr-10" />
+                <i
+                  class="pi pi-calendar absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400"></i>
               </div>
             </div>
 
-            <div class="flex items-center">
-              <label class="w-32 font-bold text-base">Address:</label>
+            <div class="flex flex-col md:flex-row md:items-center gap-1 md:gap-0">
+              <label
+                class="w-full md:w-32 font-bold text-sm md:text-base text-gray-700 dark:text-gray-200">Address:</label>
               <input type="text" [(ngModel)]="user.staffAddress"
-                class="flex-1 px-4 py-2 border border-[#2c3e50] rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-[#7cd2ef]" />
+                class="w-full md:flex-1 px-4 py-2.5 md:py-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-[#7cd2ef] transition-all" />
             </div>
 
-            <div class="flex items-center">
-              <label class="w-32 font-bold text-base">Department:</label>
+            <div class="flex flex-col md:flex-row md:items-start gap-1 md:gap-0">
+              <label
+                class="w-full md:w-32 font-bold text-sm md:text-base text-gray-700 dark:text-gray-200 md:mt-2">Department:</label>
               <p-select [options]="availableDepartments" [(ngModel)]="user.department"
                 (onChange)="selectDepartment($event.value)" optionLabel="departmentName" dataKey="departmentID"
                 placeholder="Select Department" [filter]="true" [showClear]="true" appendTo="body"
                 [ngModelOptions]="{ standalone: true }"
-                styleClass="flex-1 rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-[#7cd2ef] appearance-none"
-                class="flex-1" > </p-select>
+                class="w-full md:flex-1 block rounded-lg focus-within:ring-2 focus-within:ring-[#7cd2ef] transition-all [&_.p-select-label]:bg-white dark:[&_.p-select-label]:bg-gray-800 [&_.p-select-label]:py-2.5 md:[&_.p-select-label]:py-2 [&_.p-select-label]:px-4 [&_.p-select-label]:rounded-l-lg [&_.p-select-trigger]:bg-white dark:[&_.p-select-trigger]:bg-gray-800 [&_.p-select-trigger]:rounded-r-lg border border-gray-300 dark:border-gray-600">
+              </p-select>
             </div>
           </div>
         </div>
 
         <div
-          class="mt-12 pt-8 border-t border-gray-200 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+          class="mt-8 md:mt-12 pt-6 md:pt-8 border-t border-gray-200 dark:border-gray-700 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 md:gap-6">
           <div class="flex items-center gap-4">
-            <div class="w-12 h-12 bg-gray-200  rounded-full flex items-center justify-center relative">
-              <i class="pi pi-cog text-gray-500 text-2xl"></i>
+            <div
+              class="w-12 h-12 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-full flex items-center justify-center relative flex-shrink-0">
+              <i class="pi pi-cog text-gray-500 dark:text-gray-400 text-xl"></i>
               <div class="absolute inset-0 flex items-center justify-center">
-                <i class="pi pi-shield text-[#ff9b9b] text-sm mt-1"></i>
+                <i class="pi pi-shield text-[#ff9b9b] dark:text-[#ff6b6b] text-xs mt-1.5 ml-1"></i>
               </div>
             </div>
             <div>
-              <h3 class="font-bold text-lg m-0">User Role:</h3>
-              <p class="text-sm text-gray-500 m-0">Assign a role to this user</p>
+              <h3 class="font-bold text-lg text-gray-900 dark:text-white m-0">User Role:</h3>
+              <p class="text-sm text-gray-500 dark:text-gray-400 m-0">Assign a role to this user</p>
             </div>
           </div>
 
-          <p-select [options]="availableRoles" [(ngModel)]="user.role" (onChange)="selectRole($event.value)"
-            optionLabel="roleName" dataKey="roleID" placeholder="Select Role" [filter]="true" [showClear]="true"
-            [ngModelOptions]="{ standalone: true }" appendTo="body"
-            styleClass="flex-1 rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-[#7cd2ef] appearance-none"
-            class="flex-1"> </p-select>
+          <div class="w-full md:w-auto md:flex-1 md:max-w-md">
+            <p-select [options]="availableRoles" [(ngModel)]="user.role" (onChange)="selectRole($event.value)"
+              optionLabel="roleName" dataKey="roleID" placeholder="Select Role" [filter]="true" [showClear]="true"
+              [ngModelOptions]="{ standalone: true }" appendTo="body"
+              class="block w-full rounded-lg focus-within:ring-2 focus-within:ring-[#7cd2ef] transition-all [&_.p-select-label]:bg-white dark:[&_.p-select-label]:bg-gray-800 [&_.p-select-label]:py-3 [&_.p-select-label]:px-4 [&_.p-select-label]:rounded-l-lg [&_.p-select-trigger]:bg-white dark:[&_.p-select-trigger]:bg-gray-800 [&_.p-select-trigger]:rounded-r-lg border border-gray-300 dark:border-gray-600">
+            </p-select>
+          </div>
         </div>
 
-        <div class="flex justify-end mt-12 pt-6 border-t border-gray-100">
+        <div class="flex justify-end mt-10 md:mt-12 pt-6 border-t border-gray-200 dark:border-gray-700">
           <button (click)="saveChanges()"
-            class="px-8 py-3 bg-[#7cd2ef] dark:bg-[#5aa8c9] text-gray-900 dark:text-white font-bold rounded-xl shadow-sm hover:bg-[#62bddd] transition-colors">
+            class="w-full sm:w-auto px-8 py-3.5 md:py-3 bg-[#7cd2ef] dark:bg-[#5aa8c7] text-gray-900 dark:text-white font-bold rounded-xl shadow-sm hover:bg-[#62bddd] transition-colors focus:ring-4 focus:ring-[#7cd2ef]/50">
             Save Changes
           </button>
         </div>
+
       </div>
 
     </div>
