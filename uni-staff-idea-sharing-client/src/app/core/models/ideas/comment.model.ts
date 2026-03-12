@@ -4,6 +4,7 @@ export interface CommentModel {
   commentID: number;
   comment: string;
   isAnonymous: boolean | number;
+  status: string;
   ideaID: number;
   staffID: number;
   created_at?: string;
