@@ -4,6 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { CookieService } from 'ngx-cookie-service';
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
+import { MultiSelectModule } from 'primeng/multiselect';
+
 import { CategoryModel } from '../../../core/models/category.model';
 import { CategoryService } from '../../../core/services/category.service';
 import { DocumentService } from '../../../core/services/ideas/document.service';
@@ -14,7 +16,7 @@ import { environment } from '../../../../environments/environment';
 @Component({
   selector: 'app-share-idea',
   standalone: true,
-  imports: [CommonModule, FormsModule, ToastModule],
+  imports: [CommonModule, FormsModule, ToastModule, MultiSelectModule],
   providers: [MessageService],
   templateUrl: './share-idea.component.html',
   styleUrl: './share-idea.component.scss'
@@ -27,10 +29,9 @@ export class ShareIdeaComponent implements OnInit {
   profilePictureUrl: string = '';
   currentDate = new Date();
 
-  // Form State
   title: string = '';
   description: string = '';
-  selectedCategoryId: number | null = null;
+  selectedCategoryIds: number[] = [];
   agreedToTerms: boolean = false;
   selectedFiles: File[] = [];
 
@@ -81,9 +82,11 @@ export class ShareIdeaComponent implements OnInit {
 
   onFileSelect(event: any): void {
     if (event.target.files && event.target.files.length > 0) {
-      for (let file of event.target.files) {
+      const files = Array.from(event.target.files) as File[];
+
+      files.forEach(file => {
         this.selectedFiles.push(file);
-      }
+      });
     }
   }
 
@@ -91,15 +94,13 @@ export class ShareIdeaComponent implements OnInit {
     this.selectedFiles.splice(index, 1);
   }
 
-
-  // Central submission logic
   submit(isAnonymous: boolean): void {
     if (!this.title || !this.description) {
       this.messageService.add({ severity: 'warn', summary: 'Required', detail: 'Title and Description are required.' });
       return;
     }
-    if (!this.selectedCategoryId) {
-      this.messageService.add({ severity: 'warn', summary: 'Required', detail: 'Please choose a category.' });
+    if (this.selectedCategoryIds.length === 0) {
+      this.messageService.add({ severity: 'warn', summary: 'Required', detail: 'Please choose at least one category.' });
       return;
     }
     if (!this.agreedToTerms) {
@@ -107,41 +108,40 @@ export class ShareIdeaComponent implements OnInit {
       return;
     }
 
-    const ideaPayload: any = {
-      title: this.title,
-      description: this.description,
-      isAnonymous: isAnonymous,
-      staffID: Number(this.staffID), // Ensures it is passed as a number
-      settingID: 1,
-      status: 'pending'
-    };
+    const formData = new FormData();
+    formData.append('title', this.title);
+    formData.append('description', this.description);
+    formData.append('isAnonymous', isAnonymous ? '1' : '0');
+    formData.append('staffID', this.staffID.toString());
+    formData.append('status', 'pending');
 
-    this.ideaService.create(ideaPayload).subscribe({
+    this.selectedCategoryIds.forEach(id => {
+      formData.append('categoryIDs[]', id.toString());
+    });
+
+    if (this.selectedFiles.length > 0) {
+      this.selectedFiles.forEach((file) => {
+        formData.append('documents[]', file, file.name);
+      });
+    }
+
+    this.ideaService.create(formData as any).subscribe({
       next: (ideaRes: any) => {
-        const createdIdeaId = ideaRes.data.ideaID;
-
-        this.ideaCategoryService.store({ ideaID: createdIdeaId, categoryID: this.selectedCategoryId! }).subscribe();
-
-        if (this.selectedFiles.length > 0) {
-          this.selectedFiles.forEach((file) => {
-            const simulatedPath = `uploads/ideas/${Date.now()}_${file.name}`;
-            this.documentService.store({ docPath: simulatedPath, ideaID: createdIdeaId }).subscribe();
-          });
-        }
-
         this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Idea posted successfully!' });
         setTimeout(() => this.goBack(), 1500);
       },
       error: (err) => {
         console.error('Error posting idea:', err);
-        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to post idea.' });
+        const errorDetail = err.error?.message || 'Failed to post idea.';
+        this.messageService.add({ severity: 'error', summary: 'Error', detail: errorDetail });
       }
     });
   }
+
   clearForm(): void {
     this.title = '';
     this.description = '';
-    this.selectedCategoryId = null;
+    this.selectedCategoryIds = [];
     this.agreedToTerms = false;
     this.selectedFiles = [];
   }
