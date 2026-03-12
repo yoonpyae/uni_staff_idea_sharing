@@ -35,6 +35,8 @@ export class RoleComponent implements OnInit {
   filteredRoles: RoleModel[] = [];
   searchQuery: string = '';
 
+  isMobileSearchOpen: boolean = false;
+
   // Dialog
   displayDialog: boolean = false;
   dialogTitle: string = 'Add Role';
@@ -191,5 +193,13 @@ export class RoleComponent implements OnInit {
   isFieldInvalid(fieldRoleName: string): boolean {
     const control = this.roleForm.get(fieldRoleName);
     return !!(control && control.invalid && control.touched);
+  }
+
+  toggleMobileSearch(): void {
+    this.isMobileSearchOpen = !this.isMobileSearchOpen;
+    if (!this.isMobileSearchOpen) {
+      this.searchQuery = '';
+      this.onSearch();
+    }
   }
 }
