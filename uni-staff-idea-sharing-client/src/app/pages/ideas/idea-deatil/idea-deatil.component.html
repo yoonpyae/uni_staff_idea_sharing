@@ -1,136 +1,155 @@
-<div class="min-h-screen bg-white text-gray-800 font-sans p-8 max-w-5xl mx-auto">
+<div
+    class="min-h-screen bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 font-sans p-4 md:p-8 max-w-5xl mx-auto transition-colors duration-200">
 
-    <header class="flex items-center justify-between mb-10">
-        <div class="flex items-center gap-4">
+    <header class="flex items-center justify-between mb-8 md:mb-10">
+        <div class="flex items-center gap-3 md:gap-4">
             <button (click)="goBack()"
-                class="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 transition-colors text-gray-700 font-bold">
-                <i class="pi pi-angle-left text-xl"></i>
+                class="w-9 h-9 md:w-10 md:h-10 flex items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors text-gray-700 dark:text-gray-300 font-bold">
+                <i class="pi pi-angle-left text-lg md:text-xl"></i>
             </button>
-            <h1 class="text-3xl font-bold text-gray-900 m-0">Idea Details</h1>
+            <h1 class="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white m-0">Idea Details</h1>
         </div>
     </header>
 
-    <div *ngIf="!idea" class="text-center py-12 text-gray-500">
+    <div *ngIf="!idea" class="text-center py-12 text-gray-500 dark:text-gray-400">
         <i class="pi pi-spin pi-spinner text-4xl mb-3"></i>
         <p>Loading idea...</p>
     </div>
 
-    <div *ngIf="idea" class="bg-white rounded-xl pb-6">
+    <div *ngIf="idea" class="pb-6">
 
         <div class="flex justify-between items-start mb-6">
-            <div class="flex items-center gap-3">
+            <div class="flex items-start gap-3">
                 <div
-                    class="w-12 h-12 rounded-full border-2 border-gray-800 flex items-center justify-center bg-gray-100 flex-shrink-0 overflow-hidden">
+                    class="w-10 h-10 md:w-12 md:h-12 rounded-full border-2 border-gray-800 dark:border-gray-600 flex items-center justify-center bg-gray-100 dark:bg-gray-800 flex-shrink-0 overflow-hidden">
                     <img *ngIf="!idea.isAnonymous && idea.staff?.staffProfile; else defaultUserIcon"
                         [src]="getProfileUrl(idea.staff?.staffProfile)" class="w-full h-full object-cover" />
                     <ng-template #defaultUserIcon>
-                        <i class="pi pi-user text-xl text-gray-600"></i>
+                        <i class="pi pi-user text-lg md:text-xl text-gray-600 dark:text-gray-400"></i>
                     </ng-template>
                 </div>
 
-                <div class="flex flex-col">
-                    <div class="flex items-center gap-3">
-                        <span class="font-bold text-lg"
-                            [ngClass]="idea.isAnonymous ? 'text-orange-500' : 'text-gray-900'">
-                            {{ idea.isAnonymous ? 'Anonymous' : idea.staff?.staffName || 'Unknown' }}
+                <div class="flex flex-col mt-0.5">
+                    <div class="flex flex-wrap items-center gap-2 md:gap-3">
+                        <span class="font-bold text-[16px] md:text-lg"
+                            [ngClass]="idea.isAnonymous ? 'text-orange-500 dark:text-orange-400' : 'text-gray-900 dark:text-white'">
+                            {{ idea.isAnonymous ? 'Anonymous' : idea.staff?.staffName || 'Unknown Staff' }}
                         </span>
-                        <span *ngIf="idea.categories && idea.categories.length > 0"
-                            class="px-3 py-0.5 border border-gray-400 text-gray-600 rounded-full text-xs font-medium">
-                            {{ idea.categories[0].categoryname }}
-                        </span>
+
+                        <div class="flex gap-2">
+                            <span *ngFor="let cat of idea.categories"
+                                class="px-3 py-0.5 border border-gray-400 dark:border-gray-500 text-gray-600 dark:text-gray-300 rounded-full text-[11px] md:text-xs font-medium">
+                                {{ cat.categoryname }}
+                            </span>
+                        </div>
                     </div>
-                    <span class="text-sm text-gray-500 font-medium">{{ idea.created_at | date:'mediumDate' }}</span>
+                    <span class="text-xs text-gray-500 dark:text-gray-400 font-medium mt-1 md:mt-0.5">{{ idea.created_at
+                        | date:'mediumDate' }}</span>
                 </div>
             </div>
 
-            <button class="text-gray-900 hover:text-black p-1 transition-colors">
+            <button
+                class="text-gray-900 dark:text-gray-300 hover:text-black dark:hover:text-white p-1 transition-colors">
                 <i class="pi pi-ellipsis-h text-xl font-extrabold"></i>
             </button>
         </div>
 
-        <h2 class="text-xl font-bold text-gray-900 mb-4">{{ idea.title }}</h2>
-        <p class="text-[15px] text-gray-800 leading-relaxed mb-6 whitespace-pre-line">
+        <h2 class="text-[18px] md:text-xl font-bold text-gray-900 dark:text-white mb-4">{{ idea.title }}</h2>
+        <p class="text-[14px] md:text-[15px] text-gray-800 dark:text-gray-300 leading-relaxed mb-6 whitespace-pre-line">
             {{ idea.description }}
         </p>
 
-        <div class="flex items-center gap-6 text-gray-600 font-medium text-sm border-b border-gray-200 pb-6 mb-6">
-            <div class="flex items-center gap-2 cursor-pointer hover:text-blue-600 transition-colors"
-                (click)="voteIdea('Like')">
-                <i class="pi pi-thumbs-up text-lg"></i><span>{{ idea.likesCount }}</span>
-            </div>
-            <div class="flex items-center gap-2 cursor-pointer hover:text-red-600 transition-colors"
-                (click)="voteIdea('Unlike')">
-                <i class="pi pi-thumbs-down text-lg"></i><span>{{ idea.unlikesCount }}</span>
-            </div>
-            <div class="flex items-center gap-2">
-                <i class="pi pi-comment text-lg"></i><span>{{ idea.commentsCount }}</span>
-            </div>
-            <div class="flex items-center gap-2 text-gray-500">
-                <i class="pi pi-eye text-lg"></i><span>{{ idea.viewsCount }}</span>
+        <div *ngIf="idea.documents && idea.documents.length > 0" class="flex flex-wrap gap-3 mb-6">
+            <div *ngFor="let doc of idea.documents"
+                class="flex items-center gap-2.5 bg-[#f0f2f5] dark:bg-gray-800 px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                title="{{ getFileName(doc.docPath) }}">
+
+                <i class="pi text-lg" [ngClass]="getFileIcon(doc.docPath) + ' ' + getFileColor(doc.docPath)"></i>
+
+                <span
+                    class="text-[13.5px] font-medium text-[#1E88E5] dark:text-[#64B5F6] truncate max-w-[200px] sm:max-w-[250px]">
+                    {{ getFileName(doc.docPath) }}
+                </span>
             </div>
         </div>
 
-        <div class="ml-2 md:ml-10 space-y-6 mb-8">
+        <div
+            class="flex items-center gap-5 md:gap-6 text-gray-600 dark:text-gray-400 font-medium text-sm border-b border-gray-200 dark:border-gray-700 pb-6 mb-6">
+            <div class="flex items-center gap-2 cursor-pointer transition-colors"
+                [ngClass]="hasUserLiked(idea) ? 'text-blue-600 dark:text-blue-400' : 'hover:text-blue-600 dark:hover:text-blue-400'"
+                (click)="voteIdea('Like')">
+                <i class="pi pi-thumbs-up text-lg" [ngClass]="{'font-bold': hasUserLiked(idea)}"></i>
+                <span>{{ getLikesCount(idea) }}</span>
+            </div>
+            <div class="flex items-center gap-2 cursor-pointer transition-colors"
+                [ngClass]="hasUserUnliked(idea) ? 'text-red-600 dark:text-red-400' : 'hover:text-red-600 dark:hover:text-red-400'"
+                (click)="voteIdea('Unlike')">
+                <i class="pi pi-thumbs-down text-lg" [ngClass]="{'font-bold': hasUserUnliked(idea)}"></i>
+                <span>{{ getUnlikesCount(idea) }}</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <i class="pi pi-comment text-lg"></i><span>{{ getCommentsCount(idea) }}</span>
+            </div>
+            <div class="flex items-center gap-2 text-gray-500 dark:text-gray-500">
+                <i class="pi pi-eye text-lg"></i><span>{{ idea.viewCount || 0 }}</span>
+            </div>
+        </div>
 
-            <div *ngFor="let comment of comments" class="flex items-start gap-4">
+        <div class="ml-0 md:ml-10 space-y-6 mb-8">
+            <div *ngIf="comments.length === 0" class="text-gray-500 dark:text-gray-400 text-sm font-medium">
+                No comments yet. Be the first to share your thoughts!
+            </div>
+
+            <div *ngFor="let comment of comments" class="flex items-start gap-3 md:gap-4">
                 <div
-                    class="w-10 h-10 rounded-full border-2 border-gray-800 flex items-center justify-center bg-gray-100 flex-shrink-0 overflow-hidden mt-1">
+                    class="w-8 h-8 md:w-10 md:h-10 rounded-full border-2 border-gray-800 dark:border-gray-600 flex items-center justify-center bg-gray-100 dark:bg-gray-800 flex-shrink-0 overflow-hidden mt-1">
                     <img *ngIf="!comment.isAnonymous && comment.staff?.staffProfile; else commentUserIcon"
                         [src]="getProfileUrl(comment.staff?.staffProfile)" class="w-full h-full object-cover" />
                     <ng-template #commentUserIcon>
-                        <i class="pi pi-user text-gray-600"></i>
+                        <i class="pi pi-user text-gray-600 dark:text-gray-400"></i>
                     </ng-template>
                 </div>
 
-                <div class="flex-1 bg-[#f0f2f5] rounded-2xl p-4 relative">
+                <div class="flex-1 bg-[#f0f2f5] dark:bg-gray-800 rounded-2xl p-4 relative">
                     <div class="flex justify-between items-center mb-2">
-                        <div class="flex items-center gap-3">
-                            <span class="font-bold text-[15px]"
-                                [ngClass]="comment.isAnonymous ? 'text-orange-500' : 'text-gray-900'">
-                                {{ comment.isAnonymous ? 'Anonymous' : comment.staff?.staffName || 'Unknown' }}
+                        <div class="flex items-center gap-2 md:gap-3">
+                            <span class="font-bold text-[14px] md:text-[15px]"
+                                [ngClass]="comment.isAnonymous ? 'text-orange-500 dark:text-orange-400' : 'text-gray-900 dark:text-white'">
+                                {{ comment.isAnonymous ? 'Anonymous' : comment.staff?.staffName || 'Unknown Staff' }}
                             </span>
-                            <span class="text-xs text-gray-500 font-medium">{{ comment.created_at | date:'shortTime'
-                                }}</span>
+                            <span class="text-[11px] md:text-xs text-gray-500 dark:text-gray-400 font-medium">
+                                {{ comment.created_at | date:'mediumDate' }} • {{ comment.created_at | date:'shortTime'
+                                }}
+                            </span>
                         </div>
-                        <button class="text-gray-600 hover:text-black">
-                            <i class="pi pi-ellipsis-h font-bold"></i>
-                        </button>
                     </div>
 
-                    <p class="text-[14.5px] text-gray-800 leading-relaxed mb-3">
+                    <p class="text-[13.5px] md:text-[14.5px] text-gray-800 dark:text-gray-300 leading-relaxed mb-1">
                         {{ comment.comment }}
                     </p>
-
-                    <div class="flex items-center gap-4 text-gray-500 text-sm font-medium">
-                        <div class="flex items-center gap-1.5 cursor-pointer hover:text-gray-800">
-                            <i class="pi pi-thumbs-up"></i><span>0</span>
-                        </div>
-                        <div class="flex items-center gap-1.5 cursor-pointer hover:text-gray-800">
-                            <i class="pi pi-thumbs-down"></i><span>0</span>
-                        </div>
-                    </div>
                 </div>
             </div>
-
         </div>
 
-        <div class="border-[1.5px] border-gray-300 rounded-2xl p-6 bg-white shadow-sm mt-8">
+        <div
+            class="border-[1.5px] border-gray-300 dark:border-gray-700 rounded-2xl p-4 md:p-6 bg-white dark:bg-gray-800 shadow-sm mt-8 transition-colors">
             <div class="relative mb-4">
                 <input type="text" [(ngModel)]="newCommentText" (keyup.enter)="submitComment()"
                     placeholder="Write your comment..."
-                    class="w-full bg-gray-200 text-gray-800 placeholder:text-gray-500 rounded-full py-4 pl-6 pr-14 focus:outline-none focus:ring-2 focus:ring-[#6FCBF0] font-medium transition-all" />
+                    class="w-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white placeholder:text-gray-500 dark:placeholder-gray-400 rounded-full py-3.5 md:py-4 pl-5 md:pl-6 pr-14 focus:outline-none focus:ring-2 focus:ring-[#6FCBF0] font-medium transition-all text-[14px] md:text-base" />
 
                 <button (click)="submitComment()" [disabled]="!newCommentText.trim()"
-                    class="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center text-[#1E88E5] hover:text-[#1565C0] disabled:text-gray-400 transition-colors">
-                    <i class="pi pi-send text-2xl" style="transform: rotate(45deg); margin-bottom: 5px;"></i>
+                    class="absolute right-2 md:right-3 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center text-[#1E88E5] dark:text-[#42A5F5] hover:text-[#1565C0] dark:hover:text-[#1E88E5] disabled:text-gray-400 dark:disabled:text-gray-600 transition-colors">
+                    <i class="pi pi-send text-xl md:text-2xl" style="transform: rotate(45deg); margin-bottom: 5px;"></i>
                 </button>
             </div>
 
             <div class="flex items-center gap-3 ml-2">
                 <input type="checkbox" id="anonComment" [(ngModel)]="isAnonymousComment"
-                    class="w-4 h-4 rounded border-gray-400 text-gray-800 cursor-pointer" />
-                <label for="anonComment" class="text-sm font-medium text-gray-700 cursor-pointer">Comment
-                    anonymously</label>
+                    class="w-4 h-4 rounded border-gray-400 dark:border-gray-500 text-[#6FCBF0] focus:ring-[#6FCBF0] bg-white dark:bg-gray-700 cursor-pointer" />
+                <label for="anonComment" class="text-sm font-medium text-gray-700 dark:text-gray-300 cursor-pointer">
+                    Comment anonymously
+                </label>
             </div>
         </div>
 
