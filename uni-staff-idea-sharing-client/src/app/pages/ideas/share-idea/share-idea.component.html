@@ -1,23 +1,18 @@
-<div class="min-h-screen bg-white text-gray-800 font-sans p-8 max-w-6xl mx-auto">
+<div
+    class="h-full w-full min-h-screen bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 font-sans p-4 md:p-8 max-w-6xl mx-auto transition-colors duration-200">
 
-    <header class="flex items-center justify-between mb-10">
+    <header class="flex items-center justify-between mb-8 md:mb-10">
         <button (click)="goBack()"
-            class="flex items-center gap-2 px-5 py-2.5 bg-gray-200 rounded-full font-bold text-gray-800 hover:bg-gray-300 transition-colors shadow-sm">
+            class="flex items-center gap-2 px-4 py-2 md:px-5 md:py-2.5 bg-gray-200 dark:bg-gray-800 rounded-full font-bold text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-700 transition-colors shadow-sm text-sm md:text-base">
             <i class="pi pi-angle-left"></i> Back to Ideas
         </button>
-
-        <!-- <div class="relative">
-            <input type="text" placeholder="Search..."
-                class="w-64 px-4 py-2.5 pl-4 pr-10 bg-gray-200 border-none rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-300 text-gray-800" />
-            <i class="pi pi-search absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"></i>
-        </div> -->
     </header>
 
     <div class="flex flex-col gap-6">
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
-            <div class="flex items-center gap-4">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-5 md:gap-6">
+            <div class="flex items-center gap-3 md:gap-4">
                 <div
-                    class="w-12 h-12 rounded-full border-2 border-gray-800 flex items-center justify-center bg-gray-100 flex-shrink-0 overflow-hidden">
+                    class="w-10 h-10 md:w-12 md:h-12 rounded-full border-2 border-gray-800 dark:border-gray-600 flex items-center justify-center bg-gray-100 dark:bg-gray-800 flex-shrink-0 overflow-hidden">
 
                     <img *ngIf="profilePictureUrl; else defaultIcon" [src]="profilePictureUrl" alt="Profile"
                         class="w-full h-full object-cover" />
@@ -25,25 +20,25 @@
                     <ng-template #defaultIcon>
                         <div
                             class="w-full h-full bg-[#2c5f5d] dark:bg-[#a8e6cf] flex items-center justify-center text-white dark:text-[#2c3e50]">
-                            <i class="pi pi-user text-2xl"></i>
+                            <i class="pi pi-user text-xl md:text-2xl"></i>
                         </div>
                     </ng-template>
 
                 </div>
 
                 <div class="flex flex-col">
-                    <span class="font-bold text-gray-900 dark:text-white text-lg">{{ name }}</span>
-                    <span class="text-sm text-gray-500 dark:text-gray-400 font-medium">
+                    <span class="font-bold text-gray-900 dark:text-white text-[16px] md:text-lg">{{ name }}</span>
+                    <span class="text-[12px] md:text-sm text-gray-500 dark:text-gray-400 font-medium mt-0.5">
                         {{ currentDate | date:'mediumDate' }} &nbsp; {{ currentDate | date:'shortTime' }}
                     </span>
                 </div>
             </div>
 
-            <div class="relative inline-block w-full sm:w-auto min-w-[240px]">
+            <div class="relative w-full sm:w-auto min-w-[240px]">
                 <p-multiSelect [options]="categories" [(ngModel)]="selectedCategoryIds" optionLabel="categoryname"
                     optionValue="categoryID" placeholder="Choose Categories" display="chip"
-                    styleClass="w-full bg-[#a8e6cf] border-none shadow-sm rounded-xl text-gray-900 font-bold hover:bg-[#88d4ab] transition-colors py-1"
-                    [panelStyleClass]="'bg-white text-gray-800 shadow-xl border border-gray-100 rounded-xl'">
+                    styleClass="w-full bg-[#a8e6cf] dark:bg-[#2c5f5d] border-none shadow-sm rounded-xl text-gray-900 dark:text-white font-bold hover:bg-[#88d4ab] dark:hover:bg-[#1f4746] transition-colors py-1"
+                    [panelStyleClass]="'bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 shadow-xl border border-gray-100 dark:border-gray-700 rounded-xl'">
                 </p-multiSelect>
             </div>
         </div>
@@ -52,29 +47,31 @@
 
             <div class="lg:col-span-2 flex flex-col gap-4">
                 <input type="text" [(ngModel)]="title" placeholder="Enter your idea title..."
-                    class="w-full border border-gray-400 rounded-xl px-5 py-4 text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#6FCBF0] shadow-sm font-medium" />
+                    class="w-full border border-gray-400 dark:border-gray-600 bg-white dark:bg-gray-800 rounded-xl px-5 py-4 text-gray-800 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#6FCBF0] shadow-sm font-medium transition-colors" />
 
                 <textarea [(ngModel)]="description" placeholder="What's on your mind?" rows="12"
-                    class="w-full border border-gray-400 rounded-xl px-5 py-4 text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#6FCBF0] shadow-sm resize-none font-medium"></textarea>
+                    class="w-full border border-gray-400 dark:border-gray-600 bg-white dark:bg-gray-800 rounded-xl px-5 py-4 text-gray-800 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#6FCBF0] shadow-sm resize-none font-medium transition-colors"></textarea>
             </div>
 
             <div class="lg:col-span-1 h-full">
                 <input type="file" id="fileUpload" multiple (change)="onFileSelect($event)" class="hidden" />
 
                 <label for="fileUpload"
-                    class="h-full min-h-[300px] border-[1.5px] border-gray-400 rounded-xl flex flex-col items-center justify-center p-8 text-center cursor-pointer hover:bg-gray-50 transition-colors shadow-sm">
-                    <i class="pi pi-file-plus text-4xl text-gray-600 mb-4"></i>
-                    <span class="text-gray-600 font-medium mb-1">Drop files here or click to select</span>
-                    <span class="text-sm text-gray-400 font-medium">Supports images and documents</span>
+                    class="h-full min-h-[300px] border-[1.5px] border-gray-400 dark:border-gray-600 rounded-xl flex flex-col items-center justify-center p-8 text-center cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors shadow-sm bg-white dark:bg-gray-800">
+                    <i class="pi pi-file-plus text-4xl text-gray-600 dark:text-gray-400 mb-4 transition-colors"></i>
+                    <span class="text-gray-600 dark:text-gray-300 font-medium mb-1 transition-colors">Drop files here or
+                        click to select</span>
+                    <span class="text-sm text-gray-400 dark:text-gray-500 font-medium transition-colors">Supports images
+                        and documents</span>
 
                     <div *ngIf="selectedFiles.length > 0"
-                        class="mt-6 w-full text-left bg-white border border-gray-200 rounded-lg p-3 shadow-inner">
-                        <h4 class="text-sm font-bold text-gray-700 mb-2">Selected Files:</h4>
-                        <ul class="text-sm space-y-1">
+                        class="mt-6 w-full text-left bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-3 shadow-inner transition-colors">
+                        <h4 class="text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Selected Files:</h4>
+                        <ul class="text-sm space-y-1.5">
                             <li *ngFor="let file of selectedFiles; let i = index"
-                                class="flex justify-between items-center text-gray-600">
-                                <span class="truncate pr-2">{{ file.name }}</span>
-                                <i class="pi pi-times text-red-500 cursor-pointer hover:text-red-700"
+                                class="flex justify-between items-center text-gray-600 dark:text-gray-400 bg-white dark:bg-gray-800 px-2 py-1.5 rounded border border-gray-100 dark:border-gray-700">
+                                <span class="truncate pr-2 font-medium">{{ file.name }}</span>
+                                <i class="pi pi-times text-red-500 dark:text-red-400 cursor-pointer hover:text-red-700 dark:hover:text-red-300 transition-colors"
                                     (click)="removeFile(i); $event.preventDefault()"></i>
                             </li>
                         </ul>
@@ -83,28 +80,45 @@
             </div>
         </div>
 
-        <div class="flex flex-col sm:flex-row items-center justify-between mt-4">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mt-4 gap-6 sm:gap-0">
 
             <div class="flex items-center gap-3">
-                <input type="checkbox" id="terms" [(ngModel)]="agreedToTerms"
-                    class="w-5 h-5 rounded border-gray-400 text-[#6FCBF0] focus:ring-[#6FCBF0] cursor-pointer" />
-                <label for="terms" class="font-bold text-gray-800 cursor-pointer text-sm md:text-base">I agree to terms
-                    and conditions</label>
+                <input type="checkbox" id="terms" [(ngModel)]="agreedToTerms" [disabled]="isSubmitting"
+                    class="w-5 h-5 rounded border-gray-400 dark:border-gray-500 text-[#6FCBF0] dark:bg-gray-800 focus:ring-[#6FCBF0] cursor-pointer disabled:opacity-50 transition-colors" />
+                <label for="terms"
+                    class="font-bold text-gray-800 dark:text-gray-200 cursor-pointer text-sm md:text-base transition-colors"
+                    [class.opacity-50]="isSubmitting">
+                    I agree to terms and conditions
+                </label>
             </div>
 
-            <div class="flex items-center gap-3 mt-6 sm:mt-0">
-                <button (click)="submit(false)"
-                    class="px-8 py-3 bg-[#6FCBF0] hover:bg-[#5bb8db] text-gray-900 font-bold rounded-xl shadow-sm transition-colors">
-                    Submit
-                </button>
-                <button (click)="submit(true)"
-                    class="px-6 py-3 bg-[#6FCBF0] hover:bg-[#5bb8db] text-gray-900 font-bold rounded-xl shadow-sm transition-colors">
-                    Submit Anonymously
-                </button>
-                <button (click)="clearForm()"
-                    class="px-8 py-3 bg-[#ff9b9b] hover:bg-[#ff8282] text-gray-900 font-bold rounded-xl shadow-sm transition-colors">
-                    Clear
-                </button>
+            <div class="flex flex-col items-start sm:items-end gap-2 w-full sm:w-auto">
+
+                <div class="flex flex-wrap items-center gap-3 w-full sm:w-auto">
+                    <button (click)="submit(false)" [disabled]="isSubmitting"
+                        class="flex-1 sm:flex-none px-6 md:px-8 py-3 bg-[#6FCBF0] hover:bg-[#5bb8db] dark:bg-[#45a4c9] dark:hover:bg-[#3486a6] text-gray-900 dark:text-white font-bold rounded-xl shadow-sm transition-colors flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed min-w-[130px] md:min-w-[140px] text-sm md:text-base">
+                        <i *ngIf="isSubmitting" class="pi pi-spin pi-spinner text-lg"></i>
+                        {{ isSubmitting ? 'Submitting...' : 'Submit' }}
+                    </button>
+
+                    <button (click)="submit(true)" [disabled]="isSubmitting"
+                        class="flex-1 sm:flex-none px-4 md:px-6 py-3 bg-[#6FCBF0] hover:bg-[#5bb8db] dark:bg-[#45a4c9] dark:hover:bg-[#3486a6] text-gray-900 dark:text-white font-bold rounded-xl shadow-sm transition-colors flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed min-w-[180px] md:min-w-[220px] text-sm md:text-base">
+                        <i *ngIf="isSubmitting" class="pi pi-spin pi-spinner text-lg"></i>
+                        {{ isSubmitting ? 'Submitting...' : 'Submit Anonymously' }}
+                    </button>
+
+                    <button (click)="clearForm()" [disabled]="isSubmitting"
+                        class="px-5 md:px-8 py-3 bg-[#ff9b9b] hover:bg-[#ff8282] dark:bg-[#d66b6b] dark:hover:bg-[#b85656] text-gray-900 dark:text-white font-bold rounded-xl shadow-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm md:text-base">
+                        Clear
+                    </button>
+                </div>
+
+                <div *ngIf="isSubmitting"
+                    class="text-xs md:text-sm font-medium text-gray-500 dark:text-gray-400 animate-pulse flex items-center gap-2 sm:mr-2 transition-colors mt-2 sm:mt-0">
+                    <i class="pi pi-cloud-upload text-base"></i>
+                    Uploading files, please do not close this page... ({{ loadingSeconds }}s)
+                </div>
+
             </div>
         </div>
 
