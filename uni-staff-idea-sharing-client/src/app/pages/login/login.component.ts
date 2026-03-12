@@ -55,6 +55,7 @@ export class LoginComponent implements OnInit {
     private router: Router,
     private authService: AuthService,
     private messageService: MessageService,
+    private cookieService: CookieService
   ) { }
 
   ngOnInit(): void {
@@ -77,7 +78,12 @@ export class LoginComponent implements OnInit {
         });
 
         if (res.success) {
-          this.router.navigate(['/dashboard']);
+          const userRole = this.cookieService.get('roleName') || '';
+          if (userRole.toLowerCase() === 'staff') {
+            this.router.navigate(['/staff-idea-feed']);
+          } else {
+            this.router.navigate(['/dashboard']);
+          }
         }
       },
       error: (err) => {
