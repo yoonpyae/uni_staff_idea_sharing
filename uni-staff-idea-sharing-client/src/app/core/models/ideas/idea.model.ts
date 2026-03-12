@@ -2,6 +2,8 @@ import { CategoryModel } from "../category.model";
 import { StaffModel } from "../staff.model";
 import { CommentModel } from "./comment.model";
 import { VoteModel } from "./vote.model";
+import { DocumentModel } from "./document.model";
+import { ClosureSettingModel } from "../closureSetting.model";
 
 export interface IdeaModel {
   ideaID: number;
@@ -11,6 +13,9 @@ export interface IdeaModel {
   staffID: number;
   settingID: number;
   status: string;
+  viewCount: number;        
+  isFlagged?: boolean | number;       
+  isCommentEnabled?: boolean | number; 
   created_at?: string;
   updated_at?: string;
   
@@ -18,9 +23,6 @@ export interface IdeaModel {
   categories?: CategoryModel[];
   comments?: CommentModel[];
   votes?: VoteModel[];
-  
-  likesCount?: number;
-  unlikesCount?: number;
-  commentsCount?: number;
-  viewsCount?: number; // Note: Add this to your backend if you want real view tracking
+  documents?: DocumentModel[];        
+  closureSetting?: ClosureSettingModel[];      
 }
