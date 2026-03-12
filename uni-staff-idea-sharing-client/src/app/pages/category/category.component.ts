@@ -62,7 +62,7 @@ export class CategoryComponent implements OnInit {
     categoryID: [0],
     categoryname: ['', Validators.required],
     status:[],
-    create_at: [''],
+    created_at: [''],
     updated_at: ['']
   });
 
