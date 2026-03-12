@@ -15,16 +15,40 @@ import { CategoryComponent } from './pages/category/category.component';
 import { IdeaFeedComponent } from './pages/ideas/idea-feed/idea-feed.component';
 import { ShareIdeaComponent } from './pages/ideas/share-idea/share-idea.component';
 import { IdeaDeatilComponent } from './pages/ideas/idea-deatil/idea-deatil.component';
+import { PendingIdeasComponent } from './pages/ideas/pending-ideas/pending-ideas.component';
+import { StaffIdeaFeedComponent } from './pages/ideas/staff-idea-feed/staff-idea-feed.component';
 
 export const routes: Routes = [
-  { path: '', component: LoginComponent },
+  { path: '', redirectTo: 'login', pathMatch: 'full' },
+  { path: 'login', component: LoginComponent },
   {
-    path: 'login',
-    component: LoginComponent,
+    path: 'staff-idea-feed',
+    component: StaffIdeaFeedComponent,
+    canActivate: [roleGuard],
+    data: { title: 'Idea Feed', roles: ['Staff'] }
+  },
+  {
+    path: 'staff-share-idea',
+    component: ShareIdeaComponent,
+    canActivate: [roleGuard],
+    data: { title: 'Share New Idea', roles: ['Staff'] }
+  },
+  {
+    path: 'staff-idea-detail/:id',
+    component: IdeaDeatilComponent,
+    canActivate: [roleGuard],
+    data: { title: 'Idea Details', roles: ['Staff'] }
+  },
+  {
+    path: 'account-details',
+    component: AccountDetailsComponent,
+    data: { title: 'Account Details', roles: ['Staff'] }
   },
   {
     path: '',
     component: AppLayoutComponent,
+    canActivate: [roleGuard],
+    data: { roles: ['Administrator', 'QA Manager', 'QA Coordinator'] },
     children: [
       {
         path: 'dashboard',
@@ -34,6 +58,7 @@ export const routes: Routes = [
       {
         path: 'account-details',
         component: AccountDetailsComponent,
+        canActivate: [roleGuard],
         data: { title: 'Account Details' },
       },
       {
@@ -89,6 +114,12 @@ export const routes: Routes = [
         component: StaffManagementComponent,
         canActivate: [roleGuard],
         data: { title: 'Staff Management', roles: ['QA Manager'] }
+      },
+      {
+        path: 'pending-ideas',
+        component: PendingIdeasComponent,
+        canActivate: [roleGuard],
+        data: { title: 'Pending Ideas', roles: ['QA Coordinator'] }
       },
     ],
   }
