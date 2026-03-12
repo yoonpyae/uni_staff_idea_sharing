@@ -24,6 +24,8 @@ export interface ViewStaffModel {
     termsAccepted: number;
     termsAcceptedDate: null;
     createdDateTime: string;
+    last_login_at: null;
+    account_status: string;
     departmentID: number;
     roleID: number;
     department: Department;
@@ -35,12 +37,26 @@ export interface Role {
     roleName: string;
     created_at: string;
     updated_at: string;
-    permissions: any[];
+    permissions: Permission[];
+}
+
+
+export interface Permission {
+    permissionID: number;
+    permission: string;
+    created_at: null | string | string;
+    updated_at: null;
+    pivot: Pivot;
+}
+
+export interface Pivot {
+    roleID: number;
+    permissionID: number;
 }
 
 export interface Department {
     departmentID: number;
     departmentName: string;
-    created_at: string;
-    updated_at: string;
+    created_at: null | string;
+    updated_at: null | string;
 }
