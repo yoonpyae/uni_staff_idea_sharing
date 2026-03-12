@@ -61,6 +61,12 @@ export const NAVIGATION_MENU: Readonly<MenuItem[]> = [
         routerLink: ['/staff-management'],
         roles: ['QA Manager']
       },
+      {
+        label: 'Pending Ideas',
+        icon: 'pi pi-fw pi-hourglass',
+        routerLink: ['/pending-ideas'],
+        roles: ['QA Coordinator']
+      },
     ],
   },
 ];
