@@ -15,7 +15,6 @@ import { DepartmentModel } from '../../../core/models/department.model';
 import { environment } from '../../../../environments/environment';
 import { SelectModule } from 'primeng/select';
 
-// rxjs helpers used elsewhere
 import { Observable } from 'rxjs';
 import { DatePickerModule } from 'primeng/datepicker';
 
@@ -47,11 +46,9 @@ export class UserAssignmentComponent implements OnInit {
 
     showPassword = false;
 
-    // profile picture handling
     selectedProfileFile?: File;
     profileFileName: string = 'No file chosen';
 
-    // reactive form and helpers
     private formBuilder = inject(FormBuilder);
     public staffForm: FormGroup = this.formBuilder.group({
         staffID: [''],
@@ -82,7 +79,6 @@ export class UserAssignmentComponent implements OnInit {
     ngOnInit(): void {
         const userId = this.route.snapshot.paramMap.get('id');
 
-        // load roles and departments first
         this.loadRoles();
         this.loadDepartments();
 
@@ -94,7 +90,6 @@ export class UserAssignmentComponent implements OnInit {
             this.user = { ...this.user, staffID: 0 } as StaffModel;
         } else if (userId) {
             this.isCreateMode = false;
-            // if navigated via edit button, set title; if via row click, keep empty
             this.pageTitle = mode === 'edit' ? 'Edit User' : '';
             this.loadUser(parseInt(userId, 10));
         }
@@ -107,19 +102,16 @@ export class UserAssignmentComponent implements OnInit {
                 if (data) {
                     this.user = data;
 
-                    // set displayed file name from existing profile path
                     if (data.staffProfile) {
                         const parts = data.staffProfile.split('/');
                         this.profileFileName = parts[parts.length - 1] || this.profileFileName;
                     }
 
-                    // normalize departments to array for the UI
                     if (data.department && data.department.departmentName) {
                         this.user.departments = [data.department.departmentName];
                         this.user.departmentID = data.department.departmentID;
                     }
 
-                    // ensure role selection reflects current role
                     if (data.role) {
                         this.user.roleID = data.role.roleID;
                         this.user.roleName = data.role.roleName;
@@ -157,7 +149,6 @@ export class UserAssignmentComponent implements OnInit {
         });
     }
 
-    // Select role locally — do not call API until Save
     selectRole(role: RoleModel): void {
         if (!this.user) return;
         this.user.roleID = role.roleID;
@@ -169,7 +160,6 @@ export class UserAssignmentComponent implements OnInit {
         return this.user && this.user.roleID === role.roleID;
     }
 
-    // Select department locally — do not call API until Save
     selectDepartment(dept: DepartmentModel): void {
         if (!this.user) return;
         this.user.departmentID = dept.departmentID;
@@ -194,7 +184,7 @@ export class UserAssignmentComponent implements OnInit {
             if (!isNaN(d.getTime())) {
                 formattedDOB = d.toISOString().split('T')[0];
             } else {
-                formattedDOB = rawDob; 
+                formattedDOB = rawDob;
             }
         }
 
@@ -283,11 +273,10 @@ export class UserAssignmentComponent implements OnInit {
         if (/^(https?:)?\/\//.test(profilePath)) return profilePath;
         const trimmed = profilePath.replace(/^\/+/, '');
         let base = (environment.main_url ?? '').replace(/\/+$/, '');
-        base = base.replace(/\/api$/, ''); // ensure we don't keep a trailing /api
+        base = base.replace(/\/api$/, '');
         return base ? `${base}/${trimmed}` : `/${trimmed}`;
     }
 
-    // -------- profile helpers --------
     onProfileSelected(event: Event): void {
         const input = event.target as HTMLInputElement;
         if (input.files && input.files.length > 0) {
