@@ -146,13 +146,13 @@ export class IdeaFeedComponent implements OnInit {
       );
     }
 
-    if (this.selectedCat) {
+    if (this.selectedCat !== null) {
       result = result.filter(idea =>
         idea.categories?.some(c => c.categoryID == this.selectedCat)
       );
     }
 
-    if (this.selectedDept) {
+    if (this.selectedDept !== null) {
       result = result.filter(idea =>
         idea.staff?.departmentID == this.selectedDept
       );
@@ -175,6 +175,16 @@ export class IdeaFeedComponent implements OnInit {
     }
 
     this.filteredIdeas = result;
+  }
+
+  resetFilters(): void {
+    this.searchQuery = '';
+
+    this.activeFilter = 'All';
+    this.selectedDept = null;
+    this.selectedCat = null;
+
+    this.applyFilters();
   }
 
   goToIdeaDetail(idea: IdeaModel): void {
