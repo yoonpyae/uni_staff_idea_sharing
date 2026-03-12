@@ -47,6 +47,7 @@ export class ClosureSettingComponent implements OnInit {
   ngOnInit(): void {
     this.loadSettings();
   }
+
   loadSettings(): void {
     this.closureSettingService.get().subscribe({
       next: (res) => {
@@ -80,7 +81,6 @@ export class ClosureSettingComponent implements OnInit {
     this.closureForm.patchValue({
       settingID: setting.settingID,
       title: setting.title,
-      // Convert string dates to Date objects for PrimeNG DatePicker
       closureDate: setting.closureDate ? new Date(setting.closureDate) : null,
       finalclosureDate: setting.finalclosureDate ? new Date(setting.finalclosureDate) : null,
       academicYear: setting.academicYear
@@ -110,7 +110,8 @@ export class ClosureSettingComponent implements OnInit {
       title: formValues.title,
       closureDate: this.formatDate(formValues.closureDate),
       finalclosureDate: this.formatDate(formValues.finalclosureDate),
-      academicYear: formValues.academicYear
+      academicYear: formValues.academicYear,
+      status: 'active' 
     };
 
     if (this.isEditMode && formValues.settingID) {
@@ -136,18 +137,18 @@ export class ClosureSettingComponent implements OnInit {
 
   deleteSetting(setting: ClosureSettingModel): void {
     this.confirmationService.confirm({
-      message: `Are you sure you want to delete the closure dates for ${setting.academicYear}?`,
-      header: 'Delete Confirmation',
+      message: `Are you sure you want to deactivate the closure dates for ${setting.academicYear}?`,
+      header: 'Deactivate Confirmation',
       icon: 'pi pi-exclamation-triangle',
       acceptButtonStyleClass: 'p-button-danger',
       accept: () => {
         if (setting.settingID) {
           this.closureSettingService.delete(setting.settingID).subscribe({
             next: () => {
-              this.messageService.add({ severity: 'success', summary: 'Deleted', detail: 'Closure setting removed' });
+              this.messageService.add({ severity: 'success', summary: 'Deactivated', detail: 'Closure setting marked as inactive' });
               this.loadSettings();
             },
-            error: () => this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to delete' })
+            error: () => this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to deactivate' })
           });
         }
       }
