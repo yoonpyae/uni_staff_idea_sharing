@@ -1,5 +1,5 @@
 import { CommonModule, Location } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CookieService } from 'ngx-cookie-service';
 import { MessageService } from 'primeng/api';
@@ -21,7 +21,7 @@ import { environment } from '../../../../environments/environment';
   templateUrl: './share-idea.component.html',
   styleUrl: './share-idea.component.scss'
 })
-export class ShareIdeaComponent implements OnInit {
+export class ShareIdeaComponent implements OnInit, OnDestroy {
 
   name = '';
   staffID = '';
@@ -36,6 +36,10 @@ export class ShareIdeaComponent implements OnInit {
   selectedFiles: File[] = [];
 
   categories: CategoryModel[] = [];
+
+  isSubmitting: boolean = false;
+  loadingSeconds: number = 0;
+  private timerInterval: any;
 
   constructor(
     private categoryService: CategoryService,
@@ -71,6 +75,9 @@ export class ShareIdeaComponent implements OnInit {
     this.loadCategories();
   }
 
+  ngOnDestroy(): void {
+    this.stopLoadingTimer();
+  }
   loadCategories(): void {
     this.categoryService.get().subscribe({
       next: (res) => {
@@ -108,6 +115,12 @@ export class ShareIdeaComponent implements OnInit {
       return;
     }
 
+    this.isSubmitting = true;
+    this.loadingSeconds = 0;
+    this.timerInterval = setInterval(() => {
+      this.loadingSeconds++;
+    }, 1000);
+
     const formData = new FormData();
     formData.append('title', this.title);
     formData.append('description', this.description);
@@ -127,15 +140,24 @@ export class ShareIdeaComponent implements OnInit {
 
     this.ideaService.create(formData as any).subscribe({
       next: (ideaRes: any) => {
+        this.stopLoadingTimer();
         this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Idea posted successfully!' });
         setTimeout(() => this.goBack(), 1500);
       },
       error: (err) => {
+        this.stopLoadingTimer();
         console.error('Error posting idea:', err);
         const errorDetail = err.error?.message || 'Failed to post idea.';
         this.messageService.add({ severity: 'error', summary: 'Error', detail: errorDetail });
       }
     });
+  }
+
+  stopLoadingTimer(): void {
+    this.isSubmitting = false;
+    if (this.timerInterval) {
+      clearInterval(this.timerInterval);
+    }
   }
 
   clearForm(): void {
