@@ -28,7 +28,6 @@ export class IdeaDeatilComponent implements OnInit {
   idea: IdeaModel | null = null;
   comments: CommentModel[] = [];
 
-  // Comment Form State
   newCommentText: string = '';
   isAnonymousComment: boolean = false;
 
@@ -47,7 +46,6 @@ export class IdeaDeatilComponent implements OnInit {
     const staffIDStr = this.cookieService.get('staffID');
     this.currentStaffID = staffIDStr ? Number(staffIDStr) : 1;
 
-    // Get the Idea ID from the URL
     this.route.paramMap.subscribe(params => {
       const id = params.get('id');
       if (id) {
@@ -63,13 +61,7 @@ export class IdeaDeatilComponent implements OnInit {
     this.ideaService.getById(this.ideaId).subscribe({
       next: (res) => {
         this.idea = res.data as IdeaModel;
-
-        // Calculate counts
-        this.idea.likesCount = this.idea.votes?.filter(v => v.voteType === 'Like').length || 0;
-        this.idea.unlikesCount = this.idea.votes?.filter(v => v.voteType === 'Unlike').length || 0;
-        this.idea.viewsCount = 120; // Mock views
-
-        this.loadComments();
+        this.comments = this.idea.comments || [];
       },
       error: (err) => {
         console.error('Failed to load idea', err);
@@ -78,25 +70,13 @@ export class IdeaDeatilComponent implements OnInit {
     });
   }
 
-  loadComments(): void {
-    this.commentService.get().subscribe({
-      next: (res) => {
-        const allComments = res.data as any[];
-        this.comments = allComments.filter(c => c.ideaID === this.ideaId);
-        if (this.idea) {
-          this.idea.commentsCount = this.comments.length;
-        }
-      },
-      error: (err) => console.error('Failed to load comments', err)
-    });
-  }
-
   submitComment(): void {
     if (!this.newCommentText.trim() || !this.ideaId) return;
 
     const payload = {
       comment: this.newCommentText,
-      isAnonymous: this.isAnonymousComment,
+      isAnonymous: this.isAnonymousComment ? 1 : 0,
+      status: 'active',
       ideaID: this.ideaId,
       staffID: this.currentStaffID
     };
@@ -105,7 +85,7 @@ export class IdeaDeatilComponent implements OnInit {
       next: () => {
         this.newCommentText = '';
         this.isAnonymousComment = false;
-        this.loadComments(); // Refresh comments list
+        this.loadIdeaDetails();
         this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Comment posted' });
       },
       error: (err) => {
@@ -117,14 +97,55 @@ export class IdeaDeatilComponent implements OnInit {
 
   voteIdea(type: 'Like' | 'Unlike'): void {
     if (!this.idea) return;
-    const payload = { voteType: type, staffID: this.currentStaffID, ideaID: this.idea.ideaID };
 
-    this.voteService.store(payload).subscribe({
-      next: () => this.loadIdeaDetails(), // Reload to update counts
-      error: (err) => {
-        if (err.status === 409) this.messageService.add({ severity: 'warn', summary: 'Voted', detail: 'Already voted' });
+    const userVote = this.idea.votes?.find(v => v.staffID === this.currentStaffID);
+
+    if (userVote) {
+      if (userVote.voteType === type) {
+        this.voteService.delete(userVote.voteID).subscribe({
+          next: () => this.loadIdeaDetails(),
+          error: (err) => console.error('Failed to remove vote', err)
+        });
+      } else {
+        const payload = { voteType: type, staffID: this.currentStaffID, ideaID: this.idea.ideaID };
+        this.voteService.update(userVote.voteID, payload).subscribe({
+          next: () => this.loadIdeaDetails(),
+          error: (err) => console.error('Failed to switch vote', err)
+        });
       }
-    });
+    } else {
+      const payload = { voteType: type, staffID: this.currentStaffID, ideaID: this.idea.ideaID };
+      this.voteService.store(payload).subscribe({
+        next: () => this.loadIdeaDetails(),
+        error: (err) => console.error('Failed to store vote', err)
+      });
+    }
+  }
+
+  // --- Helper Methods ---
+  getLikesCount(idea: IdeaModel): number {
+    return idea.votes?.filter(v => v.voteType === 'Like').length || 0;
+  }
+
+  getUnlikesCount(idea: IdeaModel): number {
+    return idea.votes?.filter(v => v.voteType === 'Unlike').length || 0;
+  }
+
+  getCommentsCount(idea: IdeaModel): number {
+    return idea.comments?.length || 0;
+  }
+
+  hasUserLiked(idea: IdeaModel): boolean {
+    return idea.votes?.some(v => v.staffID === this.currentStaffID && v.voteType === 'Like') || false;
+  }
+
+  hasUserUnliked(idea: IdeaModel): boolean {
+    return idea.votes?.some(v => v.staffID === this.currentStaffID && v.voteType === 'Unlike') || false;
+  }
+
+  getFileName(path: string): string {
+    if (!path) return 'Document';
+    return path.split('/').pop() || 'Document';
   }
 
   goBack(): void {
@@ -138,5 +159,30 @@ export class IdeaDeatilComponent implements OnInit {
     let base = (environment.main_url ?? '').replace(/\/+$/, '');
     base = base.replace(/\/api$/, '');
     return base ? `${base}/${trimmed}` : `/${trimmed}`;
+  }
+
+  getFileIcon(path: string): string {
+    if (!path) return 'pi-file';
+    const ext = path.split('.').pop()?.toLowerCase();
+
+    if (ext === 'pdf') return 'pi-file-pdf';
+    if (ext === 'doc' || ext === 'docx') return 'pi-file-word';
+    if (ext === 'xls' || ext === 'xlsx') return 'pi-file-excel';
+    if (['jpg', 'jpeg', 'png', 'gif', 'svg'].includes(ext || '')) return 'pi-image';
+
+    return 'pi-file';
+  }
+
+  getFileColor(path: string): string {
+    if (!path) return 'text-gray-500 dark:text-gray-400';
+    const ext = path.split('.').pop()?.toLowerCase();
+
+    if (ext === 'pdf') return 'text-red-500 dark:text-red-400';
+    if (ext === 'doc' || ext === 'docx') return 'text-blue-500 dark:text-blue-400';
+    if (ext === 'xls' || ext === 'xlsx') return 'text-green-500 dark:text-green-400';
+    if (ext === 'ppt' || ext === 'pptx') return 'text-orange-500 dark:text-orange-400';
+    if (['jpg', 'jpeg', 'png', 'gif', 'svg'].includes(ext || '')) return 'text-purple-500 dark:text-purple-400';
+
+    return 'text-gray-500 dark:text-gray-400';
   }
 }
