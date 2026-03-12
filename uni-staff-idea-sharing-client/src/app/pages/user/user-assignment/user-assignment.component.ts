@@ -42,7 +42,6 @@ export class UserAssignmentComponent implements OnInit {
 
     availableRoles: RoleModel[] = [];
     availableDepartments: DepartmentModel[] = [];
-    availableStatuses = ['Active', 'Inactive', 'Suspended'];
 
     showPassword = false;
 
@@ -60,7 +59,7 @@ export class UserAssignmentComponent implements OnInit {
         staffProfile: [''],
         departmentID: [0],
         roleID: [0],
-        status: ['Active']
+        account_status: ['Active']
     });
 
     formSubmitted: boolean = false;
@@ -172,8 +171,33 @@ export class UserAssignmentComponent implements OnInit {
     }
 
     deactivateAccount(): void {
-        this.user.status = 'Inactive';
-        this.messageService.add({ severity: 'warn', summary: 'Account Deactivated', detail: 'The account has been deactivated.', life: 3000 });
+        if (!this.user || !this.user.staffID) return;
+
+        const newStatus = (this.user.account_status === 'Inactive' || this.user.account_status === 'Deactivated')
+            ? 'Active'
+            : 'Inactive';
+
+        this.user.account_status = newStatus;
+
+        const payload = {
+            ...this.buildStaffPayload(),
+            account_status: newStatus
+        };
+
+        this.staffService.update(this.user.staffID, payload).subscribe({
+            next: () => {
+                this.messageService.add({
+                    severity: 'success',
+                    summary: 'Status Updated',
+                    detail: `Account is now ${newStatus}`,
+                    life: 3000
+                });
+            },
+            error: (err) => {
+                console.error(err);
+                this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to update status' });
+            }
+        });
     }
 
     private buildStaffPayload(): any {
@@ -323,7 +347,6 @@ export class UserAssignmentComponent implements OnInit {
             password: '',
             dob: '',
             address: '',
-            status: 'Active',
             department: '',
             role: ''
         };
