@@ -73,7 +73,6 @@ export class AppLayoutComponent implements OnInit {
     this.currentUser = { name, role, profilePicture };
 
     if (profilePicture) {
-      // if backend already returned a full URL, use it; otherwise extract the filename
       if (profilePicture.startsWith('http') || profilePicture.startsWith('data:')) {
         this.profilePictureUrl = profilePicture;
       } else {
@@ -88,14 +87,12 @@ export class AppLayoutComponent implements OnInit {
   }
 
   filterMenuByRole(userRole: string): void {
-    // Create a deep copy of the menu to avoid mutating the original constant
     const fullMenu = JSON.parse(JSON.stringify(NAVIGATION_MENU));
 
     this.menuItems = fullMenu.map((section: any) => {
-      // Filter out items where the user's role is not in the allowed roles array
       section.items = section.items.filter((item: any) => {
         if (!item.roles || item.roles.length === 0) {
-          return true; // No roles restricted, everyone sees it
+          return true;
         }
         return item.roles.includes(userRole);
       });
@@ -109,7 +106,6 @@ export class AppLayoutComponent implements OnInit {
 
   toggleMobileMenu(): void {
     this.isMobileMenuOpen = !this.isMobileMenuOpen;
-    // Ensure mini-sidebar mode is disabled when opening on mobile
     if (this.isMobileMenuOpen) {
       this.isSidebarCollapsed = false;
     }
@@ -126,7 +122,6 @@ export class AppLayoutComponent implements OnInit {
   logout(): void {
     this.authService.logout().subscribe({
       next: (res: any) => {
-        // show backend message if present
         if (res && res.message) {
           this.messageService.add({
             severity: res.success ? 'success' : 'info',
@@ -148,7 +143,7 @@ export class AppLayoutComponent implements OnInit {
           key: environment.default_toastKey
         });
         console.error('Logout failed:', err);
-        this.authService.logoutForce(); // fallback
+        this.authService.logoutForce();
         this.router.navigate(['/login']);
       }
     });
