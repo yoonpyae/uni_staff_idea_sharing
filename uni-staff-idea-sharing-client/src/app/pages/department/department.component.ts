@@ -45,6 +45,8 @@ export class DepartmentComponent implements OnInit {
   filteredDepartments: DepartmentModel[] = [];
   searchQuery: string = '';
 
+  isMobileSearchOpen: boolean = false;
+
   // Dialog
   displayDialog: boolean = false;
   dialogTitle: string = 'Add Department';
@@ -197,5 +199,13 @@ export class DepartmentComponent implements OnInit {
   isFieldInvalid(fielddepartmentName: string): boolean {
     const control = this.departmentForm.get(fielddepartmentName);
     return !!(control && control.invalid && control.touched);
+  }
+
+  toggleMobileSearch(): void {
+    this.isMobileSearchOpen = !this.isMobileSearchOpen;
+    if (!this.isMobileSearchOpen) {
+      this.searchQuery = '';
+      this.onSearch();
+    }
   }
 }
