@@ -1,58 +1,70 @@
-<div class="min-h-screen flex items-center justify-center bg-gray-200 dark:bg-gray-900 p-6">
-  <div class="flex w-full max-w-6xl rounded-2xl overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.25)]">
-    <!-- Left Side - Image -->
-    <div class="hidden lg:block lg:w-1/2 bg-white">
+<div
+  class="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900 p-4 sm:p-6 md:p-8 transition-colors duration-300">
+
+  <div
+    class="flex w-full max-w-5xl lg:max-w-6xl rounded-3xl overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.15)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.5)] transition-all duration-300 bg-white dark:bg-gray-800">
+
+    <div class="hidden lg:block lg:w-1/2 bg-white relative">
+      <div class="absolute inset-0 bg-black/0 dark:bg-black/20 transition-colors duration-300 z-10 pointer-events-none">
+      </div>
       <img
         src="https://th.bing.com/th/id/R.4ec1b347a5557d820f6b2fedf6c8973a?rik=BvOIB56hCbuY8Q&riu=http%3a%2f%2fprezibase.com%2fwp-content%2fuploads%2f2015%2f04%2fThink-Big-Ideas-Prezi-Template.jpg&ehk=YGiACMzKzEAK9mkykM%2fLRQBo8uyjUF9ubqSphy1Q%2bJw%3d&risl=&pid=ImgRaw&r=0"
         alt="Think Big Ideas" class="w-full h-full object-cover" />
     </div>
 
-    <!-- Right Side - Login Form -->
-    <div class="flex-1 bg-[#95E2D3] dark:from-[#1a3936] dark:to-[#122825] flex items-center justify-center md:p-6">
-      <div [@slideIn] class=" rounded-3xl p-8 md:p-12 w-full max-w-[440px] ">
-        <h2 class=" text-3xl md:text-4xl font-bold text-[#2c3e50] dark:text-white m-0 mb-2 text-center font-sans">
+    <div
+      class="flex-1 bg-[#95E2D3] dark:bg-gradient-to-br dark:from-[#1a3936] dark:to-[#122825] flex items-center justify-center p-6 sm:p-10 md:p-12 transition-colors duration-300">
+
+      <div [@slideIn] class="w-full max-w-[400px] md:max-w-[440px]">
+        <h2
+          class="text-3xl md:text-4xl font-bold text-[#2c3e50] dark:text-white m-0 mb-2 text-center font-sans transition-colors">
           Welcome
         </h2>
-        <p class="text-base text-[#2c3e50] dark:text-gray-300 m-0 mb-10 text-center font-medium">
+        <p
+          class="text-[15px] md:text-base text-[#2c3e50]/80 dark:text-gray-300 m-0 mb-8 md:mb-10 text-center font-medium transition-colors">
           Sign in with Email!
         </p>
 
         <form (ngSubmit)="onSubmit()" class="w-full">
-          <!-- Email Field -->
-          <div class="mb-7">
-            <label for="email" class="block text-[0.95rem] font-semibold text-[#2c3e50] dark:text-white mb-2">
+
+          <div class="mb-6 md:mb-7">
+            <label for="email"
+              class="block text-sm md:text-[0.95rem] font-semibold text-[#2c3e50] dark:text-white mb-2 transition-colors">
               Email
             </label>
             <input id="email" type="email" [(ngModel)]="email" name="email" placeholder="Enter your email..." required
-              class="w-full px-4 py-3.5 text-base border-2 border-gray-300 dark:border-gray-600 rounded-xl bg-gray-50 dark:bg-gray-700 text-[#2c3e50] dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-all duration-300 focus:outline-none focus:border-[#a8e6cf] dark:focus:border-[#88d4ab] focus:bg-white dark:focus:bg-gray-600 focus:shadow-[0_0_0_3px_rgba(168,230,207,0.1)] dark:focus:shadow-[0_0_0_3px_rgba(136,212,171,0.2)]" />
+              class="w-full px-4 py-3 md:py-3.5 text-[15px] md:text-base border-2 border-transparent dark:border-gray-600 rounded-xl bg-white/90 dark:bg-gray-800/80 text-[#2c3e50] dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-all duration-300 focus:outline-none focus:border-[#2c5f5d] dark:focus:border-[#88d4ab] focus:bg-white dark:focus:bg-gray-800 focus:ring-4 focus:ring-[#2c5f5d]/10 dark:focus:ring-[#88d4ab]/20 backdrop-blur-sm shadow-sm" />
           </div>
 
-          <!-- Password Field -->
-          <div class="mb-7">
-            <label for="password" class="block text-[0.95rem] font-semibold text-[#2c3e50] dark:text-white mb-2">
+          <div class="mb-8 md:mb-10">
+            <label for="password"
+              class="block text-sm md:text-[0.95rem] font-semibold text-[#2c3e50] dark:text-white mb-2 transition-colors">
               Password
             </label>
             <div class="relative">
               <input id="password" [type]="showPassword ? 'text' : 'password'" [(ngModel)]="password" name="password"
                 placeholder="Enter your password..." required
-                class="w-full px-4 py-3.5 text-base border-2 border-gray-300 dark:border-gray-600 rounded-xl bg-gray-50 dark:bg-gray-700 text-[#2c3e50] dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-all duration-300 focus:outline-none focus:border-[#a8e6cf] dark:focus:border-[#88d4ab] focus:bg-white dark:focus:bg-gray-600 focus:shadow-[0_0_0_3px_rgba(168,230,207,0.1)] dark:focus:shadow-[0_0_0_3px_rgba(136,212,171,0.2)]" />
+                class="w-full px-4 py-3 md:py-3.5 text-[15px] md:text-base border-2 border-transparent dark:border-gray-600 rounded-xl bg-white/90 dark:bg-gray-800/80 text-[#2c3e50] dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-all duration-300 focus:outline-none focus:border-[#2c5f5d] dark:focus:border-[#88d4ab] focus:bg-white dark:focus:bg-gray-800 focus:ring-4 focus:ring-[#2c5f5d]/10 dark:focus:ring-[#88d4ab]/20 backdrop-blur-sm shadow-sm pr-12" />
+
               <button type="button" (click)="togglePasswordVisibility()"
                 [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'"
-                class="absolute right-4 top-1/2 -translate-y-1/2 bg-transparent border-0 text-gray-500 dark:text-gray-400 cursor-pointer p-2 flex items-center justify-center transition-colors duration-200 hover:text-[#2c5f5d] dark:hover:text-[#a8e6cf]">
-                <i [class]="showPassword ? 'pi pi-eye-slash' : 'pi pi-eye'" class="text-lg"></i>
+                class="absolute right-2 top-1/2 -translate-y-1/2 bg-transparent border-0 text-gray-500 dark:text-gray-400 cursor-pointer w-10 h-10 flex items-center justify-center transition-colors duration-200 hover:text-[#2c3e50] dark:hover:text-white outline-none rounded-full hover:bg-gray-200/50 dark:hover:bg-gray-700/50">
+                <i [class]="showPassword ? 'pi pi-eye-slash' : 'pi pi-eye'" class="text-lg md:text-xl"></i>
               </button>
             </div>
           </div>
 
-          <!-- Submit Button -->
-          <div class="flex justify-center w-full mt-4">
-            <button type="submit" [disabled]="isLoading" [disabled]="!email || !password"
-              class="items-center justify-center px-3 py-3 text-sm font-semibold bg-[#3E3D3D] dark:bg-[#a8e6cf] border-0 rounded-xl text-white dark:text-[#2c3e50] cursor-pointer transition-all duration-300 tracking-wider disabled:opacity-50 disabled:cursor-not-allowed enabled:hover:bg-[#234a48] dark:enabled:hover:bg-[#88d4ab] enabled:hover:-translate-y-0.5 enabled:hover:shadow-[0_8px_20px_rgba(44,95,93,0.3)] dark:enabled:hover:shadow-[0_8px_20px_rgba(168,230,207,0.3)]">
+          <div class="w-full mt-2">
+            <button type="submit" [disabled]="isLoading || !email || !password"
+              class="w-full flex items-center justify-center px-4 py-3.5 md:py-4 text-[15px] md:text-base font-bold bg-[#3E3D3D] dark:bg-[#88d4ab] border-0 rounded-xl text-white dark:text-[#1a3936] cursor-pointer transition-all duration-300 tracking-wide disabled:opacity-60 disabled:cursor-not-allowed enabled:hover:bg-[#2a2a2a] dark:enabled:hover:bg-[#a8e6cf] enabled:hover:-translate-y-0.5 enabled:hover:shadow-lg dark:enabled:hover:shadow-[0_8px_20px_rgba(136,212,171,0.25)] focus:outline-none focus:ring-4 focus:ring-[#3E3D3D]/30 dark:focus:ring-[#88d4ab]/40">
+              <i *ngIf="isLoading" class="pi pi-spin pi-spinner mr-2"></i>
               {{ isLoading ? 'Signing in...' : 'Sign In' }}
             </button>
           </div>
+
         </form>
       </div>
     </div>
+
   </div>
 </div>
