@@ -232,12 +232,6 @@ export class UserAccountComponent implements OnInit {
     return 'text-blue-600 dark:text-blue-400';
   }
 
-  // Add these to your component class
-  /**
-   * Previously computed from users list – replaced by server-loaded values.
-   * Keep getters in case something else still uses them, but they now fall back
-   * to the server options so behavior is consistent.
-   */
   get roleOptions() {
     return this.roleFilterOptions;
   }
