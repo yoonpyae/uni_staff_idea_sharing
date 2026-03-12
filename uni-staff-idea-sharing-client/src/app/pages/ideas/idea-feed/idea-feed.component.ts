@@ -17,12 +17,12 @@ import { environment } from '../../../../environments/environment';
 @Component({
   selector: 'app-idea-feed',
   standalone: true,
-  imports: [CommonModule, FormsModule, SelectModule, DropdownModule, RouterLink],
+  imports: [CommonModule, FormsModule, SelectModule, DropdownModule],
   templateUrl: './idea-feed.component.html',
   styleUrl: './idea-feed.component.scss'
 })
 export class IdeaFeedComponent implements OnInit {
-  userName: string = 'William';
+  userName: string = 'Guest';
   searchQuery: string = '';
   activeFilter: string = 'All';
 
@@ -50,8 +50,11 @@ export class IdeaFeedComponent implements OnInit {
 
   ngOnInit(): void {
     const name = this.cookieService.get('staffName') || 'Guest';
-    const staffID = this.cookieService.get('staffID');
+    const staffIDStr = this.cookieService.get('staffID');
+
     this.name = name;
+    this.staffID = staffIDStr ? Number(staffIDStr) : 0;
+
     this.loadIdeas();
     this.loadDepartments();
     this.loadCategories();
@@ -84,14 +87,7 @@ export class IdeaFeedComponent implements OnInit {
       next: (res) => {
         const fetchedIdeas = res.data as IdeaModel[];
 
-        this.ideas = fetchedIdeas.map(idea => {
-          idea.likesCount = idea.votes?.filter(v => v.voteType === 'Like').length || 0;
-          idea.unlikesCount = idea.votes?.filter(v => v.voteType === 'Unlike').length || 0;
-          idea.commentsCount = idea.comments?.length || 0;
-          idea.viewsCount = 0; // Requires backend implementation for real views
-
-          return idea;
-        });
+        this.ideas = fetchedIdeas.filter(idea => idea.status === 'approved');
 
         this.applyFilters();
       },
@@ -99,28 +95,39 @@ export class IdeaFeedComponent implements OnInit {
     });
   }
 
-  // --- API Call for Voting ---
-  vote(idea: IdeaModel, type: 'Like' | 'Unlike'): void {
-    const payload = {
-      voteType: type,
-      staffID: this.staffID,
-      ideaID: idea.ideaID
-    };
 
-    this.voteService.store(payload).subscribe({
-      next: (res) => {
-        console.log(`${type} recorded successfully!`);
-        this.loadIdeas(); // Reload ideas to get the updated vote counts
-      },
-      error: (err) => {
-        // Handle 409 Conflict if they already voted
-        if (err.status === 409) {
-          alert('You have already voted on this idea.');
-        } else {
-          console.error('Voting failed:', err);
-        }
+  vote(idea: IdeaModel, type: 'Like' | 'Unlike'): void {
+    const userVote = idea.votes?.find(v => v.staffID === this.staffID);
+
+    if (userVote) {
+      if (userVote.voteType === type) {
+        this.voteService.delete(userVote.voteID).subscribe({
+          next: () => this.loadIdeas(),
+          error: (err) => console.error('Failed to remove vote', err)
+        });
+      } else {
+        const payload = { voteType: type, staffID: this.staffID, ideaID: idea.ideaID };
+        this.voteService.update(userVote.voteID, payload).subscribe({
+          next: () => this.loadIdeas(),
+          error: (err) => console.error('Failed to switch vote', err)
+        });
       }
-    });
+    } else {
+      const payload = { voteType: type, staffID: this.staffID, ideaID: idea.ideaID };
+      this.voteService.store(payload).subscribe({
+        next: () => this.loadIdeas(),
+        error: (err) => console.error('Failed to store vote', err)
+      });
+    }
+  }
+
+  // Helper methods to check active UI state
+  hasUserLiked(idea: IdeaModel): boolean {
+    return idea.votes?.some(v => v.staffID === this.staffID && v.voteType === 'Like') || false;
+  }
+
+  hasUserUnliked(idea: IdeaModel): boolean {
+    return idea.votes?.some(v => v.staffID === this.staffID && v.voteType === 'Unlike') || false;
   }
 
   setFilter(filter: string): void {
@@ -131,7 +138,6 @@ export class IdeaFeedComponent implements OnInit {
   applyFilters(): void {
     let result = [...this.ideas];
 
-    // Search filter
     if (this.searchQuery) {
       const q = this.searchQuery.toLowerCase();
       result = result.filter(idea =>
@@ -148,26 +154,22 @@ export class IdeaFeedComponent implements OnInit {
 
     if (this.selectedDept) {
       result = result.filter(idea =>
-        (idea.staff as any)?.departmentID == this.selectedDept
+        idea.staff?.departmentID == this.selectedDept
       );
     }
 
     switch (this.activeFilter) {
       case 'Popular':
-        // Sort by highest likes
-        result.sort((a, b) => (b.likesCount || 0) - (a.likesCount || 0));
+        result.sort((a, b) => this.getLikesCount(b) - this.getLikesCount(a));
         break;
       case 'Latest':
-        // Sort by created_at (newest first)
         result.sort((a, b) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime());
         break;
       case 'Most Viewed':
-        // Sort by views (if implemented in backend)
-        result.sort((a, b) => (b.viewsCount || 0) - (a.viewsCount || 0));
+        result.sort((a, b) => (b.viewCount || 0) - (a.viewCount || 0));
         break;
       case 'All':
       default:
-        // Default sort (e.g., by ID descending)
         result.sort((a, b) => b.ideaID - a.ideaID);
         break;
     }
@@ -175,26 +177,52 @@ export class IdeaFeedComponent implements OnInit {
     this.filteredIdeas = result;
   }
 
+  goToIdeaDetail(idea: IdeaModel): void {
+    this.ideaService.increaseViewCount(idea.ideaID).subscribe({
+      next: () => this.router.navigate(['/submit-ideas/idea-detail', idea.ideaID]),
+      error: () => this.router.navigate(['/submit-ideas/idea-detail', idea.ideaID])
+    });
+  }
+
+  getLikesCount(idea: IdeaModel): number {
+    return idea.votes?.filter(v => v.voteType === 'Like').length || 0;
+  }
+
+  getUnlikesCount(idea: IdeaModel): number {
+    return idea.votes?.filter(v => v.voteType === 'Unlike').length || 0;
+  }
+
+  getCommentsCount(idea: IdeaModel): number {
+    return idea.comments?.length || 0;
+  }
+
+  // --- Helper Methods ---
+
+  getFileName(path: string): string {
+    if (!path) return 'Document';
+    return path.split('/').pop() || 'Document';
+  }
+
   toggleMenu(ideaID: number, event: Event): void {
-    event.stopPropagation(); // Prevent the document click listener from immediately closing it
+    event.stopPropagation();
     this.activeMenuId = this.activeMenuId === ideaID ? null : ideaID;
   }
 
   @HostListener('document:click', ['$event'])
   onClickOutside(event: Event) {
-    // Close the menu if the user clicks anywhere else on the page
     this.activeMenuId = null;
   }
 
   removeIdea(idea: IdeaModel): void {
-    console.log('Remove idea logic here for idea:', idea.ideaID);
-    this.activeMenuId = null; // Close menu after action
-    // Call this.ideaService.delete(idea.ideaID)...
+    this.ideaService.delete(idea.ideaID).subscribe({
+      next: () => this.loadIdeas(),
+      error: (err) => console.error('Failed to delete idea', err)
+    });
+    this.activeMenuId = null;
   }
 
   hideIdea(idea: IdeaModel): void {
-    console.log('Hide idea logic here for idea:', idea.ideaID);
-    this.activeMenuId = null; // Close menu after action
+    this.activeMenuId = null;
   }
 
   goToShareIdea(): void {
@@ -206,7 +234,32 @@ export class IdeaFeedComponent implements OnInit {
     if (/^(https?:)?\/\//.test(profilePath)) return profilePath;
     const trimmed = profilePath.replace(/^\/+/, '');
     let base = (environment.main_url ?? '').replace(/\/+$/, '');
-    base = base.replace(/\/api$/, ''); // strip accidental "/api"
+    base = base.replace(/\/api$/, '');
     return base ? `${base}/${trimmed}` : `/${trimmed}`;
+  }
+
+  getFileIcon(path: string): string {
+    if (!path) return 'pi-file';
+    const ext = path.split('.').pop()?.toLowerCase();
+
+    if (ext === 'pdf') return 'pi-file-pdf';
+    if (ext === 'doc' || ext === 'docx') return 'pi-file-word';
+    if (ext === 'xls' || ext === 'xlsx') return 'pi-file-excel';
+    if (['jpg', 'jpeg', 'png', 'gif', 'svg'].includes(ext || '')) return 'pi-image';
+
+    return 'pi-file';
+  }
+
+  getFileColor(path: string): string {
+    if (!path) return 'text-gray-500 dark:text-gray-400';
+    const ext = path.split('.').pop()?.toLowerCase();
+
+    if (ext === 'pdf') return 'text-red-500 dark:text-red-400';
+    if (ext === 'doc' || ext === 'docx') return 'text-blue-500 dark:text-blue-400';
+    if (ext === 'xls' || ext === 'xlsx') return 'text-green-500 dark:text-green-400';
+    if (ext === 'ppt' || ext === 'pptx') return 'text-orange-500 dark:text-orange-400';
+    if (['jpg', 'jpeg', 'png', 'gif', 'svg'].includes(ext || '')) return 'text-purple-500 dark:text-purple-400';
+
+    return 'text-gray-500 dark:text-gray-400';
   }
 }
