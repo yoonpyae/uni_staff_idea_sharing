@@ -39,14 +39,12 @@
                 </div>
             </div>
 
-            <div class="relative inline-block">
-                <select [(ngModel)]="selectedCategoryId"
-                    class="appearance-none bg-[#a8e6cf] hover:bg-[#88d4ab] text-gray-900 font-bold px-6 py-3 pr-10 rounded-xl cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#88d4ab] transition-colors shadow-sm w-48 text-center">
-                    <option [ngValue]="null" disabled selected>Choose Category</option>
-                    <option *ngFor="let cat of categories" [value]="cat.categoryID">{{ cat.categoryname }}</option>
-                </select>
-                <i
-                    class="pi pi-angle-down absolute right-4 top-1/2 -translate-y-1/2 text-gray-800 font-bold pointer-events-none"></i>
+            <div class="relative inline-block w-full sm:w-auto min-w-[240px]">
+                <p-multiSelect [options]="categories" [(ngModel)]="selectedCategoryIds" optionLabel="categoryname"
+                    optionValue="categoryID" placeholder="Choose Categories" display="chip"
+                    styleClass="w-full bg-[#a8e6cf] border-none shadow-sm rounded-xl text-gray-900 font-bold hover:bg-[#88d4ab] transition-colors py-1"
+                    [panelStyleClass]="'bg-white text-gray-800 shadow-xl border border-gray-100 rounded-xl'">
+                </p-multiSelect>
             </div>
         </div>
 
