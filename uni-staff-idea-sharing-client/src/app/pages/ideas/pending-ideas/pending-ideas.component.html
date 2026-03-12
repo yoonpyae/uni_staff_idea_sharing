@@ -1,0 +1,106 @@
+<div
+    class="min-h-screen bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 font-sans p-4 md:p-8 max-w-5xl mx-auto transition-colors duration-200">
+
+    <header class="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 md:mb-10 gap-4">
+        <h1 class="text-[22px] md:text-[26px] font-bold text-gray-900 dark:text-white m-0">
+            Pending Ideas of <span class="text-[#ed8936]">{{ departmentName }}</span>
+        </h1>
+
+        <div class="relative w-full md:w-72">
+            <input type="text" [(ngModel)]="searchQuery" (input)="applySearch()" placeholder="Search..."
+                class="w-full px-4 py-2.5 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 border-none rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6FCBF0] transition-all font-medium" />
+            <i class="pi pi-search absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400"></i>
+        </div>
+    </header>
+
+    <div class="space-y-0">
+        <div *ngIf="filteredIdeas.length === 0" class="text-center py-12 text-gray-500 dark:text-gray-400 font-medium">
+            No pending ideas at the moment.
+        </div>
+
+        <div *ngFor="let idea of filteredIdeas"
+            class="border-b border-gray-200 dark:border-gray-700 py-6 md:py-8 first:pt-0 last:border-0 relative">
+
+            <div class="flex items-start gap-3 mb-4">
+                <div
+                    class="w-10 h-10 md:w-12 md:h-12 rounded-full border border-gray-300 dark:border-gray-600 flex items-center justify-center bg-gray-100 dark:bg-gray-800 flex-shrink-0 overflow-hidden">
+                    <img *ngIf="!idea.isAnonymous && idea.staff?.staffProfile; else defaultUserIcon"
+                        [src]="getProfileUrl(idea.staff?.staffProfile)" class="w-full h-full object-cover" />
+                    <ng-template #defaultUserIcon>
+                        <i class="pi pi-user text-gray-600 dark:text-gray-400 text-lg md:text-xl"></i>
+                    </ng-template>
+                </div>
+
+                <div class="flex flex-col mt-0.5 md:mt-1">
+                    <div class="flex flex-wrap items-center gap-2 md:gap-3">
+                        <span class="font-bold text-[16px] md:text-[17px] text-gray-900 dark:text-white">
+                            {{ idea.isAnonymous ? 'Anonymous' : idea.staff?.staffName || 'Unknown' }}
+                        </span>
+
+                        <span *ngIf="idea.categories && idea.categories.length > 0"
+                            class="px-3 py-0.5 border border-gray-400 dark:border-gray-500 text-gray-700 dark:text-gray-300 rounded-full text-[11px] md:text-xs font-medium bg-white dark:bg-gray-800">
+                            {{ idea.categories[0].categoryname }}
+                        </span>
+                    </div>
+                    <span class="text-[11px] md:text-xs text-gray-500 dark:text-gray-400 font-medium mt-1 md:mt-0.5">
+                        {{ idea.created_at | date:'shortTime' }}
+                    </span>
+                </div>
+            </div>
+
+            <h3 class="text-[16px] md:text-[17px] font-bold text-gray-900 dark:text-white mb-2">{{ idea.title }}</h3>
+            <p class="text-[14px] md:text-[15px] text-gray-700 dark:text-gray-300 leading-relaxed mb-5 line-clamp-3">
+                {{ idea.description }}
+            </p>
+
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-5 sm:gap-4">
+                <div
+                    class="flex items-center gap-4 md:gap-5 text-gray-600 dark:text-gray-400 font-medium text-[14px] md:text-[15px]">
+                    <div class="flex items-center gap-1.5"><i class="pi pi-thumbs-up"></i><span>{{ getLikesCount(idea)
+                            }}</span></div>
+                    <div class="flex items-center gap-1.5"><i class="pi pi-thumbs-down"></i><span>{{
+                            getUnlikesCount(idea) }}</span></div>
+                    <div class="flex items-center gap-1.5"><i class="pi pi-comment"></i><span>{{ getCommentsCount(idea)
+                            }}</span></div>
+                    <div class="flex items-center gap-1.5"><i class="pi pi-eye"></i><span>{{ idea.viewCount || 0
+                            }}</span></div>
+                </div>
+
+                <div class="flex items-center gap-3 w-full sm:w-auto">
+                    <button (click)="openApproveDialog(idea)"
+                        class="flex-1 sm:flex-none justify-center px-6 py-2 md:py-2.5 bg-[#69f0ae] hover:bg-[#5ce09d] text-gray-900 font-bold rounded-lg transition-colors shadow-sm text-sm md:text-base">
+                        Approve
+                    </button>
+                    <button (click)="rejectIdea(idea)"
+                        class="flex-1 sm:flex-none justify-center px-6 py-2 md:py-2.5 bg-[#ff8a80] hover:bg-[#ff756b] text-gray-900 font-bold rounded-lg transition-colors shadow-sm text-sm md:text-base">
+                        Reject
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<p-dialog [(visible)]="showApproveDialog" header="Assign Academic Year" [modal]="true"
+    [style]="{ width: '90vw', maxWidth: '400px' }" styleClass="p-fluid rounded-xl dark:bg-gray-800">
+    <div class="pt-2 pb-4">
+        <p class="text-gray-600 dark:text-gray-300 mb-4 font-medium text-sm">Select the active Academic Year/Closure
+            Date before approving
+            this idea.</p>
+
+        <p-dropdown [options]="closureSettings" [(ngModel)]="selectedSettingId" optionLabel="academicYear"
+            optionValue="settingID" placeholder="Select Academic Year" styleClass="w-full font-medium" appendTo="body">
+        </p-dropdown>
+    </div>
+    <div class="flex justify-end gap-3 border-t border-gray-100 dark:border-gray-700 pt-4 mt-2">
+        <button (click)="showApproveDialog = false"
+            class="px-5 py-2 text-gray-600 dark:text-gray-300 font-bold hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">Cancel</button>
+        <button (click)="confirmApproval()"
+            class="px-5 py-2 bg-[#6FCBF0] hover:bg-[#5bb8db] text-gray-900 font-bold rounded-lg transition-colors shadow-sm">Confirm
+            Approval</button>
+    </div>
+</p-dialog>
+
+<p-toast position="top-right"></p-toast>
+<p-confirmDialog styleClass="custom-confirm-dialog"></p-confirmDialog>
