@@ -4,6 +4,7 @@ export interface ClosureSettingModel {
     closureDate: string | Date;
     finalclosureDate: string | Date;
     academicYear: string;
+    status: string;
     created_at?: string;
     updated_at?: string;
 }
