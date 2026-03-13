@@ -173,29 +173,30 @@ export class UserAssignmentComponent implements OnInit {
     deactivateAccount(): void {
         if (!this.user || !this.user.staffID) return;
 
-        const newStatus = (this.user.account_status === 'Inactive' || this.user.account_status === 'Deactivated')
-            ? 'Active'
-            : 'Inactive';
+        const originalStatus = this.user.account_status;
+        const newStatus = originalStatus === 'active' ? 'disabled' : 'active';
 
-        this.user.account_status = newStatus;
+        this.staffService.updateStatus(this.user.staffID, newStatus).subscribe({
+            next: (res) => {
+                if (res.success) {
+                    this.user.account_status = newStatus;
 
-        const payload = {
-            ...this.buildStaffPayload(),
-            account_status: newStatus
-        };
-
-        this.staffService.update(this.user.staffID, payload).subscribe({
-            next: () => {
-                this.messageService.add({
-                    severity: 'success',
-                    summary: 'Status Updated',
-                    detail: `Account is now ${newStatus}`,
-                    life: 3000
-                });
+                    this.messageService.add({
+                        severity: 'success',
+                        summary: 'Status Updated',
+                        detail: `Account is now ${newStatus}`,
+                        life: 3000
+                    });
+                }
             },
             error: (err) => {
-                console.error(err);
-                this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to update status' });
+                console.error('Status update failed', err);
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Update Failed',
+                    detail: err.error?.message || 'Failed to update account status',
+                    life: 3000
+                });
             }
         });
     }
