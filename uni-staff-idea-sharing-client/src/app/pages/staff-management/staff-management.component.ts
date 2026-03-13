@@ -15,6 +15,7 @@ import { DepartmentService } from '../../core/services/department.service';
 import { RoleService } from '../../core/services/role.service';
 import { StaffService } from '../../core/services/staff.service';
 import { environment } from '../../../environments/environment';
+import { CookieService } from 'ngx-cookie-service';
 
 @Component({
   selector: 'app-staff-management',
@@ -57,6 +58,7 @@ export class StaffManagementComponent implements OnInit {
     private staffService: StaffService,
     private roleService: RoleService,
     private departmentService: DepartmentService,
+    private cookieService: CookieService
   ) { }
 
   ngOnInit(): void {
@@ -65,20 +67,29 @@ export class StaffManagementComponent implements OnInit {
   }
 
   private loadUsers(): void {
-    this.staffService.get().subscribe({
-      next: (res) => {
-        this.users = res.data as ViewStaffModel[];
-      },
-      error: (err) => {
-        console.error('Error loading users:', err);
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Load Error',
-          detail: 'Failed to load user accounts',
-          life: 3000
-        });
-      }
-    });
+    const deptId = this.cookieService.get('departmentID');
+    if (deptId) {
+      this.departmentService.getStaffByDepartment(Number(deptId)).subscribe({
+        next: (res) => {
+          this.users = res.data as ViewStaffModel[];
+        },
+        error: (err) => {
+          console.error('Error loading users:', err);
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Load Error',
+            detail: 'Failed to load user accounts',
+            life: 3000
+          });
+        }
+      });
+    } else {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Access Denied',
+        detail: 'No department associated with your account.'
+      });
+    }
   }
 
   onGlobalFilter(event: Event) {
@@ -144,8 +155,36 @@ export class StaffManagementComponent implements OnInit {
     });
   }
 
-  // onToggleChange(user: ViewStaffModel, field: string) {
-  //   console.log(`User ${user.staffName} changed ${field} to`, user[field]);
-  //   // this.staffService.updateUserStatus(user.id, payload).subscribe(...)
-  // }
+  toggleAccountStatus(user: any, event: Event): void {
+    const checkbox = event.target as HTMLInputElement;
+    const originalStatus = user.account_status;
+
+    // Toggle between 'active' and 'disabled' to match Laravel validation
+    const newStatus = originalStatus === 'active' ? 'disabled' : 'active';
+
+    this.staffService.updateStatus(user.staffID, newStatus).subscribe({
+      next: (res) => {
+        if (res.success) {
+          user.account_status = newStatus;
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Status Updated',
+            detail: `${user.staffName} is now ${newStatus}`,
+            life: 3000
+          });
+        }
+      },
+      error: (err) => {
+        console.error('Update failed', err);
+        checkbox.checked = (originalStatus === 'disabled');
+
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Update Failed',
+          detail: err.error?.message || 'Could not change account status',
+          life: 3000
+        });
+      }
+    });
+  }
 }
