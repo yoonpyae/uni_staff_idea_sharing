@@ -126,9 +126,9 @@
             <td class="px-4 md:px-6 py-4">
               <span [ngClass]="{
     'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400': user.account_status === 'active',
-    'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400': user.account_status === 'inactive' || user.account_status === 'deactivated',
+    'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400': user.account_status === 'disabled',
     'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400': user.account_status === 'suspended'
-  }" class="px-3 py-1 rounded-full text-xs font-bold">
+  }" class="px-3 py-1 rounded-full text-xs font-bold capitalize shadow-sm">
                 {{ user.account_status || 'N/A' }}
               </span>
             </td>
