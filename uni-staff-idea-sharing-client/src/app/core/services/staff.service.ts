@@ -28,6 +28,12 @@ export class StaffService {
     return this.httpClient.post<RootModel>(`${environment.main_url}/staffs/${id}`, model);
   }
 
+  updateStatus(id: number, status: string): Observable<RootModel> {
+    return this.httpClient.patch<RootModel>(`${environment.main_url}/staffs/${id}/status`, {
+      account_status: status
+    });
+  }
+
   delete(id: number): Observable<RootModel> {
     return this.httpClient.delete<RootModel>(`${environment.main_url}/staffs/${id}`);
   }
