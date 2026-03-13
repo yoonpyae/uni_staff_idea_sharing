@@ -93,8 +93,8 @@ export class DepartmentComponent implements OnInit {
     }
 
     this.filteredDepartments = this.departments.filter(dept =>
-      dept.departmentName.toLowerCase().includes(query)
-      // dept.qaCoordinator.toLowerCase().includes(query)
+      dept.departmentName.toLowerCase().includes(query) ||
+      (dept.qa_coordinator?.staffName.toLowerCase().includes(query) ?? false)
     );
   }
 
