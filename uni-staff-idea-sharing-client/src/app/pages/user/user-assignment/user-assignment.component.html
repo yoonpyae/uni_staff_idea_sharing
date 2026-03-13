@@ -144,10 +144,10 @@
             </div>
 
             <button (click)="deactivateAccount()" [ngClass]="{
-    'bg-[#ff9b9b] dark:bg-[#d66b6b] hover:bg-[#ff8282]': user.account_status !== 'Inactive',
-    'bg-green-500 dark:bg-green-600 hover:bg-green-400': user.account_status === 'Inactive'
+    'bg-[#ff9b9b] dark:bg-[#d66b6b] hover:bg-[#ff8282]': user.account_status === 'active',
+    'bg-green-500 dark:bg-green-600 hover:bg-green-400': user.account_status === 'disabled'
   }" class="w-full max-w-[250px] py-3 font-bold text-gray-900 dark:text-white rounded-xl shadow-sm transition-colors">
-              {{ user.account_status === 'Inactive' ? 'Activate Account' : 'Deactivate Account' }}
+              {{ user.account_status === 'disabled' ? 'Activate Account' : 'Deactivate Account' }}
             </button>
           </div>
 
