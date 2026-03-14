@@ -181,24 +181,33 @@ export class StaffIdeaFeedComponent implements OnInit {
   hasUserLiked(idea: IdeaModel): boolean { return idea.votes?.some(v => v.staffID === this.staffID && v.voteType === 'Like') || false; }
   hasUserUnliked(idea: IdeaModel): boolean { return idea.votes?.some(v => v.staffID === this.staffID && v.voteType === 'Unlike') || false; }
 
-  getFileName(path: string): string { return path ? path.split('/').pop() || 'Document' : 'Document'; }
-  isImage(path: string): boolean { return ['jpg', 'jpeg', 'png', 'gif', 'svg', 'webp'].includes(path?.split('.').pop()?.toLowerCase() || ''); }
-  getIdeaImages(idea: IdeaModel): any[] { return idea.documents?.filter(doc => this.isImage(doc.docPath)) || []; }
-  getIdeaFiles(idea: IdeaModel): any[] { return idea.documents?.filter(doc => !this.isImage(doc.docPath)) || []; }
+  getFileName(path: string): string {
+    if (!path) return 'Document';
+    return path.split('/').pop() || 'Document';
+  }
 
   getFileIcon(path: string): string {
-    const ext = path?.split('.').pop()?.toLowerCase();
+    if (!path) return 'pi-file';
+    const ext = path.split('.').pop()?.toLowerCase();
+
     if (ext === 'pdf') return 'pi-file-pdf';
     if (ext === 'doc' || ext === 'docx') return 'pi-file-word';
     if (ext === 'xls' || ext === 'xlsx') return 'pi-file-excel';
+    if (['jpg', 'jpeg', 'png', 'gif', 'svg'].includes(ext || '')) return 'pi-image';
+
     return 'pi-file';
   }
 
   getFileColor(path: string): string {
-    const ext = path?.split('.').pop()?.toLowerCase();
+    if (!path) return 'text-gray-500 dark:text-gray-400';
+    const ext = path.split('.').pop()?.toLowerCase();
+
     if (ext === 'pdf') return 'text-red-500 dark:text-red-400';
     if (ext === 'doc' || ext === 'docx') return 'text-blue-500 dark:text-blue-400';
     if (ext === 'xls' || ext === 'xlsx') return 'text-green-500 dark:text-green-400';
+    if (ext === 'ppt' || ext === 'pptx') return 'text-orange-500 dark:text-orange-400';
+    if (['jpg', 'jpeg', 'png', 'gif', 'svg'].includes(ext || '')) return 'text-purple-500 dark:text-purple-400';
+
     return 'text-gray-500 dark:text-gray-400';
   }
 
