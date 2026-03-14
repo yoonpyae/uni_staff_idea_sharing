@@ -54,11 +54,13 @@ export class AuthService {
       const name = staff.staffName || staff.name;
       const role = staff.role.roleName || staff.role;
       const profilePicture = staff.staffProfile;
+      const deptId = staff.departmentID || (staff.department ? staff.department.departmentID : null);
 
       if (id) this.cookieService.set('staffID', String(id));
       if (name) this.cookieService.set('staffName', String(name));
       if (role) this.cookieService.set('roleName', String(role));
       if (profilePicture) this.cookieService.set('staffProfile', String(profilePicture));
+      if (deptId) this.cookieService.set('departmentID', String(deptId));
     }
 
     this.cookieService.set('authorized_status', 'true');
@@ -94,11 +96,7 @@ export class AuthService {
   }
 
   logoutForce(): void {
-    this.cookieService.delete('authorized_status');
-    this.cookieService.delete('staffID');
-    this.cookieService.delete('staffName');
-    this.cookieService.delete('roleName');
-    this.cookieService.delete('staffProfile');
+    this.cookieService.deleteAll();
 
     localStorage.removeItem(this.tokenKey);
     localStorage.removeItem(this.refreshTokenKey);
