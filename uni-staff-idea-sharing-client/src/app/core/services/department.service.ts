@@ -16,6 +16,10 @@ export class DepartmentService {
     return this.httpClient.get<RootModel>(`${environment.main_url}/departments`);
   }
 
+  getStaffByDepartment(departmentId: number): Observable<RootModel> {
+    return this.httpClient.get<RootModel>(`${environment.main_url}/departments/${departmentId}/staffs`);
+  }
+
   getById(id: number): Observable<RootModel> {
     return this.httpClient.get<RootModel>(`${environment.main_url}/departments/${id}`);
   }
