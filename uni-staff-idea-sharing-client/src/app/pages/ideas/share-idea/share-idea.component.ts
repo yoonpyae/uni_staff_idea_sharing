@@ -12,6 +12,7 @@ import { DocumentService } from '../../../core/services/ideas/document.service';
 import { IdeaCategoryService } from '../../../core/services/ideas/idea-category.service';
 import { IdeaService } from '../../../core/services/ideas/idea.service';
 import { environment } from '../../../../environments/environment';
+import { StaffService } from '../../../core/services/staff.service';
 
 @Component({
   selector: 'app-share-idea',
@@ -48,7 +49,8 @@ export class ShareIdeaComponent implements OnInit, OnDestroy {
     private documentService: DocumentService,
     private messageService: MessageService,
     private location: Location,
-    private cookieService: CookieService
+    private cookieService: CookieService,
+    private staffService: StaffService
   ) { }
 
   ngOnInit(): void {
@@ -121,6 +123,25 @@ export class ShareIdeaComponent implements OnInit, OnDestroy {
       this.loadingSeconds++;
     }, 1000);
 
+    const today = new Date().toISOString().split('T')[0];
+    const termsPayload = {
+      termsAccepted: 1,
+      termsAcceptedDate: today
+    };
+
+    this.staffService.update(Number(this.staffID), termsPayload).subscribe({
+      next: () => {
+        this.postIdeaData(isAnonymous);
+      },
+      error: (err) => {
+        this.stopLoadingTimer();
+        console.error('Failed to update terms:', err);
+        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to accept terms. Please try again.' });
+      }
+    });
+  }
+
+  private postIdeaData(isAnonymous: boolean): void {
     const formData = new FormData();
     formData.append('title', this.title);
     formData.append('description', this.description);
