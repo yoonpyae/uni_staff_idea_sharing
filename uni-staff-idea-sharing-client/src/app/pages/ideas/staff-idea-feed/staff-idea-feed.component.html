@@ -143,26 +143,18 @@
                 <p class="text-[15px] text-gray-700 dark:text-gray-300 leading-relaxed mb-4 line-clamp-3">{{
                     idea.description }}</p>
 
-                <div *ngIf="getIdeaImages(idea).length > 0" class="flex gap-2 h-40 sm:h-56 mb-4">
-                    <ng-container *ngFor="let img of getIdeaImages(idea).slice(0, 3)">
-                        <div class="flex-1 overflow-hidden rounded-xl bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 cursor-pointer"
-                            [routerLink]="['/staff-idea-detail', idea.ideaID]">
-                            <img [src]="getProfileUrl(img.docPath)"
-                                class="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
-                        </div>
-                    </ng-container>
-                </div>
-
-                <div *ngIf="getIdeaFiles(idea).length > 0" class="flex flex-col gap-2 mb-4">
-                    <div *ngFor="let file of getIdeaFiles(idea)"
-                        class="flex items-center gap-3 bg-[#f0f2f5] dark:bg-gray-800/50 px-4 py-2.5 rounded-lg border border-gray-200 dark:border-gray-700 w-max cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors">
-                        <i class="pi text-xl"
-                            [ngClass]="getFileIcon(file.docPath) + ' ' + getFileColor(file.docPath)"></i>
-                        <span class="text-sm font-medium text-blue-600 dark:text-blue-400">{{ getFileName(file.docPath)
-                            }}</span>
+                <div *ngIf="idea.documents && idea.documents.length > 0" class="flex flex-wrap gap-3 mb-5 mt-3">
+                    <div *ngFor="let doc of idea.documents"
+                        class="flex items-center gap-2.5 bg-[#f0f2f5] dark:bg-gray-800 px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                        title="{{ getFileName(doc.docPath) }}" [routerLink]="['/staff-idea-detail', idea.ideaID]">
+                        <i class="pi text-lg"
+                            [ngClass]="getFileIcon(doc.docPath) + ' ' + getFileColor(doc.docPath)"></i>
+                        <span
+                            class="text-[13.5px] font-medium text-[#1E88E5] dark:text-[#64B5F6] truncate max-w-[200px] sm:max-w-[250px]">
+                            {{ getFileName(doc.docPath) }}
+                        </span>
                     </div>
                 </div>
-
                 <div
                     class="flex items-center gap-5 text-gray-600 dark:text-gray-400 font-medium text-[15px] border-t border-gray-100 dark:border-gray-700 pt-4 mt-2">
                     <div class="flex items-center gap-1.5 cursor-pointer transition-colors"
