@@ -32,7 +32,7 @@
                         <div class="flex flex-col lg:flex-row justify-end items-center gap-4 py-2">
                             <div class="flex flex-wrap items-center gap-3 w-full lg:w-auto">
 
-                                <p-columnFilter field="role.roleName" matchMode="equals" [showMenu]="false">
+                                <p-columnFilter field="roleName" matchMode="equals" [showMenu]="false">
                                     <ng-template pTemplate="filter" let-value let-filter="filterCallback">
                                         <p-dropdown [options]="roleFilterOptions" [ngModel]="value"
                                             placeholder="All Roles" (onChange)="filter($event.value)" [showClear]="true"
@@ -41,7 +41,7 @@
                                     </ng-template>
                                 </p-columnFilter>
 
-                                <p-columnFilter field="department.departmentName" matchMode="equals" [showMenu]="false">
+                                <p-columnFilter field="departmentName" matchMode="equals" [showMenu]="false">
                                     <ng-template pTemplate="filter" let-value let-filter="filterCallback">
                                         <p-dropdown [options]="departmentFilterOptions" [ngModel]="value"
                                             placeholder="All Depts" (onChange)="filter($event.value)" [showClear]="true"
@@ -112,14 +112,14 @@
                             </td>
 
                             <td class="px-6 py-4">
-                                <span [class]="getRoleColor(user.role?.roleName)" class="text-sm font-semibold">
-                                    {{ user.role?.roleName || 'Role ID: ' + user.roleID }}
+                                <span [class]="getRoleColor(user.roleName)" class="text-sm font-semibold">
+                                    {{ user.roleName || 'Role ID: ' + user.roleID }}
                                 </span>
                             </td>
 
                             <td class="px-6 py-4">
                                 <span class="text-sm font-semibold text-blue-600 dark:text-blue-400">
-                                    {{ user.department?.departmentName || 'Dept ID: ' + user.departmentID }}
+                                    {{ user.departmentName || 'Dept ID: ' + user.departmentID }}
                                 </span>
                             </td>
 
