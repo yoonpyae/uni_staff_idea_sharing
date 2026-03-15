@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CookieService } from 'ngx-cookie-service';
@@ -17,7 +17,8 @@ import { StaffService } from '../../core/services/staff.service';
 })
 export class AccountDetailsComponent implements OnInit {
   isEditing: boolean = false;
-  
+  isStaffRole: boolean = false;
+
   user: any = {
     staffID: 0,
     staffName: '',
@@ -35,16 +36,16 @@ export class AccountDetailsComponent implements OnInit {
   constructor(
     private cookieService: CookieService,
     private staffService: StaffService,
-    private messageService: MessageService
-  ) {}
+    private messageService: MessageService,
+    private location: Location
+  ) { }
 
   ngOnInit(): void {
-    // Assuming you store the logged-in user's ID in a cookie upon login
+    this.isStaffRole = this.cookieService.get('roleName') === 'Staff';
     const staffIdStr = this.cookieService.get('staffID');
     if (staffIdStr) {
       this.loadUserDetails(parseInt(staffIdStr, 10));
     } else {
-      // Fallback: load basic info from cookies if ID isn't available yet
       this.user.staffName = this.cookieService.get('staffName') || 'Guest';
       this.user.roleName = this.cookieService.get('roleName') || 'Guest';
       this.setProfileUrl(this.cookieService.get('staffProfile'));
@@ -92,7 +93,7 @@ export class AccountDetailsComponent implements OnInit {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length > 0) {
       this.selectedProfileFile = input.files[0];
-      
+
       // Create a temporary preview URL for the selected image
       const reader = new FileReader();
       reader.onload = (e: any) => {
@@ -101,7 +102,7 @@ export class AccountDetailsComponent implements OnInit {
       reader.readAsDataURL(this.selectedProfileFile);
 
       // Auto-save the profile picture immediately (optional, or wait for standard save)
-      this.saveChanges(); 
+      this.saveChanges();
     }
   }
 
@@ -112,7 +113,7 @@ export class AccountDetailsComponent implements OnInit {
     form.append('staffName', this.user.staffName);
     form.append('staffPhNo', this.user.staffPhNo);
     form.append('staffEmail', this.user.staffEmail);
-    
+
     // Only send password if they typed a new one
     if (this.user.password) {
       form.append('staffPassword', this.user.password);
@@ -128,7 +129,7 @@ export class AccountDetailsComponent implements OnInit {
         this.isEditing = false;
         this.user.password = ''; // Clear password field after save
         this.selectedProfileFile = undefined;
-        
+
         // Update cookie with new profile picture if needed
         if (res.data && res.data.staffProfile) {
           this.setProfileUrl(res.data.staffProfile);
@@ -140,5 +141,9 @@ export class AccountDetailsComponent implements OnInit {
         this.messageService.add({ severity: 'error', summary: 'Update Failed', detail });
       }
     });
+  }
+
+  goBack(): void {
+    this.location.back();
   }
 }

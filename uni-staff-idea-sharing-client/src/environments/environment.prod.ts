@@ -1,6 +1,5 @@
 export const environment = {
   production: true,
-  docker: false,
 
   debug: false,
 

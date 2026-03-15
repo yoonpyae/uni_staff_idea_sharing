@@ -40,9 +40,9 @@ export const routes: Routes = [
     data: { title: 'Idea Details', roles: ['Staff'] }
   },
   {
-    path: 'account-details',
+    path: 'staff-account-details',
     component: AccountDetailsComponent,
-    data: { title: 'Account Details', roles: ['Staff'] }
+    data: { title: 'Staff Account Details', roles: ['Staff'] }
   },
   {
     path: '',
