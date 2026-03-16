@@ -8,7 +8,7 @@ RUN npm ci --silent
 
 COPY . .
 
-RUN npm run build -- --configuration production
+RUN npm run build 
 
 
 FROM nginx:alpine
