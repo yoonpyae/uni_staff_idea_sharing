@@ -2,8 +2,8 @@ export const environment = {
   production: true,
   docker: false,
 
-  main_url: 'http://127.0.0.1:8000/api',
-  web_url: 'http://127.0.0.1:8000',
+  main_url: 'https://api.uniidea.site',
+  web_url: 'https://api.uniidea.site',
 
   debug: true,
 
