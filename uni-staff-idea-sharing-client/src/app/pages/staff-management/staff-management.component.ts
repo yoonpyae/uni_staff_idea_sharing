@@ -49,8 +49,6 @@ export class StaffManagementComponent implements OnInit {
 
   // filter dropdown options fetched from server
   roleFilterOptions: Array<{ label: string; value: string }> = [];
-  departmentFilterOptions: Array<{ label: string; value: string }> = [];
-
   constructor(
     private router: Router,
     private confirmationService: ConfirmationService,
@@ -120,18 +118,8 @@ export class StaffManagementComponent implements OnInit {
     return 'text-blue-600 dark:text-blue-400';
   }
 
-  // Add these to your component class
-  /**
-   * Previously computed from users list – replaced by server-loaded values.
-   * Keep getters in case something else still uses them, but they now fall back
-   * to the server options so behavior is consistent.
-   */
   get roleOptions() {
     return this.roleFilterOptions;
-  }
-
-  get departmentOptions() {
-    return this.departmentFilterOptions;
   }
 
   private loadFilterLists(): void {
@@ -140,15 +128,6 @@ export class StaffManagementComponent implements OnInit {
         const data = res.data as any[];
         if (Array.isArray(data)) {
           this.roleFilterOptions = data.map(r => ({ label: r.roleName, value: r.roleName }));
-        }
-      },
-      error: () => { }
-    });
-    this.departmentService.get().subscribe({
-      next: (res) => {
-        const data = res.data as any[];
-        if (Array.isArray(data)) {
-          this.departmentFilterOptions = data.map(d => ({ label: d.departmentName, value: d.departmentName }));
         }
       },
       error: () => { }
