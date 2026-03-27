@@ -41,15 +41,6 @@
                                     </ng-template>
                                 </p-columnFilter>
 
-                                <p-columnFilter field="departmentName" matchMode="equals" [showMenu]="false">
-                                    <ng-template pTemplate="filter" let-value let-filter="filterCallback">
-                                        <p-dropdown [options]="departmentFilterOptions" [ngModel]="value"
-                                            placeholder="All Depts" (onChange)="filter($event.value)" [showClear]="true"
-                                            styleClass="filter-dropdown">
-                                        </p-dropdown>
-                                    </ng-template>
-                                </p-columnFilter>
-
                                 <div class="relative flex-1 sm:min-w-[300px]">
                                     <input type="text" (input)="onGlobalFilter($event)" placeholder="Search..."
                                         class="w-full px-4 pl-10 py-2.5 border-2 border-gray-300 dark:border-gray-600 rounded-xl text-[0.95rem] bg-white dark:bg-gray-700 text-[#2c3e50] dark:text-white transition-all focus:outline-none focus:border-[#a8e6cf]" />
