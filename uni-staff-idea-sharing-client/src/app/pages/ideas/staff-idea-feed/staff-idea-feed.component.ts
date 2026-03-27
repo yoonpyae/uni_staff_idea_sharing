@@ -16,6 +16,7 @@ import { environment } from '../../../../environments/environment';
 import { ThemeService } from '../../../core/services/themeService';
 import { AuthService } from '../../../core/services/auth.service';
 import { MessageService } from 'primeng/api';
+import { ReportService } from '../../../core/services/ideas/report.service';
 
 @Component({
   selector: 'app-staff-idea-feed',
@@ -43,6 +44,12 @@ export class StaffIdeaFeedComponent implements OnInit {
   selectedCat: number | null = null;
   activeMenuId: number | null = null;
 
+  displayReportModal: boolean = false;
+  reportType: 'idea' | 'comment' = 'idea';
+  reportTargetId: number | null = null;
+  reportReason: string = '';
+  isSubmittingReport: boolean = false;
+
   constructor(
     private ideaService: IdeaService,
     private cookieService: CookieService,
@@ -52,7 +59,8 @@ export class StaffIdeaFeedComponent implements OnInit {
     private router: Router,
     public themeService: ThemeService,
     private authService: AuthService,
-    private messageService: MessageService
+    private messageService: MessageService,
+    private reportService: ReportService
   ) { }
 
   ngOnInit(): void {
@@ -256,6 +264,52 @@ export class StaffIdeaFeedComponent implements OnInit {
         console.error('Logout failed:', err);
         this.authService.logoutForce(); // fallback
         this.router.navigate(['/login']);
+      }
+    });
+  }
+
+  // --- Report Logic ---
+  openReportModal(ideaID: number, event: Event): void {
+    event.stopPropagation();
+    this.reportType = 'idea';
+    this.reportTargetId = ideaID;
+    this.reportReason = '';
+    this.displayReportModal = true;
+    this.activeMenuId = null; // Close the dropdown menu
+  }
+
+  submitReport(): void {
+    if (!this.reportReason.trim() || !this.reportTargetId) return;
+
+    this.isSubmittingReport = true;
+
+    const payload = {
+      report_type: this.reportType,
+      reason: this.reportReason,
+      reporter_id: this.staffID,
+      ideaID: this.reportTargetId,
+      commentID: null,
+      status: 'pending'
+    };
+
+    this.reportService.create(payload).subscribe({
+      next: (res) => {
+        this.isSubmittingReport = false;
+        this.displayReportModal = false;
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Report Submitted',
+          detail: 'Thank you. An admin will review this shortly.'
+        });
+      },
+      error: (err) => {
+        this.isSubmittingReport = false;
+        console.error('Failed to submit report', err);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Could not submit report at this time.'
+        });
       }
     });
   }
