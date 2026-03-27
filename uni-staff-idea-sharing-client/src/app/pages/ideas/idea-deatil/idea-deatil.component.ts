@@ -1,5 +1,5 @@
 import { CommonModule, Location } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { CookieService } from 'ngx-cookie-service';
@@ -11,6 +11,7 @@ import { CommentService } from '../../../core/services/ideas/comment.service';
 import { IdeaService } from '../../../core/services/ideas/idea.service';
 import { VoteService } from '../../../core/services/ideas/vote.service';
 import { CommentModel } from '../../../core/models/ideas/comment.model';
+import { ReportService } from '../../../core/services/ideas/report.service';
 
 @Component({
   selector: 'app-idea-deatil',
@@ -31,6 +32,14 @@ export class IdeaDeatilComponent implements OnInit {
   newCommentText: string = '';
   isAnonymousComment: boolean = false;
 
+  // --- Menu & Report Variables ---
+  showIdeaMenu: boolean = false;
+  displayReportModal: boolean = false;
+  reportType: 'idea' | 'comment' = 'idea';
+  reportTargetId: number | null = null;
+  reportReason: string = '';
+  isSubmittingReport: boolean = false;
+
   constructor(
     private route: ActivatedRoute,
     private location: Location,
@@ -38,7 +47,8 @@ export class IdeaDeatilComponent implements OnInit {
     private commentService: CommentService,
     private voteService: VoteService,
     private cookieService: CookieService,
-    private messageService: MessageService
+    private messageService: MessageService,
+    private reportService: ReportService
   ) { }
 
   ngOnInit(): void {
@@ -51,6 +61,70 @@ export class IdeaDeatilComponent implements OnInit {
       if (id) {
         this.ideaId = Number(id);
         this.loadIdeaDetails();
+      }
+    });
+  }
+
+  // --- Menu Handling ---
+  toggleIdeaMenu(event: Event): void {
+    event.stopPropagation();
+    this.showIdeaMenu = !this.showIdeaMenu;
+  }
+
+  @HostListener('document:click', ['$event'])
+  onClickOutside(event: Event) {
+    this.showIdeaMenu = false; // Close menu when clicking outside
+  }
+
+  // --- Download Zip Logic (Placeholder) ---
+  downloadIdeaAsZip(): void {
+    this.showIdeaMenu = false;
+    this.messageService.add({ severity: 'info', summary: 'Downloading', detail: 'Preparing your ZIP file...' });
+    // Add your actual download logic here
+  }
+
+  // --- Report Logic ---
+  openReportModal(type: 'idea' | 'comment', id: number | undefined): void {
+    if (!id) return;
+    this.reportType = type;
+    this.reportTargetId = id;
+    this.reportReason = '';
+    this.displayReportModal = true;
+    this.showIdeaMenu = false; // close the dropdown menu
+  }
+
+  submitReport(): void {
+    if (!this.reportReason.trim() || !this.reportTargetId) return;
+
+    this.isSubmittingReport = true;
+
+    const payload = {
+      report_type: this.reportType,
+      reason: this.reportReason,
+      reporter_id: this.currentStaffID,
+      ideaID: this.reportType === 'idea' ? this.reportTargetId : null,
+      commentID: this.reportType === 'comment' ? this.reportTargetId : null,
+      status: 'pending' // As per your controller default, though it sets it anyway
+    };
+
+    this.reportService.create(payload).subscribe({
+      next: (res) => {
+        this.isSubmittingReport = false;
+        this.displayReportModal = false;
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Report Submitted',
+          detail: 'Thank you. An admin will review this shortly.'
+        });
+      },
+      error: (err) => {
+        this.isSubmittingReport = false;
+        console.error('Failed to submit report', err);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Could not submit report at this time.'
+        });
       }
     });
   }
