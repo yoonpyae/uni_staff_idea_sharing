@@ -19,6 +19,10 @@ export class CommentService {
     return this.http.post<RootModel>(`${environment.main_url}/comments`, model);
   }
 
+  update(id: number, model: any): Observable<RootModel> {
+    return this.http.put<RootModel>(`${environment.main_url}/comments/${id}`, model);
+  }
+
   delete(id: number): Observable<RootModel> {
     return this.http.delete<RootModel>(`${environment.main_url}/comments/${id}`);
   }
