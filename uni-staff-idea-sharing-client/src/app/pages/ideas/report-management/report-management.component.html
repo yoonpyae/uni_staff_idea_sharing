@@ -1,0 +1,160 @@
+<div class="h-screen flex flex-col bg-gray-50 dark:bg-gray-900">
+    <header class="flex-shrink-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg border-b border-gray-200/50 dark:border-gray-700/50 shadow-sm z-10">
+        <div class="px-4 md:px-6 lg:px-8 py-4">
+            <div class="flex flex-col gap-4 max-w-[1400px] mx-auto">
+                <div class="flex justify-between items-center gap-4">
+                    <h1 class="text-2xl md:text-3xl font-bold text-[#2c3e50] dark:text-white m-0 font-sans flex items-center gap-3">
+                        <i class="pi pi-flag text-red-500"></i> Report Management
+                    </h1>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8">
+        <div class="max-w-[1400px] w-full mx-auto">
+            
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-md border border-gray-200 dark:border-gray-700 overflow-hidden">
+                <p-table #dt [value]="reports" [paginator]="true" [rows]="rows" [rowsPerPageOptions]="rowsPerPageOptions"
+                    [globalFilterFields]="['reason', 'reporter.staffName', 'report_type', 'status']"
+                    [tableStyle]="{ 'min-width': '60rem' }" styleClass="p-datatable-sm">
+                    
+                    <ng-template pTemplate="caption">
+                        <div class="flex flex-wrap justify-end gap-3 p-2">
+                            <p-dropdown [options]="typeFilterOptions" (onChange)="dt.filter($event.value, 'report_type', 'equals')" placeholder="All Types" [showClear]="true" styleClass="w-40"></p-dropdown>
+                            <p-dropdown [options]="statusFilterOptions" (onChange)="dt.filter($event.value, 'status', 'equals')" placeholder="All Statuses" [showClear]="true" styleClass="w-40"></p-dropdown>
+                            
+                            <div class="relative w-full sm:w-64">
+                                <input type="text" (input)="onGlobalFilter($event)" placeholder="Search reports..."
+                                    class="w-full px-4 pl-10 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-400" />
+                                <i class="pi pi-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-500"></i>
+                            </div>
+                        </div>
+                    </ng-template>
+
+                    <ng-template pTemplate="header">
+                        <tr class="bg-gray-50 dark:bg-gray-700/50">
+                            <th class="px-6 py-4 text-left text-sm font-bold text-gray-700 dark:text-gray-200">Date</th>
+                            <th class="px-6 py-4 text-left text-sm font-bold text-gray-700 dark:text-gray-200">Type</th>
+                            <th class="px-6 py-4 text-left text-sm font-bold text-gray-700 dark:text-gray-200">Reported By</th>
+                            <th class="px-6 py-4 text-left text-sm font-bold text-gray-700 dark:text-gray-200">Reason Preview</th>
+                            <th class="px-6 py-4 text-center text-sm font-bold text-gray-700 dark:text-gray-200">Status</th>
+                            <th class="px-6 py-4 text-center text-sm font-bold text-gray-700 dark:text-gray-200">Actions</th>
+                        </tr>
+                    </ng-template>
+
+                    <ng-template pTemplate="body" let-report>
+                        <tr class="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors">
+                            <td class="px-6 py-4 text-sm text-gray-600 dark:text-gray-400 whitespace-nowrap">
+                                {{ report.created_at | date:'MMM d, y, h:mm a' }}
+                            </td>
+                            <td class="px-6 py-4">
+                                <span class="font-semibold text-gray-900 dark:text-white uppercase text-xs tracking-wider"
+                                      [ngClass]="report.report_type === 'idea' ? 'text-blue-500' : 'text-purple-500'">
+                                    <i class="pi" [ngClass]="report.report_type === 'idea' ? 'pi-lightbulb' : 'pi-comments'"></i> 
+                                    {{ report.report_type }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white">
+                                {{ report.reporter?.staffName || 'Unknown' }}
+                            </td>
+                            <td class="px-6 py-4 text-sm text-gray-600 dark:text-gray-300 max-w-xs truncate" title="{{ report.reason }}">
+                                {{ report.reason }}
+                            </td>
+                            <td class="px-6 py-4 text-center">
+                                <span class="px-3 py-1 rounded-full text-xs font-bold border capitalize" [ngClass]="getStatusColor(report.status)">
+                                    {{ report.status }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 text-center">
+                                <button (click)="viewDetails(report)" class="p-2 bg-blue-50 text-blue-600 hover:bg-blue-100 dark:bg-blue-900/30 dark:text-blue-400 dark:hover:bg-blue-800/50 rounded-lg transition-colors" title="View Details">
+                                    <i class="pi pi-eye"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    </ng-template>
+
+                    <ng-template pTemplate="emptymessage">
+                        <tr>
+                            <td colspan="6" class="text-center py-16">
+                                <i class="pi pi-shield text-5xl text-gray-300 dark:text-gray-600 mb-4 block"></i>
+                                <span class="text-lg font-medium text-gray-500 dark:text-gray-400">No reports found. Clean queue!</span>
+                            </td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div *ngIf="displayDetailsModal && selectedReport" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4" (click)="displayDetailsModal = false">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl w-full max-w-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]" (click)="$event.stopPropagation()">
+        
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center bg-gray-50 dark:bg-gray-800/50">
+            <h3 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
+                <i class="pi pi-flag-fill text-red-500"></i> Report Details
+            </h3>
+            <button (click)="displayDetailsModal = false" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors p-1">
+                <i class="pi pi-times text-xl"></i>
+            </button>
+        </div>
+
+        <div class="p-6 overflow-y-auto flex-1">
+            <div class="grid grid-cols-2 gap-4 mb-6">
+                <div class="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-xl border border-gray-100 dark:border-gray-600">
+                    <p class="text-xs text-gray-500 dark:text-gray-400 uppercase font-bold mb-1">Reported By</p>
+                    <p class="font-semibold text-gray-900 dark:text-white">{{ selectedReport.reporter?.staffName || 'Unknown Staff' }}</p>
+                </div>
+                <div class="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-xl border border-gray-100 dark:border-gray-600">
+                    <p class="text-xs text-gray-500 dark:text-gray-400 uppercase font-bold mb-1">Target Content</p>
+                    <p class="font-semibold text-gray-900 dark:text-white capitalize"><i class="pi" [ngClass]="selectedReport.report_type === 'idea' ? 'pi-lightbulb' : 'pi-comments'"></i> {{ selectedReport.report_type }}</p>
+                </div>
+            </div>
+
+            <div class="mb-6">
+                <h4 class="text-sm font-bold text-red-500 uppercase mb-2">Reason for Report</h4>
+                <div class="bg-red-50 dark:bg-red-900/10 border border-red-100 dark:border-red-900/30 p-4 rounded-xl text-gray-800 dark:text-gray-200 leading-relaxed">
+                    {{ selectedReport.reason }}
+                </div>
+            </div>
+
+            <div>
+                <h4 class="text-sm font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">Reported Content Preview</h4>
+                <div class="bg-gray-100 dark:bg-gray-900 p-5 rounded-xl border border-gray-200 dark:border-gray-700">
+                    
+                    <ng-container *ngIf="selectedReport.report_type === 'idea' && selectedReport.idea">
+                        <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2">{{ selectedReport.idea.title }}</h3>
+                        <p class="text-gray-700 dark:text-gray-300 text-sm whitespace-pre-line">{{ selectedReport.idea.description }}</p>
+                    </ng-container>
+
+                    <ng-container *ngIf="selectedReport.report_type === 'comment' && selectedReport.comment">
+                        <p class="text-gray-700 dark:text-gray-300 text-sm italic">"{{ selectedReport.comment.comment }}"</p>
+                    </ng-container>
+
+                    <div *ngIf="(selectedReport.report_type === 'idea' && !selectedReport.idea) || (selectedReport.report_type === 'comment' && !selectedReport.comment)" class="text-gray-500 text-sm italic flex items-center gap-2">
+                        <i class="pi pi-info-circle"></i> Original content could not be loaded (it may have been deleted).
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="px-6 py-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 flex justify-between items-center gap-3">
+            <span class="px-3 py-1.5 rounded-full text-xs font-bold border capitalize" [ngClass]="getStatusColor(selectedReport.status)">
+                Current Status: {{ selectedReport.status }}
+            </span>
+            
+            <div class="flex gap-3" *ngIf="selectedReport.status === 'pending'">
+                <button (click)="updateReportStatus(selectedReport, 'dismissed', $event)" class="px-5 py-2.5 rounded-lg font-semibold text-gray-700 bg-white border border-gray-300 dark:border-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 transition-colors shadow-sm">
+                    Dismiss Report
+                </button>
+                <button (click)="updateReportStatus(selectedReport, 'resolved', $event)" class="px-5 py-2.5 rounded-lg font-semibold bg-green-500 hover:bg-green-600 text-white transition-colors shadow-sm flex items-center gap-2">
+                    <i class="pi pi-check"></i> Mark Resolved
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<p-confirmDialog styleClass="custom-confirm-dialog"></p-confirmDialog>
+<p-toast position="top-right"></p-toast>
