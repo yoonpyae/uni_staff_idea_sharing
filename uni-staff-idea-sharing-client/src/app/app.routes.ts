@@ -17,6 +17,7 @@ import { ShareIdeaComponent } from './pages/ideas/share-idea/share-idea.componen
 import { IdeaDeatilComponent } from './pages/ideas/idea-deatil/idea-deatil.component';
 import { PendingIdeasComponent } from './pages/ideas/pending-ideas/pending-ideas.component';
 import { StaffIdeaFeedComponent } from './pages/ideas/staff-idea-feed/staff-idea-feed.component';
+import { ReportManagementComponent } from './pages/ideas/report-management/report-management.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -121,6 +122,12 @@ export const routes: Routes = [
         canActivate: [roleGuard],
         data: { title: 'Pending Ideas', roles: ['QA Coordinator'] }
       },
+      {
+        path: 'report-management',
+        component: ReportManagementComponent,
+        canActivate: [roleGuard],
+        data: { title: 'Report Management', roles: ['QA Manager'] }
+      }
     ],
   }
 ];
