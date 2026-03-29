@@ -49,6 +49,8 @@ export class StaffManagementComponent implements OnInit {
 
   // filter dropdown options fetched from server
   roleFilterOptions: Array<{ label: string; value: string }> = [];
+
+  currentStaffID: number = 0;
   constructor(
     private router: Router,
     private confirmationService: ConfirmationService,
@@ -60,6 +62,9 @@ export class StaffManagementComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    const staffIdStr = this.cookieService.get('staffID');
+    this.currentStaffID = staffIdStr ? Number(staffIdStr) : 0;
+
     this.loadUsers();
     this.loadFilterLists();
   }
@@ -136,9 +141,20 @@ export class StaffManagementComponent implements OnInit {
 
   toggleAccountStatus(user: any, event: Event): void {
     const checkbox = event.target as HTMLInputElement;
-    const originalStatus = user.account_status;
 
-    // Toggle between 'active' and 'disabled' to match Laravel validation
+    if (user.staffID === this.currentStaffID) {
+      event.preventDefault();
+      checkbox.checked = !checkbox.checked; // Revert visually
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Action Denied',
+        detail: 'You cannot disable your own account.',
+        life: 3000
+      });
+      return;
+    }
+
+    const originalStatus = user.account_status;
     const newStatus = originalStatus === 'active' ? 'disabled' : 'active';
 
     this.staffService.updateStatus(user.staffID, newStatus).subscribe({
