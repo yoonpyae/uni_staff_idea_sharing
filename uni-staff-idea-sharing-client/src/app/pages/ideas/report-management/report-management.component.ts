@@ -11,7 +11,10 @@ import { DropdownModule } from 'primeng/dropdown';
 import { ReportService } from '../../../core/services/ideas/report.service';
 import { ReportModel } from '../../../core/models/ideas/report.model';
 import { CookieService } from 'ngx-cookie-service';
-
+import { Router } from '@angular/router';
+import { StaffService } from '../../../core/services/staff.service';
+import { IdeaService } from '../../../core/services/ideas/idea.service';
+import { CommentService } from '../../../core/services/ideas/comment.service';
 @Component({
   selector: 'app-report-management',
   standalone: true,
@@ -52,13 +55,17 @@ export class ReportManagementComponent implements OnInit {
     { label: 'Comment', value: 'comment' }
   ];
   currentAdminId: number = 0;
-  
+
   constructor(
     private reportService: ReportService,
     private confirmationService: ConfirmationService,
     private messageService: MessageService,
-    private cookieService: CookieService
-  ) {}
+    private cookieService: CookieService,
+    private router: Router,
+    private staffService: StaffService,
+    private ideaService: IdeaService,
+    private commentService: CommentService
+  ) { }
 
   ngOnInit(): void {
     const staffIDStr = this.cookieService.get('staffID');
@@ -139,5 +146,66 @@ export class ReportManagementComponent implements OnInit {
       case 'dismissed': return 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-400 border-gray-200 dark:border-gray-700';
       default: return 'bg-gray-100 text-gray-700';
     }
+  }
+
+  goToLiveContent(report: ReportModel): void {
+    const ideaIdToNavigate = report.report_type === 'idea' ? report.ideaID : report.comment?.ideaID;
+
+    if (ideaIdToNavigate) {
+      this.displayDetailsModal = false; // close modal
+      this.router.navigate(['/submit-ideas/idea-detail', ideaIdToNavigate]);
+    } else {
+      this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Cannot find the original post ID.' });
+    }
+  }
+
+  hideContentAndResolve(report: ReportModel, event: Event): void {
+    this.confirmationService.confirm({
+      target: event.target as EventTarget,
+      message: `This will hide the ${report.report_type} from everyone and resolve the report. Continue?`,
+      header: 'Hide Content',
+      icon: 'pi pi-eye-slash',
+      accept: () => {
+
+        // Define what happens on success
+        const handleSuccess = () => {
+          this.messageService.add({ severity: 'success', summary: 'Content Hidden', detail: `The ${report.report_type} was successfully hidden.` });
+          this.updateReportStatus(report, 'resolved');
+        };
+
+        const handleError = (err: any) => {
+          this.messageService.add({ severity: 'error', summary: 'Action Failed', detail: 'Could not hide the content.' });
+          console.error(err);
+        };
+
+        if (report.report_type === 'idea' && report.ideaID) {
+          this.ideaService.delete(report.ideaID).subscribe({ next: handleSuccess, error: handleError });
+
+        } else if (report.report_type === 'comment' && report.commentID) {
+          this.commentService.delete(report.commentID).subscribe({ next: handleSuccess, error: handleError });
+        }
+      }
+    });
+  }
+
+  disableAuthorAndResolve(report: ReportModel, event: Event): void {
+    const authorId = report.report_type === 'idea' ? report.idea?.staffID : report.comment?.staffID;
+
+    if (!authorId) {
+      this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Could not identify the author.' });
+      return;
+    }
+
+    this.confirmationService.confirm({
+      target: event.target as EventTarget,
+      message: `This will completely DISABLE the author's account and resolve the report. Continue?`,
+      header: 'Disable User Account',
+      icon: 'pi pi-user-minus',
+      accept: () => {
+        this.staffService.updateStatus(authorId, 'disabled').subscribe();
+
+        this.updateReportStatus(report, 'resolved');
+      }
+    });
   }
 }
