@@ -3,7 +3,7 @@ export const environment = {
   docker: false,
 
   main_url: 'https://api.uniidea.site/api',
-  web_url: 'https://api.uniidea.site',
+
 
   debug: true,
 
