@@ -80,13 +80,12 @@
             <div *ngFor="let doc of idea.documents"
                 class="flex items-center gap-2.5 bg-[#f0f2f5] dark:bg-gray-800 px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
                 title="{{ getFileName(doc.docPath) }}">
-
-                <i class="pi text-lg" [ngClass]="getFileIcon(doc.docPath) + ' ' + getFileColor(doc.docPath)"></i>
-
-                <span
-                    class="text-[13.5px] font-medium text-[#1E88E5] dark:text-[#64B5F6] truncate max-w-[200px] sm:max-w-[250px]">
-                    {{ getFileName(doc.docPath) }}
-                </span>
+                <a [href]="getDocUrl(doc.docPath)" target="_blank" class="flex items-center gap-2.5 no-underline">
+                    <i class="pi text-lg" [ngClass]="getFileIcon(doc.docPath) + ' ' + getFileColor(doc.docPath)"></i>
+                    <span class="text-[13.5px] font-medium text-[#1E88E5] ...">
+                        {{ getFileName(doc.docPath) }}
+                    </span>
+                </a>
             </div>
         </div>
 
