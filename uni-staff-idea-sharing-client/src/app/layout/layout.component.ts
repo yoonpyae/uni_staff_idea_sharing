@@ -57,6 +57,7 @@ export class AppLayoutComponent implements OnInit {
   profilePictureUrl: string = '';
   isSidebarCollapsed = false;
   isMobileMenuOpen = false;
+  isLoggingOut = false;
   constructor(
     private router: Router,
     public themeService: ThemeService,
@@ -78,7 +79,7 @@ export class AppLayoutComponent implements OnInit {
       } else {
         const parts = profilePicture.split('/').filter(Boolean);
         const basename = parts.length ? parts[parts.length - 1] : profilePicture;
-        this.profilePictureUrl = `${environment.web_url.replace(/\/$/, '')}/uploads/staff_profiles/${basename}`;
+        this.profilePictureUrl = `${environment.base_url.replace(/\/$/, '')}/uploads/staff_profiles/${basename}`;
       }
     } else {
       this.profilePictureUrl = '';
@@ -120,6 +121,8 @@ export class AppLayoutComponent implements OnInit {
   }
 
   logout(): void {
+    if (this.isLoggingOut) return;
+    this.isLoggingOut = true;
     this.authService.logout().subscribe({
       next: (res: any) => {
         if (res && res.message) {
@@ -144,6 +147,7 @@ export class AppLayoutComponent implements OnInit {
         });
         console.error('Logout failed:', err);
         this.authService.logoutForce();
+        this.isLoggingOut = false;
         this.router.navigate(['/login']);
       }
     });
