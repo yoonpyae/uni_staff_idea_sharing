@@ -4,7 +4,8 @@
     <div class="px-4 md:px-6 lg:px-8 py-4">
       <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 max-w-[1400px] mx-auto">
         <div>
-          <h1 class="text-2xl md:text-3xl font-bold text-[#2c3e50] dark:text-white m-0 font-sans flex items-center gap-3">
+          <h1
+            class="text-2xl md:text-3xl font-bold text-[#2c3e50] dark:text-white m-0 font-sans flex items-center gap-3">
             <i class="pi"
               [ngClass]="{'pi-chart-line': userRole === 'QA Manager', 'pi-globe': userRole === 'Administrator', 'pi-chart-bar': userRole === 'Staff'}">
             </i>
@@ -25,8 +26,10 @@
           <div class="relative w-full sm:w-auto">
             <select (change)="onYearChange($event)"
               class="w-full appearance-none bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600 text-gray-800 dark:text-white font-bold py-2.5 pl-4 pr-10 rounded-lg focus:outline-none focus:border-[#6FCBF0] cursor-pointer shadow-sm">
-              <option *ngFor="let year of [2023, 2024, 2025, 2026]" [value]="year" [selected]="year === selectedYear">
-                {{ year }}
+
+              <option *ngFor="let setting of closureSettings" [value]="setting.settingID"
+                [selected]="setting.settingID === selectedSettingID">
+                {{ setting.academicYear }} - {{ setting.title }}
               </option>
             </select>
             <i class="pi pi-angle-down absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none"></i>
@@ -37,73 +40,71 @@
   </header>
 
   <div class="flex-1 overflow-y-auto">
-    <div class="p-4 md:p-6 lg:p-8 max-w-[1400px] mx-auto space-y-6 md:space-y-8">
-      
+    <div class="p-4 md:p-6 lg:p-8 max-w-[1400px] mx-auto space-y-4 md:space-y-6">
+
       <div [@listAnimation]="stats.length" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
         <div *ngFor="let stat of stats"
           class="bg-gradient-to-br from-[#a8e6cf] to-[#88d4ab] dark:from-[#2c5f5d] dark:to-[#1a3936] rounded-2xl p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 flex flex-col items-center justify-center min-h-[120px]">
-          <div class="text-base md:text-lg font-bold text-[#2c3e50] dark:text-white mb-2 text-center">{{ stat.label }}</div>
+          <div class="text-base md:text-lg font-bold text-[#2c3e50] dark:text-white mb-2 text-center">{{ stat.label }}
+          </div>
           <div class="text-4xl md:text-5xl font-extrabold text-[#2c5f5d] dark:text-[#a8e6cf]">{{ stat.value }}</div>
         </div>
       </div>
 
       <ng-container *ngIf="userRole === 'Administrator'">
-        <div class="pt-4">
-          <h2 class="text-2xl font-bold mb-6 flex items-center gap-2 text-gray-800 dark:text-white">
+        <div class="pt-2">
+          <h2 class="text-xl font-bold mb-4 flex items-center gap-2 text-gray-800 dark:text-white">
             <i class="pi pi-shield text-blue-500"></i> System Monitoring
           </h2>
-          
-          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-200 dark:border-gray-700 h-full">
-              <h3 class="text-lg font-bold mb-4 dark:text-white">Most Active Users</h3>
-              <div class="flex flex-col gap-4 overflow-y-auto max-h-[400px] pr-2">
-                <div *ngFor="let user of mostActiveUsers" class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50">
-                  <div class="w-10 h-10 rounded-full bg-gray-200 overflow-hidden flex-shrink-0">
-                    <img *ngIf="user.staffProfile" [src]="getProfileUrl(user.staffProfile)" class="w-full h-full object-cover">
-                  </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-200 dark:border-gray-700">
+              <h3 class="text-sm font-bold mb-3 uppercase tracking-wider text-gray-500">Most Active</h3>
+              <div class="flex flex-col gap-2 overflow-y-auto max-h-[250px] pr-1">
+                <div *ngFor="let user of mostActiveUsers"
+                  class="flex items-center gap-2 p-1.5 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                  <img *ngIf="user.staffProfile" [src]="getProfileUrl(user.staffProfile)"
+                    class="w-8 h-8 rounded-full flex-shrink-0">
                   <div class="flex-1 min-w-0">
-                    <p class="text-sm font-bold truncate m-0 text-gray-900 dark:text-white">{{ user.staffName }}</p>
-                    <p class="text-xs text-gray-500 truncate m-0">{{ user.staffEmail }}</p>
+                    <p class="text-xs font-bold truncate m-0 dark:text-white">{{ user.staffName }}</p>
                   </div>
-                  <span class="bg-blue-100 text-blue-700 text-[10px] font-bold px-2 py-1 rounded whitespace-nowrap">
-                    {{ user.activityCount }} logs
-                  </span>
+                  <span class="text-[10px] font-bold text-blue-600">{{ user.activityCount }}</span>
                 </div>
               </div>
             </div>
 
-            <div class="lg:col-span-2 bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
-              <div class="h-[300px] md:h-[400px]">
+            <div
+              class="md:col-span-2 bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-200 dark:border-gray-700">
+              <div class="h-[250px]">
                 <canvas id="pagesChart"></canvas>
               </div>
             </div>
 
-            <div class="lg:col-span-1 bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
-                <div class="h-[300px] md:h-[400px]">
-                    <canvas id="browserChart"></canvas>
-                </div>
+            <div class="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-200 dark:border-gray-700">
+              <div class="h-[250px]">
+                <canvas id="browserChart"></canvas>
+              </div>
             </div>
           </div>
         </div>
       </ng-container>
 
-      <div class="space-y-6">
-        <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 md:p-8 shadow-sm border border-gray-200 dark:border-gray-700">
-          <div class="h-[350px] md:h-[400px]">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div
+          class="lg:col-span-2 bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm border border-gray-200 dark:border-gray-700">
+          <div class="h-[280px]">
             <canvas id="barChart"></canvas>
           </div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 md:p-8 shadow-sm border border-gray-200 dark:border-gray-700">
-            <div class="h-[350px] md:h-[450px]">
-              <canvas id="donutChart"></canvas>
-            </div>
+        <div class="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm border border-gray-200 dark:border-gray-700">
+          <div class="h-[280px]">
+            <canvas id="donutChart"></canvas>
           </div>
-          <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 md:p-8 shadow-sm border border-gray-200 dark:border-gray-700">
-            <div class="h-[350px] md:h-[450px]">
-              <canvas id="horizontalBarChart"></canvas>
-            </div>
+        </div>
+        <div class="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm border border-gray-200 dark:border-gray-700">
+          <div class="h-[280px]">
+            <canvas id="horizontalBarChart"></canvas>
           </div>
         </div>
       </div>
