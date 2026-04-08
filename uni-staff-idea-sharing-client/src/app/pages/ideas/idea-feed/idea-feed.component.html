@@ -82,11 +82,11 @@
         </div>
 
         <div *ngFor="let idea of filteredIdeas"
-            class="border-b border-gray-200 dark:border-gray-700 py-6 md:py-8 first:pt-0 last:border-0 relative">
+            class="border-b border-gray-200 dark:border-gray-700 py-6 md:py-8 first:pt-0 last:border-0 relative transition-all duration-300"
+            [ngClass]="{'opacity-50 pointer-events-none grayscale': isNavigating}">
 
             <div class="flex justify-between items-start mb-4">
                 <div class="flex items-start gap-3">
-
                     <div
                         class="w-10 h-10 md:w-12 md:h-12 rounded-full border border-gray-300 dark:border-gray-600 flex items-center justify-center bg-gray-100 dark:bg-gray-800 flex-shrink-0 overflow-hidden">
                         <img *ngIf="!idea.isAnonymous && idea.staff?.staffProfile; else defaultUserIcon"
@@ -112,7 +112,6 @@
                             {{ idea.created_at | date:'mediumDate' }}
                         </span>
                     </div>
-
                 </div>
 
                 <div class="relative">
@@ -138,16 +137,15 @@
                         </button>
                     </div>
                 </div>
-
             </div>
 
-            <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2 cursor-pointer hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+            <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2 cursor-pointer transition-colors"
                 (click)="goToIdeaDetail(idea)">
                 {{ idea.title }}
             </h3>
 
-            <p
-                class="text-[14px] md:text-[15px] text-gray-700 dark:text-gray-300 leading-relaxed mb-4 whitespace-pre-line">
+            <p class="text-[14px] md:text-[15px] text-gray-700 dark:text-gray-300 leading-relaxed mb-4 whitespace-pre-line cursor-pointer"
+                (click)="goToIdeaDetail(idea)">
                 {{ idea.description }}
             </p>
 
@@ -155,11 +153,13 @@
                 <div *ngFor="let doc of idea.documents"
                     class="flex items-center gap-2.5 bg-[#f0f2f5] dark:bg-gray-800 px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
                     title="{{ getFileName(doc.docPath) }}">
-                    <i class="pi text-lg" [ngClass]="getFileIcon(doc.docPath) + ' ' + getFileColor(doc.docPath)"></i>
-                    <span
-                        class="text-[13.5px] font-medium text-[#1E88E5] dark:text-[#64B5F6] truncate max-w-[200px] sm:max-w-[250px]">
-                        {{ getFileName(doc.docPath) }}
-                    </span>
+                    <a [href]="getDocUrl(doc.docPath)" target="_blank" class="flex items-center gap-2.5 no-underline">
+                        <i class="pi text-lg"
+                            [ngClass]="getFileIcon(doc.docPath) + ' ' + getFileColor(doc.docPath)"></i>
+                        <span class="text-[13.5px] font-medium text-[#1E88E5] ...">
+                            {{ getFileName(doc.docPath) }}
+                        </span>
+                    </a>
                 </div>
             </div>
 
@@ -193,6 +193,11 @@
             </div>
 
         </div>
+    </div>
+
+    <div *ngIf="isNavigating"
+        class="fixed inset-0 z-[200] flex items-center justify-center bg-white/30 dark:bg-black/30 backdrop-blur-[2px]">
+        <i class="pi pi-spin pi-spinner text-4xl text-blue-500"></i>
     </div>
 </div>
 
