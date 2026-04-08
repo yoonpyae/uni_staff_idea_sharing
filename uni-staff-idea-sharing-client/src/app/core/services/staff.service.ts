@@ -37,4 +37,12 @@ export class StaffService {
   delete(id: number): Observable<RootModel> {
     return this.httpClient.delete<RootModel>(`${environment.main_url}/staffs/${id}`);
   }
+
+  hideContent(id: number): Observable<RootModel> {
+    return this.httpClient.patch<RootModel>(`${environment.main_url}/staffs/${id}/hide-content`, {});
+  }
+
+  unhideContent(id: number): Observable<RootModel> {
+    return this.httpClient.patch<RootModel>(`${environment.main_url}/staffs/${id}/unhide-content`, {});
+  }
 }
