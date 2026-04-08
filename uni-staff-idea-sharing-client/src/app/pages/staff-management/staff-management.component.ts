@@ -182,4 +182,50 @@ export class StaffManagementComponent implements OnInit {
       }
     });
   }
+
+  toggleContentVisibility(user: any, event: Event): void {
+    const checkbox = event.target as HTMLInputElement;
+
+    // Safety check: Prevent hiding own content
+    if (user.staffID === this.currentStaffID) {
+      event.preventDefault();
+      checkbox.checked = !checkbox.checked; // Revert visually
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Action Denied',
+        detail: 'You cannot hide your own ideas and comments.',
+        life: 3000
+      });
+      return;
+    }
+
+    const isHiding = checkbox.checked;
+    const request = isHiding
+      ? this.staffService.hideContent(user.staffID)
+      : this.staffService.unhideContent(user.staffID);
+
+    request.subscribe({
+      next: (res) => {
+        if (res.success) {
+          // Update local state if necessary
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Visibility Updated',
+            detail: res.message,
+            life: 3000
+          });
+        }
+      },
+      error: (err) => {
+        console.error('Visibility update failed', err);
+        checkbox.checked = !isHiding; // Revert UI on error
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Update Failed',
+          detail: 'Could not change content visibility',
+          life: 3000
+        });
+      }
+    });
+  }
 }
