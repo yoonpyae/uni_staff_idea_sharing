@@ -230,9 +230,18 @@ export class IdeaDeatilComponent implements OnInit {
     if (!profilePath) return '';
     if (/^(https?:)?\/\//.test(profilePath)) return profilePath;
     const trimmed = profilePath.replace(/^\/+/, '');
-    let base = (environment.main_url ?? '').replace(/\/+$/, '');
+    let base = (environment.base_url ?? '').replace(/\/+$/, '');
     base = base.replace(/\/api$/, '');
     return base ? `${base}/${trimmed}` : `/${trimmed}`;
+  }
+
+  getDocUrl(docPath: string): string {
+    if (!docPath) return '';
+    if (/^(https?:)?\/\//.test(docPath)) return docPath;
+    const trimmedPath = docPath.replace(/^\/+/, '');
+    let base = (environment.base_url ?? '').replace(/\/+$/, '');
+    base = base.replace(/\/api$/, '');
+    return `${base}/${trimmedPath}`;
   }
 
   getFileIcon(path: string): string {
