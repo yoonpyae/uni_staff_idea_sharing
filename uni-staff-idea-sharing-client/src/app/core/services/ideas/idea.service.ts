@@ -43,4 +43,8 @@ export class IdeaService {
   delete(id: number): Observable<RootModel> {
     return this.httpClient.delete<RootModel>(`${environment.main_url}/ideas/${id}`);
   }
+
+  hide(id: number): Observable<RootModel> {
+    return this.httpClient.patch<RootModel>(`${environment.main_url}/ideas/${id}/hide`, {});
+  }
 }
