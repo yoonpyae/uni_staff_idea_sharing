@@ -81,7 +81,7 @@ export class AccountDetailsComponent implements OnInit {
     } else {
       const parts = profilePath.split('/').filter(Boolean);
       const basename = parts.length ? parts[parts.length - 1] : profilePath;
-      this.profilePictureUrl = `${environment.web_url.replace(/\/$/, '')}/uploads/staff_profiles/${basename}`;
+      this.profilePictureUrl = `${environment.base_url.replace(/\/$/, '')}/uploads/staff_profiles/${basename}`;
     }
   }
 
