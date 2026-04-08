@@ -76,7 +76,7 @@ export class StaffIdeaFeedComponent implements OnInit {
       } else {
         const parts = rawPic.split('/').filter(Boolean);
         const basename = parts.length ? parts[parts.length - 1] : rawPic;
-        this.profilePictureUrl = `${environment.web_url?.replace(/\/$/, '')}/uploads/staff_profiles/${basename}`;
+        this.profilePictureUrl = `${environment.base_url?.replace(/\/$/, '')}/uploads/staff_profiles/${basename}`;
       }
     }
 
@@ -234,7 +234,16 @@ export class StaffIdeaFeedComponent implements OnInit {
     if (!profilePath) return '';
     if (/^(https?:)?\/\//.test(profilePath)) return profilePath;
     const trimmed = profilePath.replace(/^\/+/, '');
-    return `${environment.main_url.replace(/\/api$/, '')}/${trimmed}`;
+    return `${environment.base_url.replace(/\/api$/, '')}/${trimmed}`;
+  }
+
+  getDocUrl(docPath: string): string {
+    if (!docPath) return '';
+    if (/^(https?:)?\/\//.test(docPath)) return docPath;
+    const trimmedPath = docPath.replace(/^\/+/, '');
+    let base = (environment.base_url ?? '').replace(/\/+$/, '');
+    base = base.replace(/\/api$/, '');
+    return `${base}/${trimmedPath}`;
   }
 
   logout(): void {
