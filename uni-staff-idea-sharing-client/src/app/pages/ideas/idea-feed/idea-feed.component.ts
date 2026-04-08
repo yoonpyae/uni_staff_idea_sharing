@@ -47,7 +47,7 @@ export class IdeaFeedComponent implements OnInit {
   reportTargetId: number | null = null;
   reportReason: string = '';
   isSubmittingReport: boolean = false;
-
+  isNavigating: boolean = false;
   constructor(
     private ideaService: IdeaService,
     private cookieService: CookieService,
@@ -199,9 +199,19 @@ export class IdeaFeedComponent implements OnInit {
   }
 
   goToIdeaDetail(idea: IdeaModel): void {
+    if (this.isNavigating) return;
+    this.isNavigating = true;
     this.ideaService.increaseViewCount(idea.ideaID).subscribe({
-      next: () => this.router.navigate(['/submit-ideas/idea-detail', idea.ideaID]),
-      error: () => this.router.navigate(['/submit-ideas/idea-detail', idea.ideaID])
+      next: () => {
+        this.router.navigate(['/submit-ideas/idea-detail', idea.ideaID]).then(() => {
+          this.isNavigating = false;
+        });
+      },
+      error: () => {
+        this.router.navigate(['/submit-ideas/idea-detail', idea.ideaID]).then(() => {
+          this.isNavigating = false;
+        });
+      }
     });
   }
 
@@ -244,6 +254,28 @@ export class IdeaFeedComponent implements OnInit {
 
   hideIdea(idea: IdeaModel): void {
     this.activeMenuId = null;
+
+    this.ideaService.hide(idea.ideaID).subscribe({
+      next: (res) => {
+        if (res.success) {
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Idea Hidden',
+            detail: 'The idea has been hidden from the feed.'
+          });
+
+          this.loadIdeas();
+        }
+      },
+      error: (err) => {
+        console.error('Failed to hide idea:', err);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Could not hide the idea at this time.'
+        });
+      }
+    });
   }
 
   goToShareIdea(): void {
@@ -254,9 +286,18 @@ export class IdeaFeedComponent implements OnInit {
     if (!profilePath) return '';
     if (/^(https?:)?\/\//.test(profilePath)) return profilePath;
     const trimmed = profilePath.replace(/^\/+/, '');
-    let base = (environment.main_url ?? '').replace(/\/+$/, '');
+    let base = (environment.base_url ?? '').replace(/\/+$/, '');
     base = base.replace(/\/api$/, '');
     return base ? `${base}/${trimmed}` : `/${trimmed}`;
+  }
+
+  getDocUrl(docPath: string): string {
+    if (!docPath) return '';
+    if (/^(https?:)?\/\//.test(docPath)) return docPath;
+    const trimmedPath = docPath.replace(/^\/+/, '');
+    let base = (environment.base_url ?? '').replace(/\/+$/, '');
+    base = base.replace(/\/api$/, '');
+    return `${base}/${trimmedPath}`;
   }
 
   getFileIcon(path: string): string {
