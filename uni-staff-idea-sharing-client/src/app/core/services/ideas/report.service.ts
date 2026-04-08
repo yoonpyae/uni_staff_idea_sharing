@@ -16,6 +16,10 @@ export class ReportService {
     return this.httpClient.get<RootModel>(`${environment.main_url}/reports`);
   }
 
+  getReportsByDepartment(deptId: number): Observable<RootModel> {
+    return this.httpClient.get<RootModel>(`${environment.main_url}/reports/department/${deptId}`);
+  }
+
   getById(id: number): Observable<RootModel> {
     return this.httpClient.get<RootModel>(`${environment.main_url}/reports/${id}`);
   }
