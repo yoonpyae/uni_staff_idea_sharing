@@ -68,7 +68,7 @@ export class ShareIdeaComponent implements OnInit, OnDestroy {
       } else {
         const parts = profilePicture.split('/').filter(Boolean);
         const basename = parts.length ? parts[parts.length - 1] : profilePicture;
-        this.profilePictureUrl = `${environment.web_url.replace(/\/$/, '')}/uploads/staff_profiles/${basename}`;
+        this.profilePictureUrl = `${environment.base_url.replace(/\/$/, '')}/uploads/staff_profiles/${basename}`;
       }
     } else {
       this.profilePictureUrl = '';
