@@ -31,4 +31,12 @@ export class ClosureSettingService {
   delete(id: number): Observable<RootModel> {
     return this.httpClient.delete<RootModel>(`${environment.main_url}/closure-settings/${id}`);
   }
+
+  downloadZip(id: number): Observable<RootModel> {
+    return this.httpClient.get<RootModel>(`${environment.main_url}/closure-settings/${id}/download-documents`);
+  }
+
+  exportIdeas(id: number, format: 'csv' | 'xlsx' | 'pdf' = 'csv'): Observable<RootModel> {
+    return this.httpClient.get<RootModel>(`${environment.main_url}/closure-settings/${id}/export-ideas?format=${format}`);
+  }
 }
