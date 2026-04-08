@@ -213,7 +213,7 @@ export class UserAccountComponent implements OnInit {
     if (!profilePath) return '';
     if (/^(https?:)?\/\//.test(profilePath)) return profilePath;
     const trimmed = profilePath.replace(/^\/+/, '');
-    let base = (environment.main_url ?? '').replace(/\/+$/, '');
+    let base = (environment.base_url ?? '').replace(/\/+$/, '');
     base = base.replace(/\/api$/, ''); // strip accidental "/api"
     return base ? `${base}/${trimmed}` : `/${trimmed}`;
   }
