@@ -55,6 +55,7 @@ export class ReportManagementComponent implements OnInit {
     { label: 'Comment', value: 'comment' }
   ];
   currentAdminId: number = 0;
+  departmentID: number = 0;
 
   constructor(
     private reportService: ReportService,
@@ -71,13 +72,15 @@ export class ReportManagementComponent implements OnInit {
     const staffIDStr = this.cookieService.get('staffID');
     this.currentAdminId = staffIDStr ? Number(staffIDStr) : 0;
 
+    const deptIDStr = this.cookieService.get('departmentID');
+    this.departmentID = deptIDStr ? Number(deptIDStr) : 0; 
+
     this.loadReports();
   }
 
   loadReports(): void {
-    this.reportService.get().subscribe({
+    this.reportService.getReportsByDepartment(this.departmentID).subscribe({
       next: (res) => {
-        // Sort to show pending reports first, then by newest
         let fetchedReports = res.data as ReportModel[];
         this.reports = fetchedReports.sort((a, b) => {
           if (a.status === 'pending' && b.status !== 'pending') return -1;
@@ -86,8 +89,13 @@ export class ReportManagementComponent implements OnInit {
         });
       },
       error: (err) => {
-        console.error('Error loading reports:', err);
-        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to load reports' });
+        console.error('Error loading department reports:', err);
+        this.reports = [];
+        this.messageService.add({
+          severity: 'info',
+          summary: 'Info',
+          detail: 'No reports found for your department.'
+        });
       }
     });
   }
