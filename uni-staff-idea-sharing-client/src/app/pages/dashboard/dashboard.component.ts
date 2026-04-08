@@ -3,12 +3,17 @@ import { CommonModule } from '@angular/common';
 import { trigger, transition, style, animate, query, stagger } from '@angular/animations';
 import { Chart, registerables } from 'chart.js';
 import { CookieService } from 'ngx-cookie-service';
-
+import { MessageService } from 'primeng/api';
+import { ToastModule } from 'primeng/toast';
+import { DashboardService } from '../../core/services/dashboard.service';
+import { environment } from '../../../environments/environment';
+import { ClosureSettingService } from '../../core/services/closure-setting.service';
 Chart.register(...registerables);
 
 @Component({
   selector: 'app-dashboard',
-  imports: [CommonModule],
+  imports: [CommonModule, ToastModule],
+  providers: [MessageService],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
   animations: [
@@ -27,7 +32,7 @@ Chart.register(...registerables);
 export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   currentYear = new Date().getFullYear();
   selectedYear = this.currentYear;
-  
+
   // Role & View Management
   userRole: string = '';
   userDepartment: string = '';
@@ -37,6 +42,10 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   barChart: Chart | null = null;
   donutChart: Chart | null = null;
   horizontalBarChart: Chart | null = null;
+
+
+  closureSettings: any[] = [];
+  selectedSettingID: number | null = null;
 
   stats: any[] = [];
   years = [this.currentYear, this.currentYear - 1, this.currentYear - 2];
@@ -54,15 +63,34 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   categories = ['Infrastructure', 'Staff Welfare', 'Digital Transform', 'Student Exp', 'Workload', 'Internal Comm', 'Health & Safety', 'Data Protection'];
   ideasByCategory = [3, 19, 9, 11, 16, 23, 13, 6];
 
-  constructor(private cookieService: CookieService) {}
+  mostViewedPages: any[] = [];
+  mostActiveUsers: any[] = [];
+  browserUsageChart: Chart | null = null;
+  pagesChart: Chart | null = null;
+
+  constructor(
+    private cookieService: CookieService,
+    private messageService: MessageService,
+    private dashboardService: DashboardService,
+    private closureService: ClosureSettingService
+  ) { }
 
   ngOnInit(): void {
-    // Get user context
     this.userRole = this.cookieService.get('roleName') || 'Guest';
     this.userDepartment = this.cookieService.get('departmentName') || 'Social Studies Department';
-    
+    this.loadClosureSettings();
+    this.isGlobalView = this.userRole === 'Administrator';
+
+    if (this.isGlobalView) {
+      this.loadSystemUsageData();
+    }
+
     // Determine if user sees global stats or department stats
-    this.isGlobalView = ['Administrator', 'QA Manager'].includes(this.userRole);
+    if (this.userRole === 'Administrator') {
+      this.isGlobalView = true;
+    } else {
+      this.isGlobalView = false;
+    }
 
     // Set stats cards based on role
     if (this.isGlobalView) {
@@ -96,11 +124,104 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     this.horizontalBarChart?.destroy();
   }
 
-  onYearChange(event: any): void {
-    this.selectedYear = parseInt(event.target.value);
+  loadClosureSettings(): void {
+    this.closureService.get().subscribe({
+      next: (res) => {
+        // Store the actual closure setting records
+        this.closureSettings = res.data;
+
+        if (this.closureSettings.length > 0) {
+          // Default to the first available setting
+          this.selectedSettingID = this.closureSettings[0].settingID;
+          this.selectedYear = this.closureSettings[0].academicYear;
+        }
+      },
+      error: (err) => console.error('Failed to load closure settings', err)
+    });
   }
 
-  onExport(): void {}
+  onYearChange(event: any): void {
+    // The event.target.value will now be the settingID from the dropdown
+    this.selectedSettingID = Number(event.target.value);
+
+    // Find the label for UI display if needed
+    const selected = this.closureSettings.find(s => s.settingID === this.selectedSettingID);
+    if (selected) {
+      this.selectedYear = selected.academicYear;
+    }
+  }
+
+  exportData(): void {
+    if (this.userRole !== 'QA Manager') return;
+    if (!this.selectedSettingID) {
+      this.messageService.add({ severity: 'warn', summary: 'Selection Required', detail: 'Please select an academic year.' });
+      return;
+    }
+
+    this.messageService.add({ severity: 'info', summary: 'Exporting', detail: 'Preparing CSV...' });
+
+    // Use the dynamic ID from the dropdown
+    this.closureService.exportIdeas(this.selectedSettingID, 'csv').subscribe({
+      next: (res) => {
+        if (res.success && res.data.downloadUrl) {
+          window.location.href = res.data.downloadUrl;
+        }
+      },
+      error: (err) => {
+        // Backend error if closure date hasn't passed
+        this.messageService.add({ severity: 'error', summary: 'Export Failed', detail: err.error?.message });
+      }
+    });
+  }
+
+  loadSystemUsageData(): void {
+    this.dashboardService.getUsageStats().subscribe({
+      next: (res) => {
+        const data = res.data;
+        this.mostActiveUsers = data.mostActiveUsers;
+
+        // Initialize Monitoring Charts
+        this.initPagesChart(data.mostViewedPages);
+        this.initBrowserChart(data.browserUsage);
+      },
+      error: (err) => console.error('Failed to load usage stats', err)
+    });
+  }
+
+  private initPagesChart(pages: any[]): void {
+    const ctx = document.getElementById('pagesChart') as HTMLCanvasElement;
+    if (!ctx) return;
+
+    this.pagesChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: pages.map(p => p.url),
+        datasets: [{
+          label: 'Views',
+          data: pages.map(p => p.views),
+          backgroundColor: '#6FCBF0'
+        }]
+      },
+      options: { indexAxis: 'y', responsive: true, plugins: { title: { display: true, text: 'Most Viewed Pages' } } }
+    });
+  }
+
+  private initBrowserChart(browsers: any[]): void {
+    const ctx = document.getElementById('browserChart') as HTMLCanvasElement;
+    if (!ctx) return;
+
+    this.browserUsageChart = new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: browsers.map(b => b.browser || 'Unknown'),
+        datasets: [{
+          data: browsers.map(b => b.count),
+          backgroundColor: ['#8B5CF6', '#EF4444', '#10B981']
+        }]
+      },
+      options: { responsive: true, plugins: { title: { display: true, text: 'Browser Usage' } } }
+    });
+  }
 
   private initBarChart(): void {
     const canvas = document.getElementById('barChart') as HTMLCanvasElement;
@@ -109,7 +230,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     if (!ctx) return;
 
     const isDark = document.documentElement.classList.contains('app-dark');
-    
+
     // Dynamic Data Assignment
     const chartLabels = this.isGlobalView ? this.departments : this.months;
     const chartData = this.isGlobalView ? this.ideasPerDepartment : this.ideasPerMonth;
@@ -231,4 +352,12 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     });
   }
+
+  getProfileUrl(profilePath: string | null | undefined): string {
+    if (!profilePath) return '';
+    if (/^(https?:)?\/\//.test(profilePath)) return profilePath;
+    const trimmed = profilePath.replace(/^\/+/, '');
+    return `${environment.main_url.replace(/\/api$/, '')}/${trimmed}`;
+  }
+
 }
