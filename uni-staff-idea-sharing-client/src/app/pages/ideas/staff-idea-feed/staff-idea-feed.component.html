@@ -154,21 +154,25 @@
                     </div>
                 </div>
 
-                <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2 cursor-pointer hover:underline"
+                <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2 cursor-pointer hover:text-[#6FCBF0] transition-colors"
                     [routerLink]="['/staff-idea-detail', idea.ideaID]">{{ idea.title }}</h3>
-                <p class="text-[15px] text-gray-700 dark:text-gray-300 leading-relaxed mb-4 line-clamp-3">{{
-                    idea.description }}</p>
+                <p class="text-[15px] text-gray-700 dark:text-gray-300 leading-relaxed mb-4 line-clamp-3 cursor-pointer hover:text-[#6FCBF0] transition-colors"
+                    [routerLink]="['/staff-idea-detail', idea.ideaID]">
+                    {{ idea.description }}
+                </p>
 
                 <div *ngIf="idea.documents && idea.documents.length > 0" class="flex flex-wrap gap-3 mb-5 mt-3">
                     <div *ngFor="let doc of idea.documents"
                         class="flex items-center gap-2.5 bg-[#f0f2f5] dark:bg-gray-800 px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
                         title="{{ getFileName(doc.docPath) }}" [routerLink]="['/staff-idea-detail', idea.ideaID]">
-                        <i class="pi text-lg"
-                            [ngClass]="getFileIcon(doc.docPath) + ' ' + getFileColor(doc.docPath)"></i>
-                        <span
-                            class="text-[13.5px] font-medium text-[#1E88E5] dark:text-[#64B5F6] truncate max-w-[200px] sm:max-w-[250px]">
-                            {{ getFileName(doc.docPath) }}
-                        </span>
+                        <a [href]="getDocUrl(doc.docPath)" target="_blank"
+                            class="flex items-center gap-2.5 no-underline">
+                            <i class="pi text-lg"
+                                [ngClass]="getFileIcon(doc.docPath) + ' ' + getFileColor(doc.docPath)"></i>
+                            <span class="text-[13.5px] font-medium text-[#1E88E5] ...">
+                                {{ getFileName(doc.docPath) }}
+                            </span>
+                        </a>
                     </div>
                 </div>
                 <div
