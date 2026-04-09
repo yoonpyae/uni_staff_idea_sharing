@@ -14,4 +14,12 @@ export class DashboardService {
   getUsageStats(): Observable<RootModel> {
     return this.httpClient.get<RootModel>(`${environment.main_url}/system-reports/usage`);
   }
+
+  getDashboardStats(settingID?: number | null): Observable<RootModel> {
+    let url = `${environment.main_url}/dashboard/stats`;
+    if (settingID) {
+      url += `?settingID=${settingID}`;
+    }
+    return this.httpClient.get<RootModel>(url);
+  }
 }
