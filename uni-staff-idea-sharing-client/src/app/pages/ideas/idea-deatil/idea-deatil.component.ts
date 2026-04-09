@@ -1,9 +1,9 @@
 import { CommonModule, Location } from '@angular/common';
 import { Component, HostListener, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { CookieService } from 'ngx-cookie-service';
-import { MessageService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { environment } from '../../../../environments/environment';
 import { IdeaModel } from '../../../core/models/ideas/idea.model';
@@ -12,18 +12,20 @@ import { IdeaService } from '../../../core/services/ideas/idea.service';
 import { VoteService } from '../../../core/services/ideas/vote.service';
 import { CommentModel } from '../../../core/models/ideas/comment.model';
 import { ReportService } from '../../../core/services/ideas/report.service';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 
 @Component({
   selector: 'app-idea-deatil',
   standalone: true,
-  imports: [CommonModule, FormsModule, ToastModule],
-  providers: [MessageService],
+  imports: [CommonModule, FormsModule, ToastModule, ConfirmDialogModule],
+  providers: [MessageService, ConfirmationService],
   templateUrl: './idea-deatil.component.html',
   styleUrl: './idea-deatil.component.scss'
 })
 export class IdeaDeatilComponent implements OnInit {
   userName = '';
   currentStaffID = 0;
+  userRole = '';
   ideaId: number | null = null;
 
   idea: IdeaModel | null = null;
@@ -39,6 +41,10 @@ export class IdeaDeatilComponent implements OnInit {
   reportTargetId: number | null = null;
   reportReason: string = '';
   isSubmittingReport: boolean = false;
+  canModifyIdea: boolean = false;
+
+  isFinalClosurePassed: boolean = false;
+  editingCommentId: number | null = null;
 
   constructor(
     private route: ActivatedRoute,
@@ -48,10 +54,13 @@ export class IdeaDeatilComponent implements OnInit {
     private voteService: VoteService,
     private cookieService: CookieService,
     private messageService: MessageService,
-    private reportService: ReportService
+    private reportService: ReportService,
+    private router: Router,
+    private confirmationService: ConfirmationService
   ) { }
 
   ngOnInit(): void {
+    this.userRole = this.cookieService.get('roleName') || 'Guest';
     this.userName = this.cookieService.get('staffName') || 'Guest';
     const staffIDStr = this.cookieService.get('staffID');
     this.currentStaffID = staffIDStr ? Number(staffIDStr) : 1;
@@ -136,6 +145,15 @@ export class IdeaDeatilComponent implements OnInit {
       next: (res) => {
         this.idea = res.data as IdeaModel;
         this.comments = this.idea.comments || [];
+
+        if (this.idea && this.idea.closure_setting) {
+          const now = new Date();
+          const closureDeadline = new Date(this.idea.closure_setting.closureDate);
+          const finalDeadline = new Date(this.idea.closure_setting.finalclosureDate);
+
+          this.isFinalClosurePassed = now > finalDeadline;
+          this.canModifyIdea = (this.idea.staffID === this.currentStaffID) && (now < closureDeadline);
+        }
       },
       error: (err) => {
         console.error('Failed to load idea', err);
@@ -144,7 +162,66 @@ export class IdeaDeatilComponent implements OnInit {
     });
   }
 
+  editIdea(): void {
+    // Determine the base path based on role
+    let targetPath = '/submit-ideas/share-idea'; // Default for Management roles
+
+    if (this.userRole === 'Staff') {
+      targetPath = '/staff-share-idea';
+    }
+
+    // Navigate with the editId parameter
+    this.router.navigate([targetPath, { editId: this.idea?.ideaID }]);
+  }
+
+  deleteOwnIdea(): void {
+    this.confirmationService.confirm({
+      message: 'Are you sure you want to delete your idea? This action cannot be undone.',
+      header: 'Delete Confirmation',
+      icon: 'pi pi-trash',
+      accept: () => {
+        this.ideaService.delete(this.idea!.ideaID).subscribe({
+          next: () => {
+            this.messageService.add({ severity: 'success', summary: 'Deleted', detail: 'Your idea was removed.' });
+            this.goBack(); // Return to feed after deletion
+          },
+          error: () => this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to delete idea.' })
+        });
+      }
+    });
+  }
+
+
+  editComment(comment: CommentModel): void {
+    this.newCommentText = comment.comment;
+    this.isAnonymousComment = !!comment.isAnonymous;
+    this.editingCommentId = comment.commentID;
+
+    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+  }
+
+  deleteComment(comment: CommentModel): void {
+    this.confirmationService.confirm({
+      message: 'Are you sure you want to delete this comment?',
+      header: 'Delete Confirmation',
+      icon: 'pi pi-trash',
+      accept: () => {
+        this.commentService.delete(comment.commentID).subscribe({
+          next: () => {
+            this.messageService.add({ severity: 'success', summary: 'Deleted', detail: 'Comment removed' });
+            this.loadIdeaDetails();
+          },
+          error: () => this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Could not delete comment' })
+        });
+      }
+    });
+  }
+
   submitComment(): void {
+    if (this.isFinalClosurePassed) {
+      this.messageService.add({ severity: 'warn', summary: 'Locked', detail: 'Commenting is disabled after final closure.' });
+      return;
+    }
     if (!this.newCommentText.trim() || !this.ideaId) return;
 
     const payload = {
@@ -155,21 +232,37 @@ export class IdeaDeatilComponent implements OnInit {
       staffID: this.currentStaffID
     };
 
-    this.commentService.create(payload).subscribe({
-      next: () => {
-        this.newCommentText = '';
-        this.isAnonymousComment = false;
-        this.loadIdeaDetails();
-        this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Comment posted' });
-      },
-      error: (err) => {
-        console.error('Failed to post comment', err);
-        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Could not post comment' });
-      }
-    });
+    if (this.editingCommentId) {
+      // Call update API if in edit mode
+      this.commentService.update(this.editingCommentId, payload).subscribe({
+        next: () => {
+          this.resetCommentForm();
+          this.loadIdeaDetails();
+          this.messageService.add({ severity: 'success', summary: 'Updated', detail: 'Comment updated' });
+        },
+        error: () => this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to update' })
+      });
+    } else {
+      this.commentService.create(payload).subscribe({
+        next: () => {
+          this.newCommentText = '';
+          this.isAnonymousComment = false;
+          this.loadIdeaDetails();
+          this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Comment posted' });
+        },
+        error: (err) => {
+          console.error('Failed to post comment', err);
+          this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Could not post comment' });
+        }
+      });
+    }
   }
 
   voteIdea(type: 'Like' | 'Unlike'): void {
+    if (this.isFinalClosurePassed) {
+      this.messageService.add({ severity: 'warn', summary: 'Locked', detail: 'Voting is disabled after final closure.' });
+      return;
+    }
     if (!this.idea) return;
 
     const userVote = this.idea.votes?.find(v => v.staffID === this.currentStaffID);
@@ -267,5 +360,11 @@ export class IdeaDeatilComponent implements OnInit {
     if (['jpg', 'jpeg', 'png', 'gif', 'svg'].includes(ext || '')) return 'text-purple-500 dark:text-purple-400';
 
     return 'text-gray-500 dark:text-gray-400';
+  }
+
+  private resetCommentForm(): void {
+    this.newCommentText = '';
+    this.isAnonymousComment = false;
+    this.editingCommentId = null;
   }
 }
