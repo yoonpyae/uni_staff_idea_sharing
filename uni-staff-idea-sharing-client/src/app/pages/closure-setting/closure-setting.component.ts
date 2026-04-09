@@ -35,7 +35,8 @@ export class ClosureSettingComponent implements OnInit {
     title: ['', Validators.required],
     closureDate: [null, Validators.required],
     finalclosureDate: [null, Validators.required],
-    academicYear: ['', Validators.required]
+    academicYear: ['', Validators.required],
+    status: ['active']
   });
 
   constructor(
@@ -83,7 +84,8 @@ export class ClosureSettingComponent implements OnInit {
       title: setting.title,
       closureDate: setting.closureDate ? new Date(setting.closureDate) : null,
       finalclosureDate: setting.finalclosureDate ? new Date(setting.finalclosureDate) : null,
-      academicYear: setting.academicYear
+      academicYear: setting.academicYear,
+      status: setting.status
     });
     this.showForm = true;
   }
@@ -111,7 +113,7 @@ export class ClosureSettingComponent implements OnInit {
       closureDate: this.formatDate(formValues.closureDate),
       finalclosureDate: this.formatDate(formValues.finalclosureDate),
       academicYear: formValues.academicYear,
-      status: 'active' 
+      status: formValues.status
     };
 
     if (this.isEditMode && formValues.settingID) {
