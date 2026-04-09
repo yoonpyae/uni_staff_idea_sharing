@@ -13,6 +13,7 @@ import { IdeaModel } from '../../../core/models/ideas/idea.model';
 import { ClosureSettingModel } from '../../../core/models/closureSetting.model';
 import { IdeaService } from '../../../core/services/ideas/idea.service';
 import { ClosureSettingService } from '../../../core/services/closure-setting.service';
+import { DepartmentService } from '../../../core/services/department.service';
 
 @Component({
   selector: 'app-pending-ideas',
@@ -23,8 +24,8 @@ import { ClosureSettingService } from '../../../core/services/closure-setting.se
   styleUrl: './pending-ideas.component.scss'
 })
 export class PendingIdeasComponent implements OnInit {
-  departmentName: string = 'Social Studies Department'; // Make dynamic if needed
-  searchQuery: string = '';
+  departmentName: string = 'Loading...';
+  coordinatorDeptId: number = 0; searchQuery: string = '';
 
   pendingIdeas: IdeaModel[] = [];
   filteredIdeas: IdeaModel[] = [];
@@ -38,19 +39,47 @@ export class PendingIdeasComponent implements OnInit {
     private ideaService: IdeaService,
     private closureSettingService: ClosureSettingService,
     private messageService: MessageService,
-    private confirmationService: ConfirmationService
+    private confirmationService: ConfirmationService,
+    private cookieService: CookieService,
+    private departmentService: DepartmentService
   ) { }
 
   ngOnInit(): void {
+    const deptIdStr = this.cookieService.get('departmentID');
+    this.coordinatorDeptId = deptIdStr ? Number(deptIdStr) : 0;
+
+    // 2. Fetch the Department Name based on the ID
+    if (this.coordinatorDeptId > 0) {
+      this.fetchDepartmentName(this.coordinatorDeptId);
+    }
+
     this.loadPendingIdeas();
     this.loadClosureSettings();
+  }
+
+  fetchDepartmentName(id: number): void {
+    // Uses the GET /departments/{id} route defined in your backend
+    this.departmentService.getById(id).subscribe({
+      next: (res) => {
+        if (res.success) {
+          this.departmentName = res.data.departmentName + ' Department';
+        }
+      },
+      error: (err) => {
+        console.error('Failed to fetch department name'+ ' Department', err);
+        this.departmentName = 'Your Department';
+      }
+    });
   }
 
   loadPendingIdeas(): void {
     this.ideaService.get().subscribe({
       next: (res) => {
         const allIdeas = res.data as IdeaModel[];
-        this.pendingIdeas = allIdeas.filter(idea => idea.status === 'pending');
+        this.pendingIdeas = allIdeas.filter(idea =>
+          idea.status === 'pending' &&
+          idea.staff?.departmentID === this.coordinatorDeptId
+        );
         this.applySearch();
       },
       error: (err) => console.error('Failed to load ideas', err)
