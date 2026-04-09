@@ -22,9 +22,13 @@
         </div>
 
         <div class="flex flex-1 md:flex-none items-center justify-end gap-4 w-full md:w-auto relative">
-            <button (click)="goToShareIdea()"
-                class="hidden sm:block px-6 py-2.5 bg-[#6FCBF0] hover:bg-[#5bb8db] dark:bg-[#45a4c9] text-gray-900 dark:text-white font-bold rounded-full transition-colors whitespace-nowrap">
-                Share New Idea
+            <button (click)="!isDeptLimitReached ? goToShareIdea() : null" [disabled]="isDeptLimitReached"
+                [title]="isDeptLimitReached ? 'Your department has already submitted an idea for this period.' : 'Share a new idea'"
+                [ngClass]="{
+        'bg-gray-400 cursor-not-allowed opacity-70': isDeptLimitReached,
+        'bg-[#6FCBF0] hover:bg-[#5bb8db]': !isDeptLimitReached
+    }" class="px-6 py-2.5 text-gray-900 dark:text-white font-semibold rounded-full shadow-sm transition-colors whitespace-nowrap">
+                {{ isDeptLimitReached ? 'Submission Limit Reached' : 'Share New Idea' }}
             </button>
 
             <div class="relative w-full sm:w-72 max-w-md">
@@ -176,25 +180,38 @@
                     </div>
                 </div>
                 <div
-                    class="flex items-center gap-5 text-gray-600 dark:text-gray-400 font-medium text-[15px] border-t border-gray-100 dark:border-gray-700 pt-4 mt-2">
-                    <div class="flex items-center gap-1.5 cursor-pointer transition-colors"
-                        [ngClass]="hasUserLiked(idea) ? 'text-blue-600' : 'hover:text-blue-600'"
-                        (click)="vote(idea, 'Like')">
-                        <i class="pi pi-thumbs-up" [ngClass]="{'font-bold': hasUserLiked(idea)}"></i><span>{{
-                            getLikesCount(idea) }}</span>
+                    class="flex items-center gap-5 md:gap-6 text-gray-600 dark:text-gray-400 font-medium text-[14px] md:text-[15px]">
+
+                    <div class="flex items-center gap-2 transition-colors" [ngClass]="{
+            'text-blue-600 dark:text-blue-400': hasUserLiked(idea),
+            'opacity-50 cursor-not-allowed': isFinalClosurePassed(idea),
+            'cursor-pointer hover:text-blue-600': !isFinalClosurePassed(idea)
+        }" (click)="vote(idea, 'Like')">
+                        <i class="pi pi-thumbs-up text-lg" [ngClass]="{'font-bold': hasUserLiked(idea)}"></i>
+                        <span>{{ getLikesCount(idea) }}</span>
                     </div>
-                    <div class="flex items-center gap-1.5 cursor-pointer transition-colors"
-                        [ngClass]="hasUserUnliked(idea) ? 'text-red-600' : 'hover:text-red-600'"
-                        (click)="vote(idea, 'Unlike')">
-                        <i class="pi pi-thumbs-down" [ngClass]="{'font-bold': hasUserUnliked(idea)}"></i><span>{{
-                            getUnlikesCount(idea) }}</span>
+
+                    <div class="flex items-center gap-2 transition-colors" [ngClass]="{
+            'text-red-600 dark:text-red-400': hasUserUnliked(idea),
+            'opacity-50 cursor-not-allowed': isFinalClosurePassed(idea),
+            'cursor-pointer hover:text-red-600': !isFinalClosurePassed(idea)
+        }" (click)="vote(idea, 'Unlike')">
+                        <i class="pi pi-thumbs-down text-lg" [ngClass]="{'font-bold': hasUserUnliked(idea)}"></i>
+                        <span>{{ getUnlikesCount(idea) }}</span>
                     </div>
-                    <div class="flex items-center gap-1.5 cursor-pointer hover:text-gray-900"
-                        [routerLink]="['/staff-idea-detail', idea.ideaID]">
-                        <i class="pi pi-comment"></i><span>{{ getCommentsCount(idea) }}</span>
+
+                    <div class="flex items-center gap-2"
+                        [ngClass]="isFinalClosurePassed(idea) ? 'text-gray-400' : 'cursor-pointer hover:text-gray-900 dark:hover:text-white'"
+                        (click)="!isFinalClosurePassed(idea) ? goToIdeaDetail(idea) : null">
+                        <i class="pi pi-comment text-lg"></i>
+                        <span>{{ getCommentsCount(idea) }}</span>
+                        <i *ngIf="isFinalClosurePassed(idea)" class="pi pi-lock text-xs ml-1"
+                            title="Comments Locked"></i>
                     </div>
-                    <div class="flex items-center gap-1.5">
-                        <i class="pi pi-eye"></i><span>{{ idea.viewCount || 0 }}</span>
+
+                    <div class="flex items-center gap-2 text-gray-500 dark:text-gray-500">
+                        <i class="pi pi-eye text-lg"></i>
+                        <span>{{ idea.viewCount || 0 }}</span>
                     </div>
                 </div>
             </div>
