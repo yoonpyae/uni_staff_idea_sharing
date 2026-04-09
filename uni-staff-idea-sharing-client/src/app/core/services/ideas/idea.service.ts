@@ -29,7 +29,7 @@ export class IdeaService {
   }
 
   update(id: number, model: Partial<IdeaModel>): Observable<RootModel> {
-    return this.httpClient.put<RootModel>(`${environment.main_url}/ideas/${id}`, model);
+    return this.httpClient.post<RootModel>(`${environment.main_url}/ideas/${id}`, model);
   }
 
   updateStatus(id: number, payload: { status: string, settingID?: number }): Observable<RootModel> {
