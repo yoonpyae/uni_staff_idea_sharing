@@ -46,8 +46,12 @@ export class IdeaFeedComponent implements OnInit {
   reportType: 'idea' | 'comment' = 'idea';
   reportTargetId: number | null = null;
   reportReason: string = '';
+
   isSubmittingReport: boolean = false;
   isNavigating: boolean = false;
+
+  isDeptLimitReached: boolean = false;
+  userDeptID: number = 0;
   constructor(
     private ideaService: IdeaService,
     private cookieService: CookieService,
@@ -65,6 +69,9 @@ export class IdeaFeedComponent implements OnInit {
 
     this.name = name;
     this.staffID = staffIDStr ? Number(staffIDStr) : 0;
+
+    const deptIDStr = this.cookieService.get('departmentID');
+    this.userDeptID = deptIDStr ? Number(deptIDStr) : 0;
 
     this.loadIdeas();
     this.loadDepartments();
@@ -100,6 +107,11 @@ export class IdeaFeedComponent implements OnInit {
 
         this.ideas = fetchedIdeas.filter(idea => idea.status === 'approved');
 
+        this.isDeptLimitReached = fetchedIdeas.some(idea =>
+          idea.staff?.departmentID === this.userDeptID &&
+          idea.status !== 'deleted'
+        );
+
         this.applyFilters();
       },
       error: (err) => console.error('Error fetching ideas:', err)
@@ -108,6 +120,15 @@ export class IdeaFeedComponent implements OnInit {
 
 
   vote(idea: IdeaModel, type: 'Like' | 'Unlike'): void {
+    if (this.isFinalClosurePassed(idea)) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Locked',
+        detail: 'Voting is disabled as the final closure date has passed.'
+      });
+      return;
+    }
+
     const userVote = idea.votes?.find(v => v.staffID === this.staffID);
 
     if (userVote) {
@@ -369,5 +390,15 @@ export class IdeaFeedComponent implements OnInit {
         });
       }
     });
+  }
+
+  isFinalClosurePassed(idea: IdeaModel): boolean {
+    if (idea && idea.closure_setting) {
+      const now = new Date();
+      // Your API returns a single object for closure_setting
+      const finalDeadline = new Date(idea.closure_setting.finalclosureDate);
+      return now > finalDeadline;
+    }
+    return false;
   }
 }
