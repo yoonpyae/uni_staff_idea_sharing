@@ -20,7 +20,7 @@ export class CommentService {
   }
 
   update(id: number, model: any): Observable<RootModel> {
-    return this.http.put<RootModel>(`${environment.main_url}/comments/${id}`, model);
+    return this.http.post<RootModel>(`${environment.main_url}/comments/${id}`, model);
   }
 
   delete(id: number): Observable<RootModel> {
