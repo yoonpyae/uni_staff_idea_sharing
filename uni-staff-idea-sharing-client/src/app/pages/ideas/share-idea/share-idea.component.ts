@@ -2,10 +2,10 @@ import { CommonModule, Location } from '@angular/common';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CookieService } from 'ngx-cookie-service';
-import { MessageService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { MultiSelectModule } from 'primeng/multiselect';
-
+import { ActivatedRoute } from '@angular/router';
 import { CategoryModel } from '../../../core/models/category.model';
 import { CategoryService } from '../../../core/services/category.service';
 import { DocumentService } from '../../../core/services/ideas/document.service';
@@ -13,16 +13,20 @@ import { IdeaCategoryService } from '../../../core/services/ideas/idea-category.
 import { IdeaService } from '../../../core/services/ideas/idea.service';
 import { environment } from '../../../../environments/environment';
 import { StaffService } from '../../../core/services/staff.service';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { IdeaModel } from '../../../core/models/ideas/idea.model';
 
 @Component({
   selector: 'app-share-idea',
   standalone: true,
-  imports: [CommonModule, FormsModule, ToastModule, MultiSelectModule],
-  providers: [MessageService],
+  imports: [CommonModule, FormsModule, ToastModule, MultiSelectModule, ConfirmDialogModule],
+  providers: [MessageService, ConfirmationService],
   templateUrl: './share-idea.component.html',
   styleUrl: './share-idea.component.scss'
 })
 export class ShareIdeaComponent implements OnInit, OnDestroy {
+  isAnonymous: boolean = false;
+  isLockedAnonymous: boolean = false;
 
   name = '';
   staffID = '';
@@ -40,9 +44,16 @@ export class ShareIdeaComponent implements OnInit, OnDestroy {
 
   isSubmitting: boolean = false;
   loadingSeconds: number = 0;
+
+  editIdeaId: number | null = null;
+  isEditMode: boolean = false;
+  existingDocuments: any[] = [];
+  isDeptLimitReached: boolean = false;
+
   private timerInterval: any;
 
   constructor(
+    private route: ActivatedRoute,
     private categoryService: CategoryService,
     private ideaService: IdeaService,
     private ideaCategoryService: IdeaCategoryService,
@@ -50,10 +61,21 @@ export class ShareIdeaComponent implements OnInit, OnDestroy {
     private messageService: MessageService,
     private location: Location,
     private cookieService: CookieService,
-    private staffService: StaffService
+    private staffService: StaffService,
+    private confirmationService: ConfirmationService
   ) { }
 
   ngOnInit(): void {
+    this.checkDepartmentSubmissionLimit();
+
+    this.route.params.subscribe(params => {
+      if (params['editId']) {
+        this.editIdeaId = Number(params['editId']);
+        this.isEditMode = true;
+        this.loadIdeaForEdit();
+      }
+    });
+
     const name = this.cookieService.get('staffName') || 'Guest';
     const staffID = this.cookieService.get('staffID') || '1';
     const profilePictureEncoded = this.cookieService.get('staffProfile') || '';
@@ -83,9 +105,33 @@ export class ShareIdeaComponent implements OnInit, OnDestroy {
   loadCategories(): void {
     this.categoryService.get().subscribe({
       next: (res) => {
-        this.categories = res.data as CategoryModel[];
+        const allCategories = res.data as CategoryModel[];
+        this.categories = allCategories.filter(cat => cat.status === 'active');
       },
       error: () => console.error('Failed to load categories')
+    });
+  }
+
+  loadIdeaForEdit(): void {
+    if (!this.editIdeaId) return;
+    this.ideaService.getById(this.editIdeaId).subscribe({
+      next: (res) => {
+        const idea = res.data;
+        this.title = idea.title;
+        this.description = idea.description;
+        this.selectedCategoryIds = idea.categories.map((c: any) => c.categoryID);
+
+        // 1. Restore Terms Agreement
+        this.agreedToTerms = true;
+
+        // 2. Track existing documents to show in UI
+        this.existingDocuments = idea.documents || [];
+
+        if (idea.isAnonymous) {
+          this.isAnonymous = true;
+          this.isLockedAnonymous = true;
+        }
+      }
     });
   }
 
@@ -103,7 +149,7 @@ export class ShareIdeaComponent implements OnInit, OnDestroy {
     this.selectedFiles.splice(index, 1);
   }
 
-  submit(isAnonymous: boolean): void {
+  submit(): void {
     if (!this.title || !this.description) {
       this.messageService.add({ severity: 'warn', summary: 'Required', detail: 'Title and Description are required.' });
       return;
@@ -131,7 +177,7 @@ export class ShareIdeaComponent implements OnInit, OnDestroy {
 
     this.staffService.update(Number(this.staffID), termsPayload).subscribe({
       next: () => {
-        this.postIdeaData(isAnonymous);
+        this.postIdeaData(this.isAnonymous);
       },
       error: (err) => {
         this.stopLoadingTimer();
@@ -147,7 +193,9 @@ export class ShareIdeaComponent implements OnInit, OnDestroy {
     formData.append('description', this.description);
     formData.append('isAnonymous', isAnonymous ? '1' : '0');
     formData.append('staffID', this.staffID.toString());
-    formData.append('status', 'pending');
+    if (!this.isEditMode) {
+      formData.append('status', 'pending');
+    }
 
     this.selectedCategoryIds.forEach(id => {
       formData.append('categoryIDs[]', id.toString());
@@ -159,19 +207,33 @@ export class ShareIdeaComponent implements OnInit, OnDestroy {
       });
     }
 
-    this.ideaService.create(formData as any).subscribe({
-      next: (ideaRes: any) => {
-        this.stopLoadingTimer();
-        this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Idea posted successfully!' });
-        setTimeout(() => this.goBack(), 1500);
-      },
-      error: (err) => {
-        this.stopLoadingTimer();
-        console.error('Error posting idea:', err);
-        const errorDetail = err.error?.message || 'Failed to post idea.';
-        this.messageService.add({ severity: 'error', summary: 'Error', detail: errorDetail });
-      }
-    });
+    if (this.isEditMode && this.editIdeaId) {
+      // Use the update API for editing
+      this.ideaService.update(this.editIdeaId, formData as any).subscribe({
+        next: () => this.handleSuccess('Idea updated successfully!'),
+        error: (err) => {
+          this.stopLoadingTimer();
+          console.error('Error updating idea:', err);
+          const errorDetail = err.error?.message || 'Failed to update idea.';
+          this.messageService.add({ severity: 'error', summary: 'Error', detail: errorDetail });
+        }
+      });
+    } else {
+
+      this.ideaService.create(formData as any).subscribe({
+        next: (ideaRes: any) => {
+          this.stopLoadingTimer();
+          this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Idea posted successfully!' });
+          setTimeout(() => this.goBack(), 1500);
+        },
+        error: (err) => {
+          this.stopLoadingTimer();
+          console.error('Error posting idea:', err);
+          const errorDetail = err.error?.message || 'Failed to post idea.';
+          this.messageService.add({ severity: 'error', summary: 'Error', detail: errorDetail });
+        }
+      });
+    }
   }
 
   stopLoadingTimer(): void {
@@ -191,5 +253,51 @@ export class ShareIdeaComponent implements OnInit, OnDestroy {
 
   goBack(): void {
     this.location.back();
+  }
+
+  private handleSuccess(msg: string) {
+    this.stopLoadingTimer();
+    this.messageService.add({ severity: 'success', summary: 'Success', detail: msg });
+    setTimeout(() => this.goBack(), 1500);
+  }
+
+  getFileName(path: string): string {
+    if (!path) return 'Document';
+    return path.split('/').pop() || 'Document';
+  }
+
+  removeExistingFile(docID: number, index: number): void {
+    this.confirmationService.confirm({
+      message: 'Are you sure you want to permanently remove this saved file?',
+      accept: () => {
+        this.documentService.delete(docID).subscribe({
+          next: () => {
+            this.existingDocuments.splice(index, 1);
+            this.messageService.add({ severity: 'success', summary: 'Removed', detail: 'File deleted from server.' });
+          }
+        });
+      }
+    });
+  }
+
+  checkDepartmentSubmissionLimit(): void {
+    // Use your IdeaService to check if an idea exists for this dept in the current closure
+    this.ideaService.get().subscribe({
+      next: (res) => {
+        const ideas = res.data as IdeaModel[];
+        const userDeptID = this.cookieService.get('departmentID');
+
+        // Filter ideas to see if any belong to the user's department in the current year
+        const deptIdeaExists = ideas.some(idea =>
+          idea.staff?.departmentID === Number(userDeptID) &&
+          idea.status !== 'deleted'
+        );
+
+        // Only block if we are NOT in edit mode (authors can still edit their existing one)
+        if (deptIdeaExists && !this.isEditMode) {
+          this.isDeptLimitReached = true;
+        }
+      }
+    });
   }
 }
