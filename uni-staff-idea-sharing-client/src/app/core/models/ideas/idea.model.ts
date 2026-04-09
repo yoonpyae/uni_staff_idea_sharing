@@ -13,16 +13,16 @@ export interface IdeaModel {
   staffID: number;
   settingID: number;
   status: string;
-  viewCount: number;        
-  isFlagged?: boolean | number;       
-  isCommentEnabled?: boolean | number; 
+  viewCount: number;
+  isFlagged?: boolean | number;
+  isCommentEnabled?: boolean | number;
   created_at?: string;
   updated_at?: string;
-  
+
   staff?: StaffModel;
   categories?: CategoryModel[];
   comments?: CommentModel[];
   votes?: VoteModel[];
-  documents?: DocumentModel[];        
-  closureSetting?: ClosureSettingModel[];      
+  documents?: DocumentModel[];
+  closure_setting?: ClosureSettingModel;
 }
