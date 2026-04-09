@@ -17,7 +17,6 @@
     </div>
 
     <div *ngIf="idea" class="pb-6">
-
         <div class="flex justify-between items-start mb-6">
             <div class="flex items-start gap-3">
                 <div
@@ -43,8 +42,9 @@
                             </span>
                         </div>
                     </div>
-                    <span class="text-xs text-gray-500 dark:text-gray-400 font-medium mt-1 md:mt-0.5">{{ idea.created_at
-                        | date:'mediumDate' }}</span>
+                    <span class="text-xs text-gray-500 dark:text-gray-400 font-medium mt-1 md:mt-0.5">
+                        {{ idea.created_at | date:'mediumDate' }}
+                    </span>
                 </div>
             </div>
 
@@ -57,17 +57,35 @@
                 <div *ngIf="showIdeaMenu"
                     class="absolute right-0 top-full mt-2 w-56 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 z-20 p-2 flex flex-col gap-1"
                     (click)="$event.stopPropagation()">
-
                     <button (click)="downloadIdeaAsZip()"
                         class="w-full text-left px-4 py-3 flex items-center gap-3 bg-gray-100/50 hover:bg-gray-200 dark:bg-gray-700/50 dark:hover:bg-gray-600 rounded-lg text-gray-800 dark:text-gray-200 transition-colors font-medium text-[15px]">
                         <i class="pi pi-download text-lg"></i> Download as a ZIP File
                     </button>
-
                     <button (click)="openReportModal('idea', idea.ideaID)"
                         class="w-full text-left px-4 py-3 flex items-center gap-3 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg text-red-600 dark:text-red-400 transition-colors font-medium text-[15px]">
                         <i class="pi pi-flag text-lg"></i> Report Post
                     </button>
                 </div>
+            </div>
+        </div>
+
+        <div *ngIf="canModifyIdea"
+            class="flex flex-wrap items-center gap-3 mb-6 bg-blue-50 dark:bg-blue-900/20 p-4 rounded-xl border border-blue-100 dark:border-blue-800">
+            <div class="flex-1">
+                <p class="text-xs font-bold text-blue-600 dark:text-blue-400 m-0 uppercase tracking-wider">Author Tools
+                </p>
+                <p class="text-[13px] text-blue-800 dark:text-blue-300 m-0">You can edit or delete this idea until the
+                    closure date.</p>
+            </div>
+            <div class="flex items-center gap-2">
+                <button (click)="editIdea()"
+                    class="px-4 py-2 bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-400 font-bold rounded-lg border border-blue-200 dark:border-blue-700 hover:bg-blue-50 transition-colors shadow-sm text-sm flex items-center gap-2">
+                    <i class="pi pi-pencil"></i> Edit
+                </button>
+                <button (click)="deleteOwnIdea()"
+                    class="px-4 py-2 bg-red-500 hover:bg-red-600 text-white font-bold rounded-lg transition-colors shadow-sm text-sm flex items-center gap-2">
+                    <i class="pi pi-trash"></i> Delete
+                </button>
             </div>
         </div>
 
@@ -78,11 +96,10 @@
 
         <div *ngIf="idea.documents && idea.documents.length > 0" class="flex flex-wrap gap-3 mb-6">
             <div *ngFor="let doc of idea.documents"
-                class="flex items-center gap-2.5 bg-[#f0f2f5] dark:bg-gray-800 px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
-                title="{{ getFileName(doc.docPath) }}">
+                class="flex items-center gap-2.5 bg-[#f0f2f5] dark:bg-gray-800 px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
                 <a [href]="getDocUrl(doc.docPath)" target="_blank" class="flex items-center gap-2.5 no-underline">
                     <i class="pi text-lg" [ngClass]="getFileIcon(doc.docPath) + ' ' + getFileColor(doc.docPath)"></i>
-                    <span class="text-[13.5px] font-medium text-[#1E88E5] ...">
+                    <span class="text-[13.5px] font-medium text-[#1E88E5]">
                         {{ getFileName(doc.docPath) }}
                     </span>
                 </a>
@@ -91,16 +108,16 @@
 
         <div
             class="flex items-center gap-5 md:gap-6 text-gray-600 dark:text-gray-400 font-medium text-sm border-b border-gray-200 dark:border-gray-700 pb-6 mb-6">
-            <div class="flex items-center gap-2 cursor-pointer transition-colors"
-                [ngClass]="hasUserLiked(idea) ? 'text-blue-600 dark:text-blue-400' : 'hover:text-blue-600 dark:hover:text-blue-400'"
+            <div class="flex items-center gap-2 transition-colors"
+                [ngClass]="isFinalClosurePassed ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'"
                 (click)="voteIdea('Like')">
-                <i class="pi pi-thumbs-up text-lg" [ngClass]="{'font-bold': hasUserLiked(idea)}"></i>
+                <i class="pi pi-thumbs-up text-lg" [ngClass]="{'font-bold text-blue-600': hasUserLiked(idea)}"></i>
                 <span>{{ getLikesCount(idea) }}</span>
             </div>
-            <div class="flex items-center gap-2 cursor-pointer transition-colors"
-                [ngClass]="hasUserUnliked(idea) ? 'text-red-600 dark:text-red-400' : 'hover:text-red-600 dark:hover:text-red-400'"
+            <div class="flex items-center gap-2 transition-colors"
+                [ngClass]="isFinalClosurePassed ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'"
                 (click)="voteIdea('Unlike')">
-                <i class="pi pi-thumbs-down text-lg" [ngClass]="{'font-bold': hasUserUnliked(idea)}"></i>
+                <i class="pi pi-thumbs-down text-lg" [ngClass]="{'font-bold text-red-600': hasUserUnliked(idea)}"></i>
                 <span>{{ getUnlikesCount(idea) }}</span>
             </div>
             <div class="flex items-center gap-2">
@@ -117,6 +134,7 @@
             </div>
 
             <div *ngFor="let comment of comments" class="flex items-start gap-3 md:gap-4">
+
                 <div
                     class="w-8 h-8 md:w-10 md:h-10 rounded-full border-2 border-gray-800 dark:border-gray-600 flex items-center justify-center bg-gray-100 dark:bg-gray-800 flex-shrink-0 overflow-hidden mt-1">
                     <img *ngIf="!comment.isAnonymous && comment.staff?.staffProfile; else commentUserIcon"
@@ -133,17 +151,30 @@
                                 [ngClass]="comment.isAnonymous ? 'text-orange-500 dark:text-orange-400' : 'text-gray-900 dark:text-white'">
                                 {{ comment.isAnonymous ? 'Anonymous' : comment.staff?.staffName || 'Unknown Staff' }}
                             </span>
-                            <span class="text-[11px] md:text-xs text-gray-500 dark:text-gray-400 font-medium">
-                                {{ comment.created_at | date:'mediumDate' }} • {{ comment.created_at | date:'shortTime'
-                                }}
-                            </span>
+                            <span class="text-[10px] text-gray-400 uppercase font-bold">{{ comment.created_at |
+                                date:'shortTime' }}</span>
                         </div>
 
-                        <button (click)="openReportModal('comment', comment.commentID)"
-                            class="text-gray-400 hover:text-red-500 transition-colors p-1 rounded-md hover:bg-red-50 dark:hover:bg-red-900/20"
-                            title="Report Comment">
-                            <i class="pi pi-flag text-sm"></i>
-                        </button>
+                        <div class="flex items-center gap-1">
+                            <ng-container *ngIf="comment.staffID === currentStaffID && !isFinalClosurePassed">
+                                <button (click)="editComment(comment)"
+                                    class="text-blue-500 hover:bg-blue-100 dark:hover:bg-blue-900/30 p-1.5 rounded-md transition-colors"
+                                    title="Edit">
+                                    <i class="pi pi-pencil text-xs"></i>
+                                </button>
+                                <button (click)="deleteComment(comment)"
+                                    class="text-red-500 hover:bg-red-100 dark:hover:bg-red-900/30 p-1.5 rounded-md transition-colors"
+                                    title="Delete">
+                                    <i class="pi pi-trash text-xs"></i>
+                                </button>
+                            </ng-container>
+
+                            <button (click)="openReportModal('comment', comment.commentID)"
+                                class="text-gray-400 hover:text-red-500 transition-colors p-1 rounded-md"
+                                title="Report Comment">
+                                <i class="pi pi-flag text-sm"></i>
+                            </button>
+                        </div>
                     </div>
 
                     <p class="text-[13.5px] md:text-[14.5px] text-gray-800 dark:text-gray-300 leading-relaxed mb-1">
@@ -153,31 +184,35 @@
             </div>
         </div>
 
-        <div
+        <div *ngIf="isFinalClosurePassed"
+            class="mt-8 p-4 bg-gray-100 dark:bg-gray-800 rounded-xl text-center text-gray-500 font-medium border border-gray-200 dark:border-gray-700">
+            <i class="pi pi-lock mr-2"></i> This post is locked. Comments and voting are disabled after the final
+            closure date.
+        </div>
+
+        <div *ngIf="!isFinalClosurePassed"
             class="border-[1.5px] border-gray-300 dark:border-gray-700 rounded-2xl p-4 md:p-6 bg-white dark:bg-gray-800 shadow-sm mt-8 transition-colors">
             <div class="relative mb-4">
                 <input type="text" [(ngModel)]="newCommentText" (keyup.enter)="submitComment()"
-                    placeholder="Write your comment..."
-                    class="w-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white placeholder:text-gray-500 dark:placeholder-gray-400 rounded-full py-3.5 md:py-4 pl-5 md:pl-6 pr-14 focus:outline-none focus:ring-2 focus:ring-[#6FCBF0] font-medium transition-all text-[14px] md:text-base" />
+                    [placeholder]="editingCommentId ? 'Update your comment...' : 'Write your comment...'"
+                    class="w-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white rounded-full py-3.5 md:py-4 pl-5 md:pl-6 pr-14 focus:outline-none focus:ring-2 focus:ring-[#6FCBF0] font-medium transition-all text-[14px] md:text-base" />
 
                 <button (click)="submitComment()" [disabled]="!newCommentText.trim()"
-                    class="absolute right-2 md:right-3 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center text-[#1E88E5] dark:text-[#42A5F5] hover:text-[#1565C0] dark:hover:text-[#1E88E5] disabled:text-gray-400 dark:disabled:text-gray-600 transition-colors">
+                    class="absolute right-2 md:right-3 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center text-[#1E88E5]">
                     <i class="pi pi-send text-xl md:text-2xl" style="transform: rotate(45deg); margin-bottom: 5px;"></i>
                 </button>
             </div>
 
             <div class="flex items-center gap-3 ml-2">
                 <input type="checkbox" id="anonComment" [(ngModel)]="isAnonymousComment"
-                    class="w-4 h-4 rounded border-gray-400 dark:border-gray-500 text-[#6FCBF0] focus:ring-[#6FCBF0] bg-white dark:bg-gray-700 cursor-pointer" />
+                    class="w-4 h-4 rounded border-gray-400 text-[#6FCBF0] cursor-pointer" />
                 <label for="anonComment" class="text-sm font-medium text-gray-700 dark:text-gray-300 cursor-pointer">
                     Comment anonymously
                 </label>
             </div>
         </div>
-
     </div>
 </div>
-
 <p-toast position="top-right"></p-toast>
 
 <div *ngIf="displayReportModal"
@@ -221,3 +256,5 @@
         </div>
     </div>
 </div>
+
+<p-confirmDialog></p-confirmDialog>
