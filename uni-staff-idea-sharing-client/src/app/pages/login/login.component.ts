@@ -67,7 +67,7 @@ export class LoginComponent implements OnInit {
     this.isLoading = true;
 
     this.authService.login(this.email, this.password).subscribe({
-      next: (res: RootModel) => {
+      next: (res: any) => {
         this.isLoading = false;
 
         this.messageService.add({
@@ -78,6 +78,9 @@ export class LoginComponent implements OnInit {
         });
 
         if (res.success) {
+          const prevLogin = res.data.previous_login_at;
+          this.cookieService.set('previousLoginAt', prevLogin ? prevLogin : 'first_login');
+          sessionStorage.setItem('showLoginReminder', 'true');
           const userRole = this.cookieService.get('roleName') || '';
           if (userRole.toLowerCase() === 'staff') {
             this.router.navigate(['/staff-idea-feed']);
