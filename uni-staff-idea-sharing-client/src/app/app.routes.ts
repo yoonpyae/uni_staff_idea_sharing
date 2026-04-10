@@ -18,6 +18,7 @@ import { IdeaDeatilComponent } from './pages/ideas/idea-deatil/idea-deatil.compo
 import { PendingIdeasComponent } from './pages/ideas/pending-ideas/pending-ideas.component';
 import { StaffIdeaFeedComponent } from './pages/ideas/staff-idea-feed/staff-idea-feed.component';
 import { ReportManagementComponent } from './pages/ideas/report-management/report-management.component';
+import { permissionGuard } from './core/guards/permission.guard';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -31,8 +32,8 @@ export const routes: Routes = [
   {
     path: 'staff-share-idea',
     component: ShareIdeaComponent,
-    canActivate: [roleGuard],
-    data: { title: 'Share New Idea', roles: ['Staff'] }
+    canActivate: [permissionGuard],
+    data: { title: 'Share New Idea', permissions: ['Submit Ideas'] }
   },
   {
     path: 'staff-idea-detail/:id',
@@ -65,8 +66,8 @@ export const routes: Routes = [
       {
         path: 'department',
         component: DepartmentComponent,
-        canActivate: [roleGuard],
-        data: { title: 'Department', roles: ['Administrator'] }
+        canActivate: [permissionGuard],
+        data: { title: 'Department', permissions: ['Manage Departments'] }
       },
       {
         path: 'role',
@@ -80,8 +81,8 @@ export const routes: Routes = [
       },
       {
         path: 'user-accounts',
-        canActivate: [roleGuard],
-        data: { title: 'User Accounts', roles: ['Administrator'] },
+        canActivate: [permissionGuard],
+        data: { title: 'User Accounts', permissions: ['Manage User Accounts'] },
         children: [
           { path: '', component: UserAccountComponent },
           { path: 'user-assignment', component: UserAssignmentComponent, data: { title: 'User Assignment' } },
@@ -91,18 +92,19 @@ export const routes: Routes = [
       {
         path: 'closure-settings',
         component: ClosureSettingComponent,
-        data: { title: 'Closure Settings', roles: ['Administrator'] }
+        canActivate: [permissionGuard],
+        data: { title: 'Closure Settings', permissions: ['Manage Closure Dates'] }
       },
       {
         path: 'idea-categories',
-        canActivate: [roleGuard],
-        data: { title: 'Categories', roles: ['QA Manager'] },
+        canActivate: [permissionGuard],
+        data: { title: 'Categories', permissions: ['Manage Idea Categories'] },
         component: CategoryComponent,
       },
       {
         path: 'submit-ideas',
-        canActivate: [roleGuard],
-        data: { title: 'Ideas' },
+        canActivate: [permissionGuard],
+        data: { title: 'Ideas', permissions: ['Submit Ideas'] },
         children: [
           { path: '', component: IdeaFeedComponent },
           { path: 'idea-detail', component: IdeaDeatilComponent, data: { title: 'Idea Details' } },
@@ -113,20 +115,20 @@ export const routes: Routes = [
       {
         path: 'staff-management',
         component: StaffManagementComponent,
-        canActivate: [roleGuard],
-        data: { title: 'Staff Management', roles: ['QA Manager'] }
+        canActivate: [permissionGuard],
+        data: { title: 'Staff Management', permissions: ['Manage Staff'] }
       },
       {
         path: 'pending-ideas',
         component: PendingIdeasComponent,
-        canActivate: [roleGuard],
-        data: { title: 'Pending Ideas', roles: ['QA Coordinator'] }
+        canActivate: [permissionGuard],
+        data: { title: 'Pending Ideas', permissions: ['Manage Pending Ideas'] }
       },
       {
         path: 'report-management',
         component: ReportManagementComponent,
-        canActivate: [roleGuard],
-        data: { title: 'Report Management', roles: ['QA Manager'] }
+        canActivate: [permissionGuard],
+        data: { title: 'Report Management', permissions: ['Manage Reports'] }
       }
     ],
   }
