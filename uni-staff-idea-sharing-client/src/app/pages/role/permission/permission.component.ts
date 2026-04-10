@@ -89,7 +89,7 @@ export class PermissionComponent implements OnInit {
         groups['Department-Level Permissions'].push(perm);
       } else if (name.includes('report') || name.includes('export') || name.includes('download') || name.includes('statistic')) {
         groups['Reporting & Data Permissions'].push(perm);
-      } else if (name.includes('staff') || name.includes('role') || name.includes('closure') || name.includes('assign')) {
+      } else if (name.includes('staff') || name.includes('role') || name.includes('closure') || name.includes('assign') || name.includes('user')) {
         groups['Administrative Permissions'].push(perm);
       } else {
         groups['Other Permissions'].push(perm);
