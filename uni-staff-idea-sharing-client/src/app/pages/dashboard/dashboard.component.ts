@@ -285,14 +285,33 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // --- Helper Methods ---
 
-  exportData(): void {
-    if (this.userRole !== 'QA Manager' || !this.selectedSettingID) return;
-    this.messageService.add({ severity: 'info', summary: 'Exporting', detail: 'Preparing CSV...' });
-    this.closureService.exportIdeas(this.selectedSettingID, 'csv').subscribe({
-      next: (res) => { if (res.success && res.data.downloadUrl) window.location.href = res.data.downloadUrl; },
-      error: (err) => this.messageService.add({ severity: 'error', summary: 'Export Failed', detail: err.error?.message })
-    });
-  }
+  exportData(format: 'csv' | 'pdf'): void {
+  if (!this.selectedSettingID) return;
+
+  this.closureService.exportIdeas(this.selectedSettingID, format).subscribe({
+    next: (res) => {
+      if (res.success && res.data.downloadUrl) {
+        // Create a temporary anchor element
+        const link = document.createElement('a');
+        link.href = res.data.downloadUrl;
+        
+        // The 'download' attribute forces the browser to download instead of open
+        const fileName = res.data.downloadUrl.split('/').pop() || `export.${format}`;
+        link.setAttribute('download', fileName);
+        
+        // For PDF safety, also set target to _blank so if it does open, it's a new tab
+        link.target = '_blank';
+        
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Download started' });
+      }
+    },
+    error: (err) => { /* error logic */ }
+  });
+}
 
   getProfileUrl(profilePath: string | null | undefined): string {
     if (!profilePath) return '';
