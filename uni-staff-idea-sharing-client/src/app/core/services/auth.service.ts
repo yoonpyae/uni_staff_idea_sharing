@@ -55,7 +55,9 @@ export class AuthService {
       const role = staff.role.roleName || staff.role;
       const profilePicture = staff.staffProfile;
       const deptId = staff.departmentID || (staff.department ? staff.department.departmentID : null);
+      const deptName = staff.department?.departmentName || staff.departmentName;
 
+      if (deptName) this.cookieService.set('departmentName', String(deptName));
       if (id) this.cookieService.set('staffID', String(id));
       if (name) this.cookieService.set('staffName', String(name));
       if (role) this.cookieService.set('roleName', String(role));
@@ -64,10 +66,25 @@ export class AuthService {
     }
 
     this.cookieService.set('authorized_status', 'true');
+
+    if (staff && staff.role && staff.role.permissions) {
+      // Extract permission names into a comma-separated string for the cookie
+      const permissionNames = staff.role.permissions.map((p: any) => p.permission).join(',');
+      this.cookieService.set('userPermissions', permissionNames);
+    }
   }
 
   me(): Observable<RootModel> {
     return this.http.get<RootModel>(`${environment.main_url}/staff/me`);
+  }
+
+  hasPermission(permission: string): boolean {
+    const cookieValue = this.cookieService.get('userPermissions');
+    if (!cookieValue) return false;
+
+    // URL-decode the cookie string to handle spaces/special characters correctly
+    const permissions = decodeURIComponent(cookieValue).split(',');
+    return permissions.includes(permission);
   }
 
   refreshToken(): Observable<RootModel> {
