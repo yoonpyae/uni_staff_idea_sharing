@@ -22,4 +22,8 @@ export class DashboardService {
     }
     return this.httpClient.get<RootModel>(url);
   }
+
+  downloadAllDocuments(settingID: number): Observable<RootModel> {
+    return this.httpClient.get<RootModel>(`${environment.main_url}/closure-settings/${settingID}/download-documents`);
+  }
 }
