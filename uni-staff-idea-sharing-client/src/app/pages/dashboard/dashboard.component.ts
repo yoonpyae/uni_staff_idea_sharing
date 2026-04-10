@@ -8,6 +8,7 @@ import { ToastModule } from 'primeng/toast';
 import { DashboardService } from '../../core/services/dashboard.service';
 import { environment } from '../../../environments/environment';
 import { ClosureSettingService } from '../../core/services/closure-setting.service';
+import { AuthService } from '../../core/services/auth.service';
 
 Chart.register(...registerables);
 
@@ -69,7 +70,8 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     private cookieService: CookieService,
     private messageService: MessageService,
     private dashboardService: DashboardService,
-    private closureService: ClosureSettingService
+    private closureService: ClosureSettingService,
+    public authService: AuthService
   ) { }
 
   ngOnInit(): void {
