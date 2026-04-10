@@ -314,4 +314,25 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     }
     sessionStorage.removeItem('showLoginReminder');
   }
+
+  downloadZip(): void {
+    if (this.userRole !== 'QA Manager' || !this.selectedSettingID) return;
+
+    this.messageService.add({ severity: 'info', summary: 'Processing', detail: 'Creating ZIP file...' });
+
+    this.dashboardService.downloadAllDocuments(this.selectedSettingID).subscribe({
+      next: (res) => {
+        if (res.success && res.data.downloadUrl) {
+          window.location.href = res.data.downloadUrl; // Triggers browser download
+        }
+      },
+      error: (err) => {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Failed',
+          detail: err.error.message || 'Download restricted until after closure date.'
+        });
+      }
+    });
+  }
 }
