@@ -34,10 +34,24 @@
         </div>
 
         <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto items-center">
-          <button *ngIf="authService.hasPermission('Export System Data')" (click)="exportData()"
-            class="w-full sm:w-auto px-5 py-2.5 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg shadow-sm flex items-center justify-center gap-2 transition-colors">
-            <i class="pi pi-file-excel"></i> Export CSV
-          </button>
+          <div class="relative group w-full sm:w-auto" *ngIf="authService.hasPermission('Export System Data')">
+            <button
+              class="w-full sm:w-auto px-5 py-2.5 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg shadow-sm flex items-center justify-center gap-2 transition-colors">
+              <i class="pi pi-download"></i> Export Data <i class="pi pi-angle-down text-xs"></i>
+            </button>
+
+            <div
+              class="absolute right-0 top-full mt-1 w-full sm:w-40 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 hidden group-hover:block z-50 overflow-hidden">
+              <button (click)="exportData('csv')"
+                class="w-full text-left px-4 py-3 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 flex items-center gap-2">
+                <i class="pi pi-file-excel text-green-600"></i> Export as CSV
+              </button>
+              <button (click)="exportData('pdf')"
+                class="w-full text-left px-4 py-3 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 flex items-center gap-2 border-t border-gray-100 dark:border-gray-700">
+                <i class="pi pi-file-pdf text-red-500"></i> Export as PDF
+              </button>
+            </div>
+          </div>
 
           <button *ngIf="authService.hasPermission('Download All Documents')" (click)="downloadZip()"
             class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-sm flex items-center gap-2 transition-colors">
