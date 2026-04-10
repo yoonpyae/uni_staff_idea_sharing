@@ -34,12 +34,12 @@
         </div>
 
         <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto items-center">
-          <button *ngIf="userRole === 'QA Manager'" (click)="exportData()"
+          <button *ngIf="authService.hasPermission('Export System Data')" (click)="exportData()"
             class="w-full sm:w-auto px-5 py-2.5 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg shadow-sm flex items-center justify-center gap-2 transition-colors">
             <i class="pi pi-file-excel"></i> Export CSV
           </button>
 
-          <button *ngIf="userRole === 'QA Manager'" (click)="downloadZip()"
+          <button *ngIf="authService.hasPermission('Download All Documents')" (click)="downloadZip()"
             class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-sm flex items-center gap-2 transition-colors">
             <i class="pi pi-file-pdf"></i> Download Documents ZIP
           </button>
