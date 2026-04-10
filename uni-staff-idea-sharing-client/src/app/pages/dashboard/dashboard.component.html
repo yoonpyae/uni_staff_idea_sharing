@@ -12,6 +12,8 @@
   </button>
 </div>
 
+<p-toast position="top-right"></p-toast>
+
 <div class="h-screen flex flex-col bg-gray-50 dark:bg-gray-900">
   <header
     class="flex-shrink-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg border-b border-gray-200/50 dark:border-gray-700/50 shadow-sm z-10">
@@ -35,6 +37,11 @@
           <button *ngIf="userRole === 'QA Manager'" (click)="exportData()"
             class="w-full sm:w-auto px-5 py-2.5 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg shadow-sm flex items-center justify-center gap-2 transition-colors">
             <i class="pi pi-file-excel"></i> Export CSV
+          </button>
+
+          <button *ngIf="userRole === 'QA Manager'" (click)="downloadZip()"
+            class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-sm flex items-center gap-2 transition-colors">
+            <i class="pi pi-file-pdf"></i> Download Documents ZIP
           </button>
 
           <div class="relative w-full sm:w-auto">
