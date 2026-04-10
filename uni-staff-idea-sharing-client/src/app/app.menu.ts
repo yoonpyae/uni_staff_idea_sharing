@@ -3,7 +3,7 @@ export interface MenuItem {
   icon?: string;
   routerLink?: string[];
   items?: MenuItem[];
-  roles?: string[];
+  permissions?: string[];
 }
 
 export const NAVIGATION_MENU: Readonly<MenuItem[]> = [
@@ -24,54 +24,55 @@ export const NAVIGATION_MENU: Readonly<MenuItem[]> = [
         label: 'Departments',
         icon: 'pi pi-fw pi-building',
         routerLink: ['/department'],
-        roles: ['Administrator']
+        permissions: ['Manage Departments']
       },
       {
         label: 'User Roles',
         icon: 'pi pi-fw pi-cog',
         routerLink: ['/role'],
-        roles: ['Administrator']
+        permissions: ['Manage Roles']
       },
       {
         label: 'User Accounts',
         icon: 'pi pi-fw pi-users',
         routerLink: ['/user-accounts'],
-        roles: ['Administrator']
+        permissions: ['Manage User Accounts']
       },
       {
         label: 'Closure Settings',
         icon: 'pi pi-fw pi-calendar',
         routerLink: ['/closure-settings'],
-        roles: ['Administrator']
+        permissions: ['Manage Closure Dates']
       },
       {
         label: 'Categories',
         icon: 'pi pi-fw pi-list',
         routerLink: ['/idea-categories'],
-        roles: ['QA Manager']
+        permissions: ['Manage Idea Categories']
       },
       {
         label: 'Ideas',
         icon: 'pi pi-fw pi-lightbulb',
         routerLink: ['/submit-ideas'],
+        permissions: ['Submit Ideas']
       },
       {
         label: 'Staff Management',
         icon: 'pi pi-fw pi-users',
         routerLink: ['/staff-management'],
-        roles: ['QA Manager']
+        permissions: ['Manage Staff']
       },
       {
         label: 'Pending Ideas',
         icon: 'pi pi-fw pi-hourglass',
         routerLink: ['/pending-ideas'],
-        roles: ['QA Coordinator']
+        permissions: ['Manage Pending Ideas']
       },
       {
         label: 'Report Management',
         icon: 'pi pi-fw pi-flag',
         routerLink: ['/report-management'],
-        roles: ['QA Manager']
+        permissions: ['Manage Reports']
       },
     ],
   },
