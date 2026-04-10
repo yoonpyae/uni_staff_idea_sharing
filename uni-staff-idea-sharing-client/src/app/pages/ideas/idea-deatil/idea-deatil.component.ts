@@ -13,6 +13,7 @@ import { VoteService } from '../../../core/services/ideas/vote.service';
 import { CommentModel } from '../../../core/models/ideas/comment.model';
 import { ReportService } from '../../../core/services/ideas/report.service';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { ClosureSettingService } from '../../../core/services/closure-setting.service';
 
 @Component({
   selector: 'app-idea-deatil',
@@ -56,7 +57,8 @@ export class IdeaDeatilComponent implements OnInit {
     private messageService: MessageService,
     private reportService: ReportService,
     private router: Router,
-    private confirmationService: ConfirmationService
+    private confirmationService: ConfirmationService,
+    private closureService: ClosureSettingService
   ) { }
 
   ngOnInit(): void {
@@ -87,11 +89,37 @@ export class IdeaDeatilComponent implements OnInit {
 
   // --- Download Zip Logic (Placeholder) ---
   downloadIdeaAsZip(): void {
-    this.showIdeaMenu = false;
-    this.messageService.add({ severity: 'info', summary: 'Downloading', detail: 'Preparing your ZIP file...' });
-    // Add your actual download logic here
+  // Ensure we have a closure setting ID linked to this idea
+  const settingID = this.idea?.settingID;
+  
+  if (!settingID) {
+    this.messageService.add({ 
+      severity: 'warn', 
+      summary: 'Not Available', 
+      detail: 'This idea is not associated with an academic year closure.' 
+    });
+    return;
   }
 
+  this.showIdeaMenu = false;
+  this.messageService.add({ severity: 'info', summary: 'Downloading', detail: 'Preparing your ZIP file...' });
+
+  // Call the service method
+  this.closureService.downloadZip(settingID).subscribe({
+    next: (res) => {
+      if (res.success && res.data.downloadUrl) {
+        // Trigger the browser download
+        window.location.href = res.data.downloadUrl;
+        this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Download started.' });
+      }
+    },
+    error: (err) => {
+      // Handle cases where closure date hasn't passed or no files exist
+      const errorMsg = err.error?.message || 'Failed to download documents.';
+      this.messageService.add({ severity: 'error', summary: 'Download Failed', detail: errorMsg });
+    }
+  });
+}
   // --- Report Logic ---
   openReportModal(type: 'idea' | 'comment', id: number | undefined): void {
     if (!id) return;
