@@ -85,6 +85,7 @@ export class AppLayoutComponent implements OnInit {
       this.profilePictureUrl = '';
     }
     this.filterMenuByRole(role);
+    this.filterMenuByPermissions();
   }
 
   filterMenuByRole(userRole: string): void {
@@ -160,5 +161,25 @@ export class AppLayoutComponent implements OnInit {
 
   getTextState(): string {
     return this.isSidebarCollapsed ? 'out' : 'in';
+  }
+
+  filterMenuByPermissions(): void {
+    // Deep clone the menu to avoid mutating the original constant
+    const fullMenu: MenuItem[] = JSON.parse(JSON.stringify(NAVIGATION_MENU));
+
+    this.menuItems = fullMenu.filter(section => {
+      // 1. Filter the items within each section
+      section.items = section.items?.filter(item => {
+        // If item has no permission requirements, show it (like Dashboard)
+        if (!item.permissions || item.permissions.length === 0) {
+          return true;
+        }
+        // Check if user has at least one of the required permissions
+        return item.permissions.some(p => this.authService.hasPermission(p));
+      });
+
+      // 2. Only show the section if it has at least one visible item
+      return section.items && section.items.length > 0;
+    });
   }
 }
