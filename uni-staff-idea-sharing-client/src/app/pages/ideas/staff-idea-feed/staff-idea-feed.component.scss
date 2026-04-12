@@ -1,0 +1,44 @@
+// Hide scrollbar but keep functionality
+.no-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+  &::-webkit-scrollbar {
+    display: none; /* Chrome, Safari and Opera */
+  }
+}
+
+// Animation for pop-ups
+@keyframes fabPop {
+  0% { opacity: 0; transform: translateY(10px) scale(0.95); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.animate-fab-pop {
+  animation: fabPop 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+// Line clamp for descriptions
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;  
+  overflow: hidden;
+}
+
+// Ensure the header has no bottom margin that could cause a gap
+header {
+    margin-bottom: 0 !important;
+}
+
+// Remove any top margin/padding from the main content area
+main {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+}
+
+// Optional: If you see a tiny 1px line, it might be a box-shadow or 
+// sub-pixel rendering. This ensures the filter bar sits perfectly:
+.sticky {
+    margin-top: -1px; 
+    padding-top: calc(1rem + 3px);
+}
