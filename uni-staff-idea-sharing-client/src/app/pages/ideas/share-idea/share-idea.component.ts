@@ -121,10 +121,8 @@ export class ShareIdeaComponent implements OnInit, OnDestroy {
         this.description = idea.description;
         this.selectedCategoryIds = idea.categories.map((c: any) => c.categoryID);
 
-        // 1. Restore Terms Agreement
         this.agreedToTerms = true;
 
-        // 2. Track existing documents to show in UI
         this.existingDocuments = idea.documents || [];
 
         if (idea.isAnonymous) {
@@ -208,7 +206,6 @@ export class ShareIdeaComponent implements OnInit, OnDestroy {
     }
 
     if (this.isEditMode && this.editIdeaId) {
-      // Use the update API for editing
       this.ideaService.update(this.editIdeaId, formData as any).subscribe({
         next: () => this.handleSuccess('Idea updated successfully!'),
         error: (err) => {
@@ -281,19 +278,16 @@ export class ShareIdeaComponent implements OnInit, OnDestroy {
   }
 
   checkDepartmentSubmissionLimit(): void {
-    // Use your IdeaService to check if an idea exists for this dept in the current closure
     this.ideaService.get().subscribe({
       next: (res) => {
         const ideas = res.data as IdeaModel[];
         const userDeptID = this.cookieService.get('departmentID');
 
-        // Filter ideas to see if any belong to the user's department in the current year
         const deptIdeaExists = ideas.some(idea =>
           idea.staff?.departmentID === Number(userDeptID) &&
           idea.status !== 'deleted'
         );
 
-        // Only block if we are NOT in edit mode (authors can still edit their existing one)
         if (deptIdeaExists && !this.isEditMode) {
           this.isDeptLimitReached = true;
         }
