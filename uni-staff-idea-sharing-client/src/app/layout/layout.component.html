@@ -1,117 +1,136 @@
-<div class="flex min-h-screen h-screen overflow-hidden bg-gray-100 dark:bg-gray-900"
+<div class="flex min-h-screen bg-gray-100 dark:bg-gray-900 overflow-x-hidden"
   [ngClass]="{'opacity-60 pointer-events-none grayscale': isLoggingOut}">
 
   <aside [@slideInOut]="getSidebarState()"
-    class="bg-gradient-to-b from-[#a8e6cf] to-[#88d4ab] dark:from-[#1a3936] dark:to-[#122825] flex flex-col shadow-[4px_0_20px_rgba(0,0,0,0.08)] dark:shadow-[4px_0_20px_rgba(0,0,0,0.3)] fixed inset-y-0 left-0 z-50 lg:relative transition-all duration-300 transform"
+    class="bg-gradient-to-b from-[#a8e6cf] to-[#88d4ab] dark:from-[#1a3936] dark:to-[#122825] flex flex-col shadow-2xl fixed inset-y-0 left-0 z-50 lg:relative transition-all duration-300 transform"
     [ngClass]="isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'"
-    [class.w-[260px]]="!isSidebarCollapsed" [class.w-[80px]]="isSidebarCollapsed">
+    [class.w-[280px]]="!isSidebarCollapsed" [class.w-[85px]]="isSidebarCollapsed">
 
     <div class="flex flex-col h-full py-6">
       <div class="px-6 mb-8 flex items-center justify-between">
-        <div class="overflow-hidden flex-1">
-          <img src="images/1.png" alt="University Logo" [class]="isSidebarCollapsed ? 'h-18 w-18 object-contain' : 'h-18 w-18 object-contain mr-2'">
-          <div [@fadeInOut]="getTextState()" class="h-[3px] bg-[#2c5f5d] dark:bg-[#a8e6cf] rounded mt-3 w-[60px]">
+        <div class="overflow-hidden flex-1 flex items-center h-14" [class.justify-center]="isSidebarCollapsed">
+
+          <div class="flex-shrink-0 flex items-center justify-center transition-all duration-300"
+            [class.w-10]="isSidebarCollapsed" [class.h-10]="isSidebarCollapsed" [class.w-12]="!isSidebarCollapsed"
+            [class.h-12]="!isSidebarCollapsed">
+            <img src="images/1.png" alt="Logo" class="max-w-full max-h-full object-contain transition-all duration-300">
+          </div>
+
+          <div *ngIf="!isSidebarCollapsed" [@fadeInOut]="getTextState()" class="ml-4 flex flex-col">
+            <span
+              class="font-black text-2xl tracking-tighter text-[#2c5f5d] dark:text-[#a8e6cf] uppercase leading-none">
+              IdeaHub
+            </span>
+            <span
+              class="text-[10px] font-bold tracking-[0.2em] text-[#2c5f5d]/60 dark:text-[#a8e6cf]/60 uppercase mt-1">
+              University
+            </span>
           </div>
         </div>
+
+        <button (click)="toggleMobileMenu()"
+          class="lg:hidden text-[#2c5f5d] dark:text-[#a8e6cf] p-2 hover:bg-black/5 rounded-lg">
+          <i class="pi pi-times text-xl"></i>
+        </button>
       </div>
 
-      <nav class="flex-1 overflow-y-auto overflow-x-hidden px-2">
+      <nav class="flex-1 overflow-y-auto no-scrollbar px-3">
         <div *ngFor="let section of menuItems" class="mb-4">
-          <div *ngIf="section.items && section.items.length > 0">
-            <div *ngFor="let item of section.items" class="my-1">
-              <a [routerLink]="item.routerLink" (click)="closeMobileMenu()"
-                routerLinkActive="bg-[#2c5f5d]/15 dark:bg-white/10 border-l-[#2c5f5d] dark:border-l-[#a8e6cf] font-semibold before:absolute before:right-0 before:top-1/2 before:-translate-y-1/2 before:w-1 before:h-[70%] before:bg-[#2c5f5d] dark:before:bg-[#a8e6cf] before:rounded-l"
-                class="flex items-center px-6 py-3.5 text-[#2c3e50] dark:text-gray-200 no-underline transition-all duration-200 relative font-medium border-l-4 border-transparent hover:bg-white/20 dark:hover:bg-white/5 hover:border-l-[#2c5f5d] dark:hover:border-l-[#a8e6cf] rounded-r-lg"
-                [class.justify-center]="isSidebarCollapsed" [class.px-3]="isSidebarCollapsed">
-                <i [class]="item.icon" class="text-xl text-[#2c5f5d] dark:text-[#a8e6cf] min-w-[1.25rem]"
-                  [class.mr-0]="isSidebarCollapsed" [class.mr-4]="!isSidebarCollapsed"></i>
-                <span [@fadeInOut]="getTextState()" class="text-[0.95rem] whitespace-nowrap">
-                  {{ item.label }}
-                </span>
-              </a>
-            </div>
+          <div *ngFor="let item of section.items" class="my-1">
+            <a [routerLink]="item.routerLink" (click)="closeMobileMenu()"
+              routerLinkActive="bg-white/20 dark:bg-white/10 text-[#2c5f5d] dark:text-white font-bold border-l-4 border-[#2c5f5d] dark:border-l-[#a8e6cf]"
+              class="flex items-center px-4 py-3.5 text-[#2c3e50] dark:text-gray-200 no-underline transition-all rounded-r-xl group"
+              [class.justify-center]="isSidebarCollapsed">
+
+              <i [class]="item.icon"
+                class="text-2xl min-w-[2.5rem] flex justify-center items-center group-hover:scale-110 transition-transform"
+                [class.mr-2]="!isSidebarCollapsed" [class.mr-0]="isSidebarCollapsed">
+              </i>
+
+              <span *ngIf="!isSidebarCollapsed" [@fadeInOut]="getTextState()"
+                class="text-[1rem] font-semibold whitespace-nowrap">
+                {{ item.label }}
+              </span>
+            </a>
           </div>
         </div>
       </nav>
 
-      <div class="mt-auto px-4 lg:px-6 pt-4 border-t-2 border-[#2c5f5d]/10 dark:border-white/10 flex flex-col gap-4">
-
-        <div class="flex items-center gap-2" [ngClass]="isSidebarCollapsed ? 'flex-col' : 'flex-row'">
-
+      <div class="mt-auto px-4 space-y-4 pt-4 border-t border-black/5 dark:border-white/5">
+        <div class="flex gap-2" [ngClass]="isSidebarCollapsed ? 'flex-col items-center' : 'flex-row'">
           <button (click)="toggleTheme()"
-            class="flex items-center justify-center p-2.5 rounded-xl bg-white/30 dark:bg-black/20 hover:bg-white/50 dark:hover:bg-black/40 transition-all duration-200 text-[#2c5f5d] dark:text-[#a8e6cf] w-full"
-            [title]="themeService.isDark() ? 'Switch to Light Mode' : 'Switch to Dark Mode'">
+            class="flex-1 flex items-center justify-center p-3 rounded-2xl bg-white/30 dark:bg-black/20 hover:bg-white/50 transition-all text-[#2c5f5d] dark:text-[#a8e6cf] shadow-sm">
             <i [class]="themeService.isDark() ? 'pi pi-sun' : 'pi pi-moon'" class="text-lg"></i>
             <span *ngIf="!isSidebarCollapsed" [@fadeInOut]="getTextState()"
-              class="ml-2 font-semibold text-sm whitespace-nowrap">
+              class="ml-2 font-bold text-xs uppercase tracking-wider">
               {{ themeService.isDark() ? 'Light Mode' : 'Dark Mode' }}
             </span>
           </button>
 
           <button (click)="toggleSidebar()"
-            class="hidden lg:flex items-center justify-center p-2.5 rounded-xl bg-white/30 dark:bg-black/20 hover:bg-white/50 dark:hover:bg-black/40 transition-all duration-200 text-[#2c5f5d] dark:text-[#a8e6cf] flex-shrink-0"
-            [class.w-full]="isSidebarCollapsed" [title]="isSidebarCollapsed ? 'Expand Sidebar' : 'Collapse Sidebar'">
+            class="hidden lg:flex items-center justify-center p-3 rounded-2xl bg-white/30 dark:bg-black/20 hover:bg-white/50 transition-all text-[#2c5f5d] dark:text-[#a8e6cf] shadow-sm">
             <i [class]="isSidebarCollapsed ? 'pi pi-angle-right' : 'pi pi-angle-left'" class="text-lg"></i>
           </button>
         </div>
 
         <a [routerLink]="['/account-details']" (click)="closeMobileMenu()"
-          class="flex items-center cursor-pointer hover:bg-white/20 dark:hover:bg-black/20 p-2 -mx-2 rounded-xl transition-colors w-full group">
+          class="flex items-center p-2 rounded-2xl hover:bg-white/20 dark:hover:bg-black/20 transition-all group overflow-hidden">
           <div
-            class="w-10 h-10 rounded-full overflow-hidden flex-shrink-0 border-2 border-transparent group-hover:border-[#2c5f5d] dark:group-hover:border-[#a8e6cf] transition-colors"
-            [class.mr-0]="isSidebarCollapsed" [class.mr-3]="!isSidebarCollapsed">
-            <img *ngIf="profilePictureUrl; else defaultIcon" [src]="profilePictureUrl" alt="Profile"
-              class="w-full h-full object-cover rounded-full" />
+            class="w-10 h-10 rounded-full overflow-hidden flex-shrink-0 border-2 border-transparent group-hover:border-[#2c5f5d] dark:group-hover:border-[#a8e6cf]">
+            <img *ngIf="profilePictureUrl; else defaultIcon" [src]="profilePictureUrl"
+              class="w-full h-full object-cover" />
             <ng-template #defaultIcon>
               <div
-                class="w-full h-full bg-[#2c5f5d] dark:bg-[#a8e6cf] flex items-center justify-center text-white dark:text-[#2c3e50] text-xl">
+                class="w-full h-full bg-[#2c5f5d] dark:bg-[#a8e6cf] flex items-center justify-center text-white dark:text-[#2c3e50]">
                 <i class="pi pi-user"></i>
               </div>
             </ng-template>
           </div>
-          <div [@fadeInOut]="getTextState()" class="flex-1 overflow-hidden">
-            <div
-              class="text-[0.95rem] font-semibold text-[#2c3e50] dark:text-white whitespace-nowrap overflow-hidden text-ellipsis">
-              {{ currentUser.name }}</div>
-            <div class="text-[0.8rem] text-[#2c5f5d] dark:text-[#88d4ab] font-medium">{{ currentUser.role }}</div>
+          <div *ngIf="!isSidebarCollapsed" class="ml-3 flex-1 min-w-0">
+            <p class="text-sm font-bold text-[#2c3e50] dark:text-white truncate m-0">{{ currentUser.name }}</p>
+            <p class="text-[10px] text-[#2c5f5d] dark:text-[#88d4ab] font-black uppercase m-0">{{ currentUser.role }}
+            </p>
           </div>
         </a>
 
         <button (click)="logout()" [disabled]="isLoggingOut"
-          class="w-full px-4 py-2.5 bg-[#2c5f5d]/10 dark:bg-white/10 border-2 border-[#2c5f5d]/30 dark:border-white/20 rounded-xl text-[#2c5f5d] dark:text-[#a8e6cf] font-semibold text-[0.9rem] cursor-pointer flex items-center justify-center gap-2 transition-all duration-200 hover:bg-[#2c5f5d]/20 dark:hover:bg-white/20 hover:border-[#2c5f5d] dark:hover:border-[#a8e6cf] hover:-translate-y-0.5">
+          class="w-full py-3.5 bg-red-500/10 hover:bg-red-500 text-red-600 hover:text-white border-none rounded-2xl font-black text-xs uppercase tracking-widest transition-all flex items-center justify-center gap-2">
           <i class="pi" [ngClass]="isLoggingOut ? 'pi-spin pi-spinner' : 'pi-sign-out'"></i>
-          <span [@fadeInOut]="getTextState()">{{ isLoggingOut ? 'Logging out...' : 'Logout' }}</span>
+          <span *ngIf="!isSidebarCollapsed">{{ isLoggingOut ? 'Logging Out' : 'Logout' }}</span>
         </button>
-
       </div>
     </div>
   </aside>
 
-  <div *ngIf="isMobileMenuOpen" (click)="closeMobileMenu()"
-    class="fixed inset-0 bg-black/60 dark:bg-black/80 backdrop-blur-sm z-40 lg:hidden transition-opacity"></div>
+  <div *ngIf="isMobileMenuOpen" (click)="toggleMobileMenu()"
+    class="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden transition-opacity duration-300"></div>
 
-  <main class="flex-1 flex flex-col h-screen overflow-hidden bg-gray-100 dark:bg-gray-900 transition-all duration-300"
-    [class.lg:ml-0]="isSidebarCollapsed" [class.ml-0]="true">
+  <div class="flex-1 flex flex-col min-h-screen max-h-screen overflow-hidden transition-all duration-300">
 
     <header
-      class="lg:hidden flex items-center justify-between px-6 py-4 bg-white dark:bg-gray-800 shadow-sm z-30 flex-shrink-0">
+      class="lg:hidden flex items-center justify-between px-5 py-3.5 bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700 z-30">
       <div class="flex items-center gap-4">
         <button (click)="toggleMobileMenu()"
-          class="text-[#2c5f5d] dark:text-[#a8e6cf] hover:bg-gray-100 dark:hover:bg-gray-700 p-2 rounded-lg transition-colors">
+          class="p-2 text-[#2c5f5d] dark:text-[#a8e6cf] active:scale-90 transition-transform">
           <i class="pi pi-bars text-xl"></i>
         </button>
-        <h1 class="font-bold text-[#2c3e50] dark:text-white text-xl m-0 tracking-tight font-sans">UniversityName</h1>
+        <h1 class="font-black text-gray-900 dark:text-white text-lg tracking-tighter m-0 uppercase">IdeaHub</h1>
+      </div>
+      <div class="w-8 h-8 rounded-full overflow-hidden border border-gray-200" [routerLink]="['/account-details']">
+        <img *ngIf="profilePictureUrl" [src]="profilePictureUrl" class="w-full h-full object-cover">
       </div>
     </header>
 
-    <div class="flex-1 overflow-y-auto">
+    <div class="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-900">
       <router-outlet></router-outlet>
     </div>
-  </main>
+  </div>
 </div>
 
 <div *ngIf="isLoggingOut"
-  class="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-black/20 backdrop-blur-[2px]">
-  <i class="pi pi-spin pi-spinner text-4xl text-[#2c5f5d] dark:text-[#a8e6cf] mb-4"></i>
-  <p class="font-bold text-[#2c3e50] dark:text-white">Securely logging out...</p>
+  class="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-black/40 backdrop-blur-md">
+  <div class="bg-white dark:bg-gray-800 p-8 rounded-3xl shadow-2xl flex flex-col items-center animate-pulse">
+    <i class="pi pi-spin pi-spinner text-4xl text-[#2c5f5d] dark:text-[#a8e6cf] mb-4"></i>
+    <p class="font-black text-xs uppercase tracking-[0.2em] text-gray-500">Securely Logging Out</p>
+  </div>
 </div>
