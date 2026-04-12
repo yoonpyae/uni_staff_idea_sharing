@@ -37,6 +37,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   userRole: string = '';
   userDepartment: string = '';
   isGlobalView: boolean = true;
+  fabOpen: boolean = false;
 
   // Chart instances
   barChart: Chart | null = null;
@@ -126,6 +127,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   onYearChange(event: any): void {
     this.selectedSettingID = Number(event.target.value);
     this.loadDashboardData();
+    this.fabOpen = false; // Add this
   }
 
   loadDashboardData(): void {
@@ -286,32 +288,32 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   // --- Helper Methods ---
 
   exportData(format: 'csv' | 'pdf'): void {
-  if (!this.selectedSettingID) return;
+    if (!this.selectedSettingID) return;
 
-  this.closureService.exportIdeas(this.selectedSettingID, format).subscribe({
-    next: (res) => {
-      if (res.success && res.data.downloadUrl) {
-        // Create a temporary anchor element
-        const link = document.createElement('a');
-        link.href = res.data.downloadUrl;
-        
-        // The 'download' attribute forces the browser to download instead of open
-        const fileName = res.data.downloadUrl.split('/').pop() || `export.${format}`;
-        link.setAttribute('download', fileName);
-        
-        // For PDF safety, also set target to _blank so if it does open, it's a new tab
-        link.target = '_blank';
-        
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+    this.closureService.exportIdeas(this.selectedSettingID, format).subscribe({
+      next: (res) => {
+        if (res.success && res.data.downloadUrl) {
+          // Create a temporary anchor element
+          const link = document.createElement('a');
+          link.href = res.data.downloadUrl;
 
-        this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Download started' });
-      }
-    },
-    error: (err) => { /* error logic */ }
-  });
-}
+          // The 'download' attribute forces the browser to download instead of open
+          const fileName = res.data.downloadUrl.split('/').pop() || `export.${format}`;
+          link.setAttribute('download', fileName);
+
+          // For PDF safety, also set target to _blank so if it does open, it's a new tab
+          link.target = '_blank';
+
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+
+          this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Download started' });
+        }
+      },
+      error: (err) => { /* error logic */ }
+    });
+  }
 
   getProfileUrl(profilePath: string | null | undefined): string {
     if (!profilePath) return '';
@@ -356,4 +358,10 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     });
   }
+
+  toggleFab(): void {
+    this.fabOpen = !this.fabOpen;
+  }
+
+
 }
