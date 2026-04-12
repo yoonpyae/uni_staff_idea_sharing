@@ -1,0 +1,55 @@
+// Hide standard scrollbar for the navigation
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+// Ensure the sidebar doesn't show a white background during animations
+aside {
+  will-change: width, transform;
+}
+
+// Adjust router-outlet container to handle scrolling properly
+.flex-1 {
+  min-width: 0; // Fixes flexbox overflow issues on small screens
+}
+
+// logo fix
+.overflow-hidden img {
+  max-width: none; // Overrides global "max-width: 100%" which can squish it during sidebar contraction
+  display: block;
+  flex-shrink: 0;
+}
+
+// Ensure branding area has a consistent height during the width transition
+// Brand Area Fixes
+.h-16 {
+  height: 4rem; // Ensure enough height for the larger logo
+}
+
+img {
+  // Prevent any global styles from squishing the brand asset
+  image-rendering: -webkit-optimize-contrast; 
+  display: block;
+}
+
+// Add a slight hover effect to the brand area
+.flex-1:hover img {
+  transform: rotate(-5deg) scale(1.1);
+}
+
+// Ensure icons have a consistent center point
+i.pi {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
+}
+
+// Optional: If you want a slight glow effect on the active icon
+.active-link i {
+  text-shadow: 0 0 8px rgba(44, 95, 93, 0.3);
+}
