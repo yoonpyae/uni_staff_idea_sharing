@@ -215,6 +215,12 @@ export class StaffIdeaFeedComponent implements OnInit {
     return path.split('/').pop() || 'Document';
   }
 
+  isImage(path: string): boolean {
+    if (!path) return false;
+    const ext = path.split('.').pop()?.toLowerCase();
+    return ['jpg', 'jpeg', 'png', 'gif', 'svg', 'webp'].includes(ext || '');
+  }
+
   getFileIcon(path: string): string {
     if (!path) return 'pi-file';
     const ext = path.split('.').pop()?.toLowerCase();
