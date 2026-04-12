@@ -7,16 +7,12 @@ export const permissionGuard: CanActivateFn = (route, state) => {
   const authService = inject(AuthService);
   const router = inject(Router);
   const messageService = inject(MessageService);
-
-  // 1. Get required permissions from the route's data object
   const requiredPermissions = route.data['permissions'] as string[];
 
-  // 2. If no specific permissions are required, allow access
   if (!requiredPermissions || requiredPermissions.length === 0) {
     return true;
   }
 
-  // 3. Check if the user has the required permission
   const hasAccess = requiredPermissions.some(permission => 
     authService.hasPermission(permission)
   );
@@ -25,7 +21,6 @@ export const permissionGuard: CanActivateFn = (route, state) => {
     return true;
   }
 
-  // 4. If unauthorized, show a message and redirect to dashboard
   messageService.add({ 
     severity: 'error', 
     summary: 'Access Denied', 
@@ -35,3 +30,4 @@ export const permissionGuard: CanActivateFn = (route, state) => {
   router.navigate(['/dashboard']);
   return false;
 };
+
