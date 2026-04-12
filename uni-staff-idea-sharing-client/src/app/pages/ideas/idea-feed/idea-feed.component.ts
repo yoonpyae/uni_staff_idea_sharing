@@ -395,7 +395,6 @@ export class IdeaFeedComponent implements OnInit {
   isFinalClosurePassed(idea: IdeaModel): boolean {
     if (idea && idea.closure_setting) {
       const now = new Date();
-      // Your API returns a single object for closure_setting
       const finalDeadline = new Date(idea.closure_setting.finalclosureDate);
       return now > finalDeadline;
     }
