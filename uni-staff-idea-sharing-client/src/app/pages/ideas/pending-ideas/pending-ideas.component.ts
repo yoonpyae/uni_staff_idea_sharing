@@ -48,7 +48,6 @@ export class PendingIdeasComponent implements OnInit {
     const deptIdStr = this.cookieService.get('departmentID');
     this.coordinatorDeptId = deptIdStr ? Number(deptIdStr) : 0;
 
-    // 2. Fetch the Department Name based on the ID
     if (this.coordinatorDeptId > 0) {
       this.fetchDepartmentName(this.coordinatorDeptId);
     }
@@ -58,7 +57,6 @@ export class PendingIdeasComponent implements OnInit {
   }
 
   fetchDepartmentName(id: number): void {
-    // Uses the GET /departments/{id} route defined in your backend
     this.departmentService.getById(id).subscribe({
       next: (res) => {
         if (res.success) {
