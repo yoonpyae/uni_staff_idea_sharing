@@ -27,21 +27,9 @@ import { environment } from '../../environments/environment';
       transition('in <=> out', animate('300ms ease-in-out'))
     ]),
     trigger('fadeInOut', [
-      state('in', style({
-        opacity: 1,
-        display: 'block'
-      })),
-      state('out', style({
-        opacity: 0,
-        display: 'none'
-      })),
-      transition('in => out', [
-        animate('200ms ease-out')
-      ]),
-      transition('out => in', [
-        style({ display: 'block' }),
-        animate('200ms 100ms ease-in')
-      ])
+      state('in', style({ opacity: 1, display: 'block' })),
+      state('out', style({ opacity: 0, display: 'none' })),
+      transition('in <=> out', animate('300ms ease-in-out')) // Sync with slideInOut
     ])
   ],
   styleUrl: './layout.component.scss'
@@ -109,12 +97,15 @@ export class AppLayoutComponent implements OnInit {
   toggleMobileMenu(): void {
     this.isMobileMenuOpen = !this.isMobileMenuOpen;
     if (this.isMobileMenuOpen) {
-      this.isSidebarCollapsed = false;
+      document.body.style.overflow = 'hidden'; // Prevent background scroll
+    } else {
+      document.body.style.overflow = 'auto';
     }
   }
 
   closeMobileMenu(): void {
     this.isMobileMenuOpen = false;
+    document.body.style.overflow = 'auto';
   }
 
   toggleTheme(): void {
