@@ -1,3 +1,15 @@
+<div *ngIf="lastLoginMessage"
+    class="mb-4 md:mb-6 p-4 rounded-xl flex items-start sm:items-center gap-3 border transition-colors animate-fadein mx-4 md:mx-0"
+    [ngClass]="lastLoginMessage.includes('Welcome') 
+    ? 'bg-blue-50 border-blue-200 text-blue-700 dark:bg-blue-900/20 dark:border-blue-800 dark:text-blue-300' 
+    : 'bg-orange-50 border-orange-200 text-orange-700 dark:bg-orange-900/20 dark:border-orange-800 dark:text-orange-300'">
+    <i class="pi mt-1 sm:mt-0" [ngClass]="lastLoginMessage.includes('Welcome') ? 'pi-user' : 'pi-shield'"></i>
+    <span class="text-sm font-bold flex-1">{{ lastLoginMessage }}</span>
+    <button (click)="lastLoginMessage = ''" class="ml-auto hover:opacity-70 p-1">
+        <i class="pi pi-times text-xs"></i>
+    </button>
+</div>
+
 <div
     class="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 font-sans transition-colors duration-200 pb-20 lg:pb-0">
 
@@ -200,7 +212,7 @@
 
                     </div>
                 </div>
-                
+
                 <div class="flex items-center justify-between pt-4 border-t border-gray-50 dark:border-gray-700">
                     <div class="flex items-center gap-4 md:gap-8">
                         <div (click)="vote(idea, 'Like')" class="flex items-center gap-1.5 cursor-pointer group"
