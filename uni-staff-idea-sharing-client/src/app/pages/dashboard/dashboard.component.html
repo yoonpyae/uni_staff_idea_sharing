@@ -82,7 +82,7 @@
     </div>
   </header>
 
-  <div class="lg:hidden fixed bottom-6 right-6 flex flex-col-reverse items-end gap-3 z-40">
+  <div *ngIf="userRole === 'QA Manager'" class="lg:hidden fixed bottom-6 right-6 flex flex-col-reverse items-end gap-3 z-40">
     <button (click)="toggleFab()" 
       class="w-14 h-14 bg-blue-600 text-white rounded-full shadow-2xl flex items-center justify-center transition-all duration-300 active:scale-90"
       [ngClass]="{'rotate-45 bg-red-500 shadow-lg': fabOpen}">
