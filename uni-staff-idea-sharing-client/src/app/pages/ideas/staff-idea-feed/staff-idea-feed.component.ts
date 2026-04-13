@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { Component, HostListener, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DropdownModule } from 'primeng/dropdown';
@@ -54,6 +54,8 @@ export class StaffIdeaFeedComponent implements OnInit {
   isDeptLimitReached: boolean = false;
   userDeptID: number = 0;
 
+  lastLoginMessage: string = '';
+
   constructor(
     private ideaService: IdeaService,
     private cookieService: CookieService,
@@ -93,6 +95,7 @@ export class StaffIdeaFeedComponent implements OnInit {
     this.loadIdeas();
     this.loadDepartments();
     this.loadCategories();
+    this.setLastLoginMessage();
   }
 
   // --- THEME & AUTH LOGIC ---
@@ -358,5 +361,22 @@ export class StaffIdeaFeedComponent implements OnInit {
       return now > finalDeadline;
     }
     return false;
+  }
+
+  setLastLoginMessage(): void {
+    const shouldShow = sessionStorage.getItem('showLoginReminder');
+    if (shouldShow !== 'true') return;
+
+    const prevLogin = this.cookieService.get('previousLoginAt');
+    if (!prevLogin || prevLogin === 'first_login') {
+      this.lastLoginMessage = 'Welcome! This is your first time logging into the system.';
+    } else {
+      const datePipe = new DatePipe('en-US');
+      // Direct Wall-clock time display as per your preference
+      const rawTime = prevLogin.split('.')[0].replace('T', ' ');
+      const formattedDate = datePipe.transform(rawTime, 'medium');
+      this.lastLoginMessage = `Security Reminder: Your last login was on ${formattedDate}.`;
+    }
+    sessionStorage.removeItem('showLoginReminder');
   }
 }
