@@ -18,6 +18,7 @@ import { StaffService } from '../../core/services/staff.service';
 export class AccountDetailsComponent implements OnInit {
   isEditing: boolean = false;
   isStaffRole: boolean = false;
+  isChangingPassword: boolean = false;
 
   user: any = {
     staffID: 0,
@@ -32,6 +33,13 @@ export class AccountDetailsComponent implements OnInit {
 
   profilePictureUrl: string = '';
   selectedProfileFile?: File;
+
+  showPasswordModal: boolean = false;
+  passwordData = {
+    old_password: '',
+    new_password: '',
+    new_password_confirmation: ''
+  };
 
   constructor(
     private cookieService: CookieService,
@@ -145,5 +153,39 @@ export class AccountDetailsComponent implements OnInit {
 
   goBack(): void {
     this.location.back();
+  }
+
+  openPasswordModal(): void {
+    this.passwordData = { old_password: '', new_password: '', new_password_confirmation: '' };
+    this.showPasswordModal = true;
+  }
+
+  submitPasswordChange(): void {
+    // Simple frontend validation
+    if (!this.passwordData.old_password || !this.passwordData.new_password) {
+      this.messageService.add({ severity: 'warn', summary: 'Warning', detail: 'Please fill all fields.' });
+      return;
+    }
+
+    if (this.passwordData.new_password !== this.passwordData.new_password_confirmation) {
+      this.messageService.add({ severity: 'error', summary: 'Error', detail: 'New passwords do not match.' });
+      return;
+    }
+
+    this.isChangingPassword = true;
+
+    // Call the backend API
+    this.staffService.changePassword(this.passwordData).subscribe({
+      next: (res: any) => {
+        this.isChangingPassword = false;
+        this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Password changed successfully!' });
+        this.showPasswordModal = false;
+      },
+      error: (err) => {
+        this.isChangingPassword = false;
+        const detail = err.error.message || 'Failed to change password.';
+        this.messageService.add({ severity: 'error', summary: 'Error', detail: detail });
+      }
+    });
   }
 }
