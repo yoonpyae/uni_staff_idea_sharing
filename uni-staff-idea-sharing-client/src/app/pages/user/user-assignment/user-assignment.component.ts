@@ -64,6 +64,7 @@ export class UserAssignmentComponent implements OnInit {
 
     formSubmitted: boolean = false;
     isSubmitting: boolean = false;
+    isResetting: boolean = false;
 
     constructor(
         private route: ActivatedRoute,
@@ -315,18 +316,37 @@ export class UserAssignmentComponent implements OnInit {
             this.messageService.add({
                 severity: 'info',
                 summary: 'Info',
-                detail: 'Password will be sent to user email after account creation',
+                detail: 'Password will be set to Staff123!@# automatically after creation.',
                 life: 3000
             });
             return;
         }
 
-        this.messageService.add({
-            severity: 'info',
-            summary: 'Password Reset',
-            detail: 'Password reset link has been sent to the user\'s email',
-            life: 3000
-        });
+        if (this.user && this.user.staffID) {
+            this.isResetting = true;
+            this.staffService.resetPassword(this.user.staffID).subscribe({
+                next: (res) => {
+                    this.isResetting = false;
+                    if (res.success) {
+                        this.messageService.add({
+                            severity: 'success',
+                            summary: 'Success',
+                            detail: 'Password has been reset to Staff123!@#',
+                            life: 4000
+                        });
+                    }
+                },
+                error: (err) => {
+                    this.isResetting = false;
+                    this.messageService.add({
+                        severity: 'error',
+                        summary: 'Reset Failed',
+                        detail: err.error?.message || 'Could not reset password',
+                        life: 3000
+                    });
+                }
+            });
+        }
     }
 
     goBack(): void {
