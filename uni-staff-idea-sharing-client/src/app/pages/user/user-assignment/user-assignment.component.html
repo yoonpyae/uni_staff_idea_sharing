@@ -21,10 +21,11 @@
       </div>
 
       <div class="flex items-center gap-3 md:gap-4">
-        <button *ngIf="!isCreateMode" (click)="resetPassword()"
-          class="flex items-center justify-center gap-2 w-10 h-10 sm:w-auto sm:h-auto sm:px-6 sm:py-2.5 bg-[#ff9b9b] dark:bg-[#d66b6b] text-gray-900 dark:text-white font-semibold rounded-full shadow-sm hover:bg-[#ff8282] dark:hover:bg-[#b85656] transition-colors flex-shrink-0">
-          <i class="pi pi-key text-lg sm:text-base"></i>
-          <span class="hidden sm:inline text-sm md:text-base">Reset Password</span>
+        <button *ngIf="!isCreateMode" (click)="resetPassword()" [disabled]="isResetting"
+          class="flex items-center justify-center gap-2 w-10 h-10 sm:w-auto sm:h-auto sm:px-6 sm:py-2.5 bg-[#ff9b9b] dark:bg-[#d66b6b] text-gray-900 dark:text-white font-semibold rounded-full shadow-sm hover:bg-[#ff8282] dark:hover:bg-[#b85656] transition-colors disabled:opacity-70">
+          <i class="pi" [ngClass]="isResetting ? 'pi-spin pi-spinner' : 'pi-key'"></i>
+          <span class="hidden sm:inline text-sm md:text-base">{{ isResetting ? 'Resetting...' : 'Reset Password'
+            }}</span>
         </button>
       </div>
     </div>
