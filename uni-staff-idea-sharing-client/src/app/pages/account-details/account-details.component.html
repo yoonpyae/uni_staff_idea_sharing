@@ -98,6 +98,58 @@
             </button>
           </div>
 
+          <div class="pt-4 border-t border-gray-200 dark:border-gray-700 flex items-center justify-center">
+            <button (click)="openPasswordModal()"
+              class="px-6 py-2.5 bg-gray-800 dark:bg-gray-700 text-white text-sm font-bold rounded-xl shadow-sm hover:bg-gray-900 dark:hover:bg-gray-600 transition-all duration-200 flex items-center gap-2 active:scale-[0.98]">
+              <i class="pi pi-key text-xs"></i> Change Account Password
+            </button>
+          </div>
+
+        </div>
+      </div>
+
+      <div *ngIf="showPasswordModal"
+        class="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fadein">
+
+        <div
+          class="bg-white dark:bg-gray-800 rounded-2xl w-full max-w-md p-8 shadow-2xl border border-gray-200 dark:border-gray-700"
+          (click)="$event.stopPropagation()">
+          <h2 class="text-2xl font-bold mb-6 dark:text-white flex items-center gap-3">
+            <i class="pi pi-lock text-[#6FCBF0]"></i> Security Update
+          </h2>
+
+          <div class="space-y-5">
+            <div>
+              <label class="block text-sm font-bold mb-2 text-gray-600 dark:text-gray-400">Current Password</label>
+              <input type="password" [(ngModel)]="passwordData.old_password" placeholder="Enter old password"
+                class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-[#6FCBF0] outline-none dark:text-white transition-all" />
+            </div>
+
+            <div>
+              <label class="block text-sm font-bold mb-2 text-gray-600 dark:text-gray-400">New Password</label>
+              <input type="password" [(ngModel)]="passwordData.new_password" placeholder="Enter new password"
+                class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-[#6FCBF0] outline-none dark:text-white transition-all" />
+            </div>
+
+            <div>
+              <label class="block text-sm font-bold mb-2 text-gray-600 dark:text-gray-400">Confirm New Password</label>
+              <input type="password" [(ngModel)]="passwordData.new_password_confirmation"
+                placeholder="Confirm new password"
+                class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-[#6FCBF0] outline-none dark:text-white transition-all" />
+            </div>
+          </div>
+
+          <div class="flex justify-end gap-3 mt-8">
+            <button (click)="showPasswordModal = false"
+              class="px-6 py-2.5 text-gray-600 dark:text-gray-400 font-bold hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition-colors">
+              Cancel
+            </button>
+            <button (click)="submitPasswordChange()" [disabled]="isChangingPassword"
+              class="px-6 py-2.5 bg-[#6FCBF0] text-gray-900 font-bold rounded-xl hover:bg-[#5dbfe4] transition-all shadow-md active:scale-95 disabled:opacity-70 flex items-center gap-2">
+              <i *ngIf="isChangingPassword" class="pi pi-spin pi-spinner"></i>
+              {{ isChangingPassword ? 'Updating...' : 'Confirm Change' }}
+            </button>
+          </div>
         </div>
       </div>
 
