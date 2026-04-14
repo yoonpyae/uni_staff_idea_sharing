@@ -45,4 +45,16 @@ export class StaffService {
   unhideContent(id: number): Observable<RootModel> {
     return this.httpClient.patch<RootModel>(`${environment.main_url}/staffs/${id}/unhide-content`, {});
   }
+
+  changePassword(data: any): Observable<RootModel> {
+    return this.httpClient.post<RootModel>(`${environment.main_url}/staff/change-password`, data);
+  }
+
+  resetPassword(id: number): Observable<RootModel> {
+    return this.httpClient.patch<RootModel>(`${environment.main_url}/staffs/${id}/reset-password`, {});
+  }
+
+  resetPasswordToDefault(staffID: number): Observable<RootModel> {
+    return this.httpClient.post<RootModel>(`${environment.main_url}/staff/reset-password-default`, { staffID });
+  }
 }
