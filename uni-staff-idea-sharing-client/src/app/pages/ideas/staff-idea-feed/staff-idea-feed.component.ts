@@ -56,6 +56,10 @@ export class StaffIdeaFeedComponent implements OnInit {
 
   lastLoginMessage: string = '';
 
+  currentPage: number = 1;
+  pageSize: number = 5;
+  paginatedIdeas: IdeaModel[] = [];
+
   constructor(
     private ideaService: IdeaService,
     private cookieService: CookieService,
@@ -165,11 +169,31 @@ export class StaffIdeaFeedComponent implements OnInit {
       default: result.sort((a, b) => b.ideaID - a.ideaID); break;
     }
     this.filteredIdeas = result;
+    this.currentPage = 1;
+    this.updatePaginatedIdeas();
   }
 
   setFilter(filter: string): void {
     this.activeFilter = filter;
     this.applyFilters();
+  }
+
+  updatePaginatedIdeas(): void {
+    const startIndex = (this.currentPage - 1) * this.pageSize;
+    const endIndex = startIndex + this.pageSize;
+    this.paginatedIdeas = this.filteredIdeas.slice(startIndex, endIndex);
+  }
+
+  changePage(newPage: number): void {
+    if (newPage < 1 || newPage > this.totalPages) return;
+    this.currentPage = newPage;
+    this.updatePaginatedIdeas();
+    // Scroll to top of the feed for better UX
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  get totalPages(): number {
+    return Math.ceil(this.filteredIdeas.length / this.pageSize) || 1;
   }
 
   // --- INTERACTIONS ---
