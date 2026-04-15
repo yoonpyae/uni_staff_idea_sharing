@@ -21,7 +21,7 @@
             <div class="flex items-start gap-3">
                 <div
                     class="w-10 h-10 md:w-12 md:h-12 rounded-full border-2 border-gray-800 dark:border-gray-600 flex items-center justify-center bg-gray-100 dark:bg-gray-800 flex-shrink-0 overflow-hidden">
-                    <img *ngIf="!idea.isAnonymous && idea.staff?.staffProfile; else defaultUserIcon"
+                    <img *ngIf="(!idea.isAnonymous || canSeeAnonymous) && idea.staff?.staffProfile; else defaultUserIcon"
                         [src]="getProfileUrl(idea.staff?.staffProfile)" class="w-full h-full object-cover" />
                     <ng-template #defaultUserIcon>
                         <i class="pi pi-user text-lg md:text-xl text-gray-600 dark:text-gray-400"></i>
@@ -32,7 +32,14 @@
                     <div class="flex flex-wrap items-center gap-2 md:gap-3">
                         <span class="font-bold text-[16px] md:text-lg"
                             [ngClass]="idea.isAnonymous ? 'text-orange-500 dark:text-orange-400' : 'text-gray-900 dark:text-white'">
-                            {{ idea.isAnonymous ? 'Anonymous' : idea.staff?.staffName || 'Unknown Staff' }}
+
+                            {{ (idea.isAnonymous && !canSeeAnonymous) ? 'Anonymous' : (idea.staff?.staffName || 'Unknown
+                            Staff') }}
+                        </span>
+
+                        <span *ngIf="idea.isAnonymous && canSeeAnonymous"
+                            class="px-2 py-0.5 bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 border border-gray-300 dark:border-gray-600 rounded text-[10px] font-bold uppercase tracking-wider">
+                            Anonymous to Public
                         </span>
 
                         <div class="flex gap-2">
@@ -137,7 +144,7 @@
 
                 <div
                     class="w-8 h-8 md:w-10 md:h-10 rounded-full border-2 border-gray-800 dark:border-gray-600 flex items-center justify-center bg-gray-100 dark:bg-gray-800 flex-shrink-0 overflow-hidden mt-1">
-                    <img *ngIf="!comment.isAnonymous && comment.staff?.staffProfile; else commentUserIcon"
+                    <img *ngIf="(!comment.isAnonymous|| canSeeAnonymous) && comment.staff?.staffProfile; else commentUserIcon"
                         [src]="getProfileUrl(comment.staff?.staffProfile)" class="w-full h-full object-cover" />
                     <ng-template #commentUserIcon>
                         <i class="pi pi-user text-gray-600 dark:text-gray-400"></i>
@@ -149,7 +156,14 @@
                         <div class="flex items-center gap-2 md:gap-3">
                             <span class="font-bold text-[14px] md:text-[15px]"
                                 [ngClass]="comment.isAnonymous ? 'text-orange-500 dark:text-orange-400' : 'text-gray-900 dark:text-white'">
-                                {{ comment.isAnonymous ? 'Anonymous' : comment.staff?.staffName || 'Unknown Staff' }}
+
+                                {{ (comment.isAnonymous && !canSeeAnonymous) ? 'Anonymous' : (comment.staff?.staffName
+                                || 'Unknown Staff') }}
+                            </span>
+
+                            <span *ngIf="comment.isAnonymous && canSeeAnonymous"
+                                class="text-[9px] px-1.5 py-0.5 bg-gray-200 dark:bg-gray-700 rounded text-gray-500 dark:text-gray-400 font-bold uppercase tracking-tighter">
+                                (Anon)
                             </span>
                             <span class="text-[10px] text-gray-400 uppercase font-bold">{{ comment.created_at |
                                 date:'shortTime' }}</span>
