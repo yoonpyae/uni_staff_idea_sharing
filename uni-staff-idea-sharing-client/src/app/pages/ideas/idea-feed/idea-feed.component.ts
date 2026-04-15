@@ -53,6 +53,8 @@ export class IdeaFeedComponent implements OnInit {
   isDeptLimitReached: boolean = false;
   userDeptID: number = 0;
 
+  totalItems: number = 0;
+
   currentPage: number = 1;
   pageSize: number = 5;
   paginatedIdeas: IdeaModel[] = [];
@@ -105,25 +107,21 @@ export class IdeaFeedComponent implements OnInit {
     });
   }
 
-  loadIdeas(): void {
-    this.ideaService.get().subscribe({
-      next: (res) => {
-        const fetchedIdeas = res.data as IdeaModel[];
+  loadIdeas(page: number = 1): void {
+    this.ideaService.getApprovedIdeas(page).subscribe({
+      next: (res: any) => {
+        const paginationData = res.data; // Laravel Paginator Object
 
-        this.ideas = fetchedIdeas.filter(idea => idea.status === 'approved');
-        this.applyFilters();
-        this.isDeptLimitReached = fetchedIdeas.some(idea =>
-          idea.staff?.departmentID === this.userDeptID &&
-          idea.status !== 'deleted' &&
-          idea.closure_setting?.status === 'active'
-        );
+        this.ideas = paginationData.data as IdeaModel[];
+
+        this.currentPage = paginationData.current_page;
+        this.totalItems = paginationData.total;
 
         this.applyFilters();
       },
-      error: (err) => console.error('Error fetching ideas:', err)
+      error: (err) => console.error('Error fetching approved ideas:', err)
     });
   }
-
 
   vote(idea: IdeaModel, type: 'Like' | 'Unlike'): void {
     if (this.isFinalClosurePassed(idea)) {
@@ -213,7 +211,6 @@ export class IdeaFeedComponent implements OnInit {
     }
 
     this.filteredIdeas = result;
-    this.updatePaginatedIdeas();
   }
 
   resetFilters(): void {
@@ -226,21 +223,15 @@ export class IdeaFeedComponent implements OnInit {
     this.applyFilters();
   }
 
-  updatePaginatedIdeas(): void {
-    const startIndex = (this.currentPage - 1) * this.pageSize;
-    const endIndex = startIndex + this.pageSize;
-    this.paginatedIdeas = this.filteredIdeas.slice(startIndex, endIndex);
-  }
-
   changePage(newPage: number): void {
     if (newPage < 1 || newPage > this.totalPages) return;
-    this.currentPage = newPage;
-    this.updatePaginatedIdeas();
-    window.scrollTo({ top: 0, behavior: 'smooth' }); // Scroll to top on page change
+
+    this.loadIdeas(newPage);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   get totalPages(): number {
-    return Math.ceil(this.filteredIdeas.length / this.pageSize) || 1;
+    return Math.ceil(this.totalItems / this.pageSize) || 1;
   }
 
   goToIdeaDetail(idea: IdeaModel): void {
