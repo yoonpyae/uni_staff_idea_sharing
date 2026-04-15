@@ -16,6 +16,10 @@ export class IdeaService {
     return this.httpClient.get<RootModel>(`${environment.main_url}/ideas`);
   }
 
+  getApprovedIdeas(page: number = 1): Observable<RootModel> {
+    return this.httpClient.get<RootModel>(`${environment.main_url}/ideas/approved?page=${page}`);
+  }
+
   getById(id: number): Observable<RootModel> {
     return this.httpClient.get<RootModel>(`${environment.main_url}/ideas/${id}`);
   }
