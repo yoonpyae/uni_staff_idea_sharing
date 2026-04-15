@@ -52,6 +52,11 @@ export class IdeaFeedComponent implements OnInit {
 
   isDeptLimitReached: boolean = false;
   userDeptID: number = 0;
+
+  currentPage: number = 1;
+  pageSize: number = 5;
+  paginatedIdeas: IdeaModel[] = [];
+
   constructor(
     private ideaService: IdeaService,
     private cookieService: CookieService,
@@ -106,10 +111,11 @@ export class IdeaFeedComponent implements OnInit {
         const fetchedIdeas = res.data as IdeaModel[];
 
         this.ideas = fetchedIdeas.filter(idea => idea.status === 'approved');
-
+        this.applyFilters();
         this.isDeptLimitReached = fetchedIdeas.some(idea =>
           idea.staff?.departmentID === this.userDeptID &&
-          idea.status !== 'deleted'
+          idea.status !== 'deleted' &&
+          idea.closure_setting?.status === 'active'
         );
 
         this.applyFilters();
@@ -207,6 +213,7 @@ export class IdeaFeedComponent implements OnInit {
     }
 
     this.filteredIdeas = result;
+    this.updatePaginatedIdeas();
   }
 
   resetFilters(): void {
@@ -217,6 +224,23 @@ export class IdeaFeedComponent implements OnInit {
     this.selectedCat = null;
 
     this.applyFilters();
+  }
+
+  updatePaginatedIdeas(): void {
+    const startIndex = (this.currentPage - 1) * this.pageSize;
+    const endIndex = startIndex + this.pageSize;
+    this.paginatedIdeas = this.filteredIdeas.slice(startIndex, endIndex);
+  }
+
+  changePage(newPage: number): void {
+    if (newPage < 1 || newPage > this.totalPages) return;
+    this.currentPage = newPage;
+    this.updatePaginatedIdeas();
+    window.scrollTo({ top: 0, behavior: 'smooth' }); // Scroll to top on page change
+  }
+
+  get totalPages(): number {
+    return Math.ceil(this.filteredIdeas.length / this.pageSize) || 1;
   }
 
   goToIdeaDetail(idea: IdeaModel): void {
