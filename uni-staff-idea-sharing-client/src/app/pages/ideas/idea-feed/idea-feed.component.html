@@ -85,7 +85,7 @@
             <p class="text-lg">No ideas found.</p>
         </div>
 
-        <div *ngFor="let idea of paginatedIdeas"
+        <div *ngFor="let idea of filteredIdeas"
             class="border-b border-gray-200 dark:border-gray-700 py-6 md:py-8 first:pt-0 last:border-0 relative transition-all duration-300"
             [ngClass]="{'opacity-50 pointer-events-none grayscale': isNavigating}">
 
@@ -209,7 +209,7 @@
             </div>
         </div>
 
-        <div *ngIf="filteredIdeas.length > pageSize"
+        <div *ngIf="totalItems > pageSize"
             class="mt-10 mb-20 flex flex-col sm:flex-row items-center justify-center gap-4 border-t border-gray-200 dark:border-gray-700 pt-8">
 
             <button (click)="changePage(currentPage - 1)" [disabled]="currentPage === 1"
