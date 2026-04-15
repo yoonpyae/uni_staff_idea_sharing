@@ -46,7 +46,7 @@ export class IdeaDeatilComponent implements OnInit {
 
   isFinalClosurePassed: boolean = false;
   editingCommentId: number | null = null;
-
+  canSeeAnonymous: boolean = false;
   constructor(
     private route: ActivatedRoute,
     private location: Location,
@@ -64,8 +64,12 @@ export class IdeaDeatilComponent implements OnInit {
   ngOnInit(): void {
     this.userRole = this.cookieService.get('roleName') || 'Guest';
     this.userName = this.cookieService.get('staffName') || 'Guest';
+    
     const staffIDStr = this.cookieService.get('staffID');
     this.currentStaffID = staffIDStr ? Number(staffIDStr) : 1;
+
+    const authorizedRoles = ['Administrator', 'QA Manager', 'QA Coordinator'];
+    this.canSeeAnonymous = authorizedRoles.includes(this.userRole);
 
     this.route.paramMap.subscribe(params => {
       const id = params.get('id');
@@ -89,37 +93,37 @@ export class IdeaDeatilComponent implements OnInit {
 
   // --- Download Zip Logic (Placeholder) ---
   downloadIdeaAsZip(): void {
-  // Ensure we have a closure setting ID linked to this idea
-  const settingID = this.idea?.settingID;
-  
-  if (!settingID) {
-    this.messageService.add({ 
-      severity: 'warn', 
-      summary: 'Not Available', 
-      detail: 'This idea is not associated with an academic year closure.' 
-    });
-    return;
-  }
+    // Ensure we have a closure setting ID linked to this idea
+    const settingID = this.idea?.settingID;
 
-  this.showIdeaMenu = false;
-  this.messageService.add({ severity: 'info', summary: 'Downloading', detail: 'Preparing your ZIP file...' });
-
-  // Call the service method
-  this.closureService.downloadZip(settingID).subscribe({
-    next: (res) => {
-      if (res.success && res.data.downloadUrl) {
-        // Trigger the browser download
-        window.location.href = res.data.downloadUrl;
-        this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Download started.' });
-      }
-    },
-    error: (err) => {
-      // Handle cases where closure date hasn't passed or no files exist
-      const errorMsg = err.error?.message || 'Failed to download documents.';
-      this.messageService.add({ severity: 'error', summary: 'Download Failed', detail: errorMsg });
+    if (!settingID) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Not Available',
+        detail: 'This idea is not associated with an academic year closure.'
+      });
+      return;
     }
-  });
-}
+
+    this.showIdeaMenu = false;
+    this.messageService.add({ severity: 'info', summary: 'Downloading', detail: 'Preparing your ZIP file...' });
+
+    // Call the service method
+    this.closureService.downloadZip(settingID).subscribe({
+      next: (res) => {
+        if (res.success && res.data.downloadUrl) {
+          // Trigger the browser download
+          window.location.href = res.data.downloadUrl;
+          this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Download started.' });
+        }
+      },
+      error: (err) => {
+        // Handle cases where closure date hasn't passed or no files exist
+        const errorMsg = err.error?.message || 'Failed to download documents.';
+        this.messageService.add({ severity: 'error', summary: 'Download Failed', detail: errorMsg });
+      }
+    });
+  }
   // --- Report Logic ---
   openReportModal(type: 'idea' | 'comment', id: number | undefined): void {
     if (!id) return;
