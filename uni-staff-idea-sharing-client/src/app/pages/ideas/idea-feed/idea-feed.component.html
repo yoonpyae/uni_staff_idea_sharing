@@ -85,7 +85,7 @@
             <p class="text-lg">No ideas found.</p>
         </div>
 
-        <div *ngFor="let idea of filteredIdeas"
+        <div *ngFor="let idea of paginatedIdeas"
             class="border-b border-gray-200 dark:border-gray-700 py-6 md:py-8 first:pt-0 last:border-0 relative transition-all duration-300"
             [ngClass]="{'opacity-50 pointer-events-none grayscale': isNavigating}">
 
@@ -93,7 +93,7 @@
                 <div class="flex items-start gap-3">
                     <div
                         class="w-10 h-10 md:w-12 md:h-12 rounded-full border border-gray-300 dark:border-gray-600 flex items-center justify-center bg-gray-100 dark:bg-gray-800 flex-shrink-0 overflow-hidden">
-                        <img *ngIf="!idea.isAnonymous && idea.staff?.staffProfile; else defaultUserIcon"
+                        <img *ngIf="idea.staff?.staffProfile; else defaultUserIcon"
                             [src]="getProfileUrl(idea.staff?.staffProfile)" alt="Profile Photo"
                             class="w-full h-full object-cover" />
                         <ng-template #defaultUserIcon>
@@ -104,8 +104,14 @@
                     <div class="flex flex-col mt-0.5">
                         <div class="flex flex-wrap items-center gap-2 md:gap-3">
                             <span class="font-bold text-[16px] md:text-[17px] text-gray-900 dark:text-white">
-                                {{ idea.isAnonymous ? 'Anonymous' : idea.staff?.staffName || 'Unknown Staff' }}
+                                {{ idea.staff?.staffName || 'Unknown Staff' }}
                             </span>
+
+                            <span *ngIf="idea.isAnonymous"
+                                class="px-2 py-0.5 bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 border border-gray-300 dark:border-gray-600 rounded text-[10px] font-bold uppercase tracking-wider">
+                                Anonymous to Public
+                            </span>
+
                             <span *ngIf="idea.categories && idea.categories.length > 0"
                                 class="px-3 py-0.5 border border-gray-400 dark:border-gray-500 text-gray-600 dark:text-gray-300 rounded-full text-[11px] md:text-xs font-medium bg-white dark:bg-gray-800">
                                 {{ idea.categories[0].categoryname }}
@@ -160,7 +166,7 @@
                     <a [href]="getDocUrl(doc.docPath)" target="_blank" class="flex items-center gap-2.5 no-underline">
                         <i class="pi text-lg"
                             [ngClass]="getFileIcon(doc.docPath) + ' ' + getFileColor(doc.docPath)"></i>
-                        <span class="text-[13.5px] font-medium text-[#1E88E5] ...">
+                        <span class="text-[13.5px] font-medium text-[#1E88E5]">
                             {{ getFileName(doc.docPath) }}
                         </span>
                     </a>
@@ -201,7 +207,29 @@
                     <span>{{ idea.viewCount || 0 }}</span>
                 </div>
             </div>
+        </div>
 
+        <div *ngIf="filteredIdeas.length > pageSize"
+            class="mt-10 mb-20 flex flex-col sm:flex-row items-center justify-center gap-4 border-t border-gray-200 dark:border-gray-700 pt-8">
+
+            <button (click)="changePage(currentPage - 1)" [disabled]="currentPage === 1"
+                class="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300 disabled:opacity-50 transition-colors">
+                <i class="pi pi-angle-left"></i> Previous
+            </button>
+
+            <div class="flex items-center gap-2 font-medium">
+                <span class="text-sm text-gray-500">Page</span>
+                <span
+                    class="px-3 py-1 bg-[#a8e6cf] dark:bg-[#2c5f5d] text-gray-900 dark:text-white rounded-md shadow-sm">
+                    {{ currentPage }}
+                </span>
+                <span class="text-sm text-gray-500">of {{ totalPages }}</span>
+            </div>
+
+            <button (click)="changePage(currentPage + 1)" [disabled]="currentPage === totalPages"
+                class="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300 disabled:opacity-50 transition-colors">
+                Next <i class="pi pi-angle-right"></i>
+            </button>
         </div>
     </div>
 
