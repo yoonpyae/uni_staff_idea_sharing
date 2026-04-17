@@ -24,6 +24,9 @@ export class IdeaService {
     return this.httpClient.get<RootModel>(`${environment.main_url}/ideas/${id}`);
   }
 
+  getPendingIdeasByDepartment(departmentID: number): Observable<RootModel> {
+    return this.httpClient.get<RootModel>(`${environment.main_url}/ideas/pending/department/${departmentID}`);
+  }
   increaseViewCount(id: number): Observable<RootModel> {
     return this.httpClient.post<RootModel>(`${environment.main_url}/ideas/${id}/increase-view`, {});
   }
