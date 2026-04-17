@@ -60,6 +60,9 @@ export class StaffIdeaFeedComponent implements OnInit {
   pageSize: number = 5;
   paginatedIdeas: IdeaModel[] = [];
 
+  totalItems: number = 0;
+  isLoading: boolean = false;
+
   constructor(
     private ideaService: IdeaService,
     private cookieService: CookieService,
@@ -135,18 +138,35 @@ export class StaffIdeaFeedComponent implements OnInit {
     });
   }
 
-  loadIdeas(): void {
-    this.ideaService.get().subscribe({
-      next: (res) => {
-        const fetchedIdeas = res.data as IdeaModel[];
-        this.ideas = fetchedIdeas.filter(idea => idea.status === 'approved');
-        this.isDeptLimitReached = fetchedIdeas.some(idea =>
+  get totalPages(): number {
+    return Math.ceil(this.totalItems / this.pageSize) || 1;
+  }
+
+  loadIdeas(page: number = 1): void {
+    this.isLoading = true;
+    this.ideaService.getApprovedIdeas(page).subscribe({
+      next: (res: any) => {
+        const paginationData = res.data; // This is the Laravel Paginator Object
+
+        this.ideas = paginationData.data as IdeaModel[];
+
+        this.currentPage = paginationData.current_page;
+        this.totalItems = paginationData.total;
+
+        this.isDeptLimitReached = this.ideas.some(idea =>
           idea.staff?.departmentID === this.userDeptID &&
-          idea.status !== 'deleted'
+          idea.status !== 'deleted' &&
+          idea.closure_setting?.status === 'active'
         );
 
         this.applyFilters();
+        this.isLoading = false;
+      },
+      error: (err) => {
+        this.isLoading = false; 
+        console.error('Error fetching approved ideas:', err);
       }
+
     });
   }
 
@@ -159,6 +179,7 @@ export class StaffIdeaFeedComponent implements OnInit {
         idea.title.toLowerCase().includes(q) || idea.description.toLowerCase().includes(q)
       );
     }
+
     if (this.selectedCat) result = result.filter(idea => idea.categories?.some(c => c.categoryID == this.selectedCat));
     if (this.selectedDept) result = result.filter(idea => idea.staff?.departmentID == this.selectedDept);
 
@@ -168,9 +189,15 @@ export class StaffIdeaFeedComponent implements OnInit {
       case 'Most Viewed': result.sort((a, b) => (b.viewCount || 0) - (a.viewCount || 0)); break;
       default: result.sort((a, b) => b.ideaID - a.ideaID); break;
     }
+
     this.filteredIdeas = result;
-    this.currentPage = 1;
-    this.updatePaginatedIdeas();
+  }
+
+  changePage(newPage: number): void {
+    if (newPage < 1 || newPage > this.totalPages) return;
+
+    this.loadIdeas(newPage); // API call: ?page=newPage
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   setFilter(filter: string): void {
@@ -182,18 +209,6 @@ export class StaffIdeaFeedComponent implements OnInit {
     const startIndex = (this.currentPage - 1) * this.pageSize;
     const endIndex = startIndex + this.pageSize;
     this.paginatedIdeas = this.filteredIdeas.slice(startIndex, endIndex);
-  }
-
-  changePage(newPage: number): void {
-    if (newPage < 1 || newPage > this.totalPages) return;
-    this.currentPage = newPage;
-    this.updatePaginatedIdeas();
-    // Scroll to top of the feed for better UX
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
-
-  get totalPages(): number {
-    return Math.ceil(this.filteredIdeas.length / this.pageSize) || 1;
   }
 
   // --- INTERACTIONS ---
