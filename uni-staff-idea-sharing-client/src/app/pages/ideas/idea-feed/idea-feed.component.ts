@@ -117,6 +117,12 @@ export class IdeaFeedComponent implements OnInit {
         this.currentPage = paginationData.current_page;
         this.totalItems = paginationData.total;
 
+        this.isDeptLimitReached = this.ideas.some(idea =>
+          idea.staff?.departmentID === this.userDeptID &&
+          idea.status !== 'deleted' &&
+          idea.closure_setting?.status === 'active'
+        );
+
         this.applyFilters();
       },
       error: (err) => console.error('Error fetching approved ideas:', err)
