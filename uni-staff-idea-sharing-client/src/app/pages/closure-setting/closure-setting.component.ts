@@ -104,10 +104,17 @@ export class ClosureSettingComponent implements OnInit {
   saveSetting(): void {
     if (this.closureForm.invalid) {
       this.closureForm.markAllAsTouched();
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Validation',
+        detail: 'Please fill in all required fields.'
+      });
       return;
     }
 
     const formValues = this.closureForm.value;
+    const ideaDate = new Date(formValues.closureDate);
+    const finalDate = new Date(formValues.finalclosureDate);
     const payload: ClosureSettingModel = {
       title: formValues.title,
       closureDate: this.formatDate(formValues.closureDate),
@@ -115,6 +122,15 @@ export class ClosureSettingComponent implements OnInit {
       academicYear: formValues.academicYear,
       status: formValues.status
     };
+
+    if (finalDate < ideaDate) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Invalid Dates',
+        detail: 'Final Closure Date cannot be earlier than Idea Closure Date.'
+      });
+      return;
+    }
 
     if (this.isEditMode && formValues.settingID) {
       this.closureSettingService.update(formValues.settingID, payload).subscribe({
