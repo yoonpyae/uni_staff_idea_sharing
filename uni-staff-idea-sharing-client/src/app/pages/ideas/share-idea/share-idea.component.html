@@ -118,12 +118,15 @@
         <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mt-4 gap-6 sm:gap-0">
 
             <div class="flex items-center gap-3">
-                <input type="checkbox" id="terms" [(ngModel)]="agreedToTerms" [disabled]="isSubmitting"
+                <input type="checkbox" id="terms" [(ngModel)]="agreedToTerms"
+                    [disabled]="isSubmitting || alreadyAcceptedTerms"
                     class="w-5 h-5 rounded border-gray-400 dark:border-gray-500 text-[#6FCBF0] dark:bg-gray-800 focus:ring-[#6FCBF0] cursor-pointer disabled:opacity-50 transition-colors" />
+
                 <label for="terms"
-                    class="font-bold text-gray-800 dark:text-gray-200 cursor-pointer text-sm md:text-base transition-colors"
-                    [class.opacity-50]="isSubmitting">
+                    class="font-bold text-gray-800 dark:text-gray-200 text-sm md:text-base transition-colors"
+                    [ngClass]="(isSubmitting || alreadyAcceptedTerms) ? 'opacity-50 cursor-default' : 'cursor-pointer'">
                     I agree to terms and conditions
+                    <span *ngIf="alreadyAcceptedTerms" class="text-[#6FCBF0] text-xs ml-2">(Already Accepted)</span>
                 </label>
             </div>
 
