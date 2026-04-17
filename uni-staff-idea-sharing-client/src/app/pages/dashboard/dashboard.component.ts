@@ -311,7 +311,13 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
           this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Download started' });
         }
       },
-      error: (err) => { /* error logic */ }
+       error: (err) => {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Failed',
+          detail: err.error.message || 'Download restricted until after closure date.'
+        });
+      }
     });
   }
 
