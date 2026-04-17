@@ -114,7 +114,12 @@
                     <label
                         class="block text-sm md:text-base font-bold text-gray-800 dark:text-gray-200 mb-1.5 md:mb-2">Title:</label>
                     <input type="text" formControlName="title" placeholder="Enter title for the closure date..."
-                        class="w-full px-4 py-3 text-sm md:text-base bg-[#e8e8e8] dark:bg-gray-700 text-gray-800 dark:text-white rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-[#6FCBF0] transition-all" />
+                        class="w-full px-4 py-3 text-sm md:text-base bg-[#e8e8e8] dark:bg-gray-700 text-gray-800 dark:text-white rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-[#6FCBF0] transition-all"
+                        [ngClass]="{'border-red-500 ring-2 ring-red-200': closureForm.get('title')?.touched && closureForm.get('title')?.invalid}" />
+                    <small *ngIf="closureForm.get('title')?.touched && closureForm.get('title')?.invalid"
+                        class="text-red-500 font-bold mt-1 block">
+                        Title is required.
+                    </small>
                 </div>
 
                 <div>
@@ -126,6 +131,10 @@
                         [style]="{'width':'100%'}"
                         class="block w-full rounded-xl focus-within:ring-2 focus-within:ring-[#6FCBF0] transition-all [&_.p-inputtext]:bg-[#e8e8e8] dark:[&_.p-inputtext]:bg-gray-700 [&_.p-inputtext]:text-gray-800 dark:[&_.p-inputtext]:text-white [&_.p-inputtext]:border-none [&_.p-inputtext]:py-3 [&_.p-inputtext]:px-4 [&_.p-inputtext]:rounded-l-xl [&_.p-inputtext]:text-sm md:[&_.p-inputtext]:text-base [&_.p-datepicker-trigger]:bg-[#e8e8e8] dark:[&_.p-datepicker-trigger]:bg-gray-700 [&_.p-datepicker-trigger]:border-none [&_.p-datepicker-trigger]:rounded-r-xl [&_.p-datepicker-trigger]:text-gray-600 dark:[&_.p-datepicker-trigger]:text-gray-300">
                     </p-date-picker>
+                    <small *ngIf="closureForm.get('closureDate')?.touched && closureForm.get('closureDate')?.invalid"
+                        class="text-red-500 font-bold mt-1 block">
+                        Idea closure date is required.
+                    </small>
                 </div>
 
                 <div>
@@ -137,6 +146,11 @@
                         [style]="{'width':'100%'}"
                         class="block w-full rounded-xl focus-within:ring-2 focus-within:ring-[#6FCBF0] transition-all [&_.p-inputtext]:bg-[#e8e8e8] dark:[&_.p-inputtext]:bg-gray-700 [&_.p-inputtext]:text-gray-800 dark:[&_.p-inputtext]:text-white [&_.p-inputtext]:border-none [&_.p-inputtext]:py-3 [&_.p-inputtext]:px-4 [&_.p-inputtext]:rounded-l-xl [&_.p-inputtext]:text-sm md:[&_.p-inputtext]:text-base [&_.p-datepicker-trigger]:bg-[#e8e8e8] dark:[&_.p-datepicker-trigger]:bg-gray-700 [&_.p-datepicker-trigger]:border-none [&_.p-datepicker-trigger]:rounded-r-xl [&_.p-datepicker-trigger]:text-gray-600 dark:[&_.p-datepicker-trigger]:text-gray-300">
                     </p-date-picker>
+                    <small
+                        *ngIf="closureForm.get('finalclosureDate')?.touched && closureForm.get('finalclosureDate')?.invalid"
+                        class="text-red-500 font-bold mt-1 block">
+                        Final closure date is required.
+                    </small>
                 </div>
 
                 <div>
@@ -145,20 +159,10 @@
                         Year:</label>
                     <input type="text" formControlName="academicYear" placeholder="eg., 2026 - 2027"
                         class="w-full px-4 py-3 text-sm md:text-base bg-[#e8e8e8] dark:bg-gray-700 text-gray-800 dark:text-white rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-[#6FCBF0] transition-all" />
-                </div>
-
-                <div>
-                    <label class="block text-sm md:text-base font-bold text-gray-800 dark:text-gray-200 mb-1.5 md:mb-2">
-                        Status:
-                    </label>
-                    <select formControlName="status"
-                        class="w-full px-4 py-3 text-sm md:text-base bg-[#e8e8e8] dark:bg-gray-700 text-gray-800 dark:text-white rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-[#6FCBF0] transition-all cursor-pointer">
-                        <option value="active">Active</option>
-                        <option value="inactive">Inactive</option>
-                    </select>
-                    <p class="mt-2 text-xs text-gray-500 italic">
-                        *Inactive closures are hidden from Staff and cannot receive new ideas.
-                    </p>
+                    <small *ngIf="closureForm.get('academicYear')?.touched && closureForm.get('academicYear')?.invalid"
+                        class="text-red-500 font-bold mt-1 block">
+                        Academic year is required (e.g., 2026 - 2027).
+                    </small>
                 </div>
 
                 <div class="flex flex-row justify-center gap-3 md:gap-4 pt-4 md:pt-6 w-full">
