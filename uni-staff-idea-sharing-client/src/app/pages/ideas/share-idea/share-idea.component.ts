@@ -38,6 +38,7 @@ export class ShareIdeaComponent implements OnInit, OnDestroy {
   description: string = '';
   selectedCategoryIds: number[] = [];
   agreedToTerms: boolean = false;
+  alreadyAcceptedTerms: boolean = false;
   selectedFiles: File[] = [];
 
   categories: CategoryModel[] = [];
@@ -83,6 +84,8 @@ export class ShareIdeaComponent implements OnInit, OnDestroy {
     this.name = name;
     this.staffID = staffID;
     this.profilePicture = profilePicture;
+
+    this.loadStaffDetails();
 
     if (profilePicture) {
       if (profilePicture.startsWith('http') || profilePicture.startsWith('data:')) {
@@ -133,6 +136,20 @@ export class ShareIdeaComponent implements OnInit, OnDestroy {
     });
   }
 
+  loadStaffDetails(): void {
+    if (!this.staffID) return;
+
+    this.staffService.getById(Number(this.staffID)).subscribe({
+      next: (res: any) => {
+        const staff = res.data;
+        if (staff && staff.termsAccepted) {
+          this.agreedToTerms = true;
+          this.alreadyAcceptedTerms = true;
+        }
+      },
+      error: (err) => console.error('Failed to load staff details', err)
+    });
+  }
   onFileSelect(event: any): void {
     if (event.target.files && event.target.files.length > 0) {
       const files = Array.from(event.target.files) as File[];
@@ -167,22 +184,28 @@ export class ShareIdeaComponent implements OnInit, OnDestroy {
       this.loadingSeconds++;
     }, 1000);
 
-    const today = new Date().toISOString().split('T')[0];
-    const termsPayload = {
-      termsAccepted: 1,
-      termsAcceptedDate: today
-    };
+    if (this.alreadyAcceptedTerms) {
+      this.postIdeaData(this.isAnonymous);
+    } else {
+      // If it's their first time accepting, update the staff record first
+      const today = new Date().toISOString().split('T')[0];
+      const termsPayload = {
+        termsAccepted: 1,
+        termsAcceptedDate: today
+      };
 
-    this.staffService.update(Number(this.staffID), termsPayload).subscribe({
-      next: () => {
-        this.postIdeaData(this.isAnonymous);
-      },
-      error: (err) => {
-        this.stopLoadingTimer();
-        console.error('Failed to update terms:', err);
-        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to accept terms. Please try again.' });
-      }
-    });
+      this.staffService.update(Number(this.staffID), termsPayload).subscribe({
+        next: () => {
+          this.alreadyAcceptedTerms = true; // Mark as accepted for any subsequent edits
+          this.postIdeaData(this.isAnonymous);
+        },
+        error: (err) => {
+          this.stopLoadingTimer();
+          console.error('Failed to update terms:', err);
+          this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to accept terms. Please try again.' });
+        }
+      });
+    }
   }
 
   private postIdeaData(isAnonymous: boolean): void {
@@ -279,13 +302,14 @@ export class ShareIdeaComponent implements OnInit, OnDestroy {
 
   checkDepartmentSubmissionLimit(): void {
     this.ideaService.get().subscribe({
-      next: (res) => {
-        const ideas = res.data as IdeaModel[];
+      next: (res: any) => {
+        const ideas = res.data.data as IdeaModel[];
         const userDeptID = this.cookieService.get('departmentID');
 
         const deptIdeaExists = ideas.some(idea =>
           idea.staff?.departmentID === Number(userDeptID) &&
-          idea.status !== 'deleted'
+          idea.status !== 'deleted' &&
+          idea.closure_setting?.status === 'active' // Ensure it's for the current active period
         );
 
         if (deptIdeaExists && !this.isEditMode) {
