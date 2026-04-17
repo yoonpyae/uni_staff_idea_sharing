@@ -166,7 +166,7 @@ export class ClosureSettingComponent implements OnInit {
               this.messageService.add({ severity: 'success', summary: 'Deactivated', detail: 'Closure setting marked as inactive' });
               this.loadSettings();
             },
-            error: () => this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to deactivate' })
+            error: (err: any) => this.messageService.add({ severity: 'error', summary: 'Error', detail: err.error.message || 'Failed to deactivate' })
           });
         }
       }
