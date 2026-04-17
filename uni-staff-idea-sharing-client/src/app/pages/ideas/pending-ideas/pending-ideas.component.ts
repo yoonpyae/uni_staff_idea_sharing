@@ -64,24 +64,25 @@ export class PendingIdeasComponent implements OnInit {
         }
       },
       error: (err) => {
-        console.error('Failed to fetch department name'+ ' Department', err);
+        console.error('Failed to fetch department name' + ' Department', err);
         this.departmentName = 'Your Department';
       }
     });
   }
 
   loadPendingIdeas(): void {
-    this.ideaService.get().subscribe({
-      next: (res) => {
-        const allIdeas = res.data as IdeaModel[];
-        this.pendingIdeas = allIdeas.filter(idea =>
-          idea.status === 'pending' &&
-          idea.staff?.departmentID === this.coordinatorDeptId
-        );
-        this.applySearch();
-      },
-      error: (err) => console.error('Failed to load ideas', err)
-    });
+    if (this.coordinatorDeptId > 0) {
+      this.ideaService.getPendingIdeasByDepartment(this.coordinatorDeptId).subscribe({
+        next: (res) => {
+          this.pendingIdeas = res.data as IdeaModel[];
+          this.applySearch();
+        },
+        error: (err) => {
+          console.error('Failed to load pending ideas for department', err);
+          this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Could not load pending ideas.' });
+        }
+      });
+    }
   }
 
   loadClosureSettings(): void {
