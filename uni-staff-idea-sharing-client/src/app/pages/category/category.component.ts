@@ -61,7 +61,7 @@ export class CategoryComponent implements OnInit {
   public categoryForm: FormGroup = this.formBuilder.group({
     categoryID: [0],
     categoryname: ['', Validators.required],
-    status:[],
+    status: [],
     created_at: [''],
     updated_at: ['']
   });
@@ -175,6 +175,20 @@ export class CategoryComponent implements OnInit {
               life: 3000
             });
             this.loadCategories();
+          },
+          // CAPTURE BACKEND ERROR
+          error: (err) => {
+            console.error('Category deactivation failed:', err);
+
+            // Extract the message from the backend response or use a fallback
+            const errorMessage = err.error.message || `Failed to deactivate ${category.categoryname}. Please try again.`;
+
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Error',
+              detail: errorMessage,
+              life: 5000 // Error messages usually stay longer for readability
+            });
           }
         });
       }
