@@ -129,7 +129,7 @@
                 <p class="text-gray-500 font-medium">No ideas match your criteria.</p>
             </div>
 
-            <div *ngFor="let idea of paginatedIdeas"
+            <div *ngFor="let idea of filteredIdeas"
                 class="bg-white dark:bg-gray-800 rounded-3xl p-5 md:p-6 shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-md transition-shadow">
 
                 <div class="flex justify-between items-start mb-4">
@@ -231,12 +231,12 @@
                     </div>
                 </div>
             </div>
-            <div *ngIf="filteredIdeas.length > pageSize"
+            <div *ngIf="totalItems > pageSize"
                 class="mt-10 mb-10 flex flex-col sm:flex-row items-center justify-center gap-4 py-6 border-t border-gray-100 dark:border-gray-800">
 
-                <button (click)="changePage(currentPage - 1)" [disabled]="currentPage === 1"
+                <button (click)="changePage(currentPage - 1)" [disabled]="currentPage === 1 || isLoading"
                     class="flex items-center gap-2 px-5 py-2 rounded-xl bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 disabled:opacity-30 transition-all active:scale-95 shadow-sm">
-                    <i class="pi pi-chevron-left text-xs"></i>
+                    <i class="pi" [ngClass]="isLoading ? 'pi-spin pi-spinner' : 'pi-chevron-left text-xs'"></i>
                     <span class="font-bold text-xs uppercase tracking-widest">Prev</span>
                 </button>
 
@@ -247,12 +247,13 @@
                     <span class="text-sm font-black dark:text-white">{{ totalPages }}</span>
                 </div>
 
-                <button (click)="changePage(currentPage + 1)" [disabled]="currentPage === totalPages"
+                <button (click)="changePage(currentPage + 1)" [disabled]="currentPage === totalPages || isLoading"
                     class="flex items-center gap-2 px-5 py-2 rounded-xl bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 disabled:opacity-30 transition-all active:scale-95 shadow-sm">
                     <span class="font-bold text-xs uppercase tracking-widest">Next</span>
-                    <i class="pi pi-chevron-right text-xs"></i>
+                    <i class="pi" [ngClass]="isLoading ? 'pi-spin pi-spinner' : 'pi-chevron-right text-xs'"></i>
                 </button>
             </div>
+
         </div>
     </main>
 
