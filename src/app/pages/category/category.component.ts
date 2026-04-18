@@ -138,7 +138,7 @@ export class CategoryComponent implements OnInit {
         },
         error: (err) => {
           console.error('Update category failed:', err);
-          this.messageService.add({ severity: 'error', summary: 'Update Failed', detail: err?.error?.message || 'Failed to update category' });
+          this.messageService.add({ severity: 'error', summary: 'Update Failed', detail: err.error.message || 'Failed to update category' });
         }
       });
     } else {
@@ -153,7 +153,7 @@ export class CategoryComponent implements OnInit {
         },
         error: (err) => {
           console.error('Create category failed:', err);
-          this.messageService.add({ severity: 'error', summary: 'Create Failed', detail: err?.error?.message || 'Failed to create category' });
+          this.messageService.add({ severity: 'error', summary: 'Create Failed', detail: err.error.message || 'Failed to create category' });
         }
       });
     }

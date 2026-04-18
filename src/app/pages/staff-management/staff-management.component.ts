@@ -176,7 +176,7 @@ export class StaffManagementComponent implements OnInit {
         this.messageService.add({
           severity: 'error',
           summary: 'Update Failed',
-          detail: err.error?.message || 'Could not change account status',
+          detail: err.error.message || 'Could not change account status',
           life: 3000
         });
       }

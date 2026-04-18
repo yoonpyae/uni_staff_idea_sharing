@@ -95,7 +95,7 @@ export class LoginComponent implements OnInit {
         this.messageService.add({
           severity: 'error',
           summary: 'Login Failed',
-          detail: err?.error?.message || err?.message || 'Unable to login',
+          detail: err.error.message || err.message || 'Unable to login',
           key: environment.default_toastKey
         });
       }

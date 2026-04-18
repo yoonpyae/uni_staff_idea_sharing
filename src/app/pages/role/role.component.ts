@@ -130,7 +130,7 @@ export class RoleComponent implements OnInit {
         },
         error: (err) => {
           console.error('Update role failed:', err);
-          this.messageService.add({ severity: 'error', summary: 'Update Failed', detail: err?.error?.message || 'Failed to update role' });
+          this.messageService.add({ severity: 'error', summary: 'Update Failed', detail: err.error.message || 'Failed to update role' });
         }
       });
     } else {
@@ -144,7 +144,7 @@ export class RoleComponent implements OnInit {
         },
         error: (err) => {
           console.error('Create role failed:', err);
-          this.messageService.add({ severity: 'error', summary: 'Create Failed', detail: err?.error?.message || 'Failed to create role' });
+          this.messageService.add({ severity: 'error', summary: 'Create Failed', detail: err.error.message || 'Failed to create role' });
         }
       });
     }

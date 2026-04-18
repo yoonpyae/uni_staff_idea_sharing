@@ -145,7 +145,7 @@ export class AccountDetailsComponent implements OnInit {
         }
       },
       error: (err) => {
-        const detail = err?.error?.message || 'Failed to update profile.';
+        const detail = err?.error.message || 'Failed to update profile.';
         this.messageService.add({ severity: 'error', summary: 'Update Failed', detail });
       }
     });

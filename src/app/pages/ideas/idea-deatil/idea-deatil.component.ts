@@ -119,7 +119,7 @@ export class IdeaDeatilComponent implements OnInit {
       },
       error: (err) => {
         // Handle cases where closure date hasn't passed or no files exist
-        const errorMsg = err.error?.message || 'Failed to download documents.';
+        const errorMsg = err.error.message || 'Failed to download documents.';
         this.messageService.add({ severity: 'error', summary: 'Download Failed', detail: errorMsg });
       }
     });

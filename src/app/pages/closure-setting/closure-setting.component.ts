@@ -174,7 +174,7 @@ export class ClosureSettingComponent implements OnInit {
   }
 
   private handleApiError(err: any): void {
-    const msg = err.error?.message || 'An error occurred';
+    const msg = err.error.message || 'An error occurred';
     this.messageService.add({ severity: 'error', summary: 'Error', detail: msg });
   }
 }

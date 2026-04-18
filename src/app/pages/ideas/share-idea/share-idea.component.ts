@@ -234,7 +234,7 @@ export class ShareIdeaComponent implements OnInit, OnDestroy {
         error: (err) => {
           this.stopLoadingTimer();
           console.error('Error updating idea:', err);
-          const errorDetail = err.error?.message || 'Failed to update idea.';
+          const errorDetail = err.error.message || 'Failed to update idea.';
           this.messageService.add({ severity: 'error', summary: 'Error', detail: errorDetail });
         }
       });
@@ -249,7 +249,7 @@ export class ShareIdeaComponent implements OnInit, OnDestroy {
         error: (err) => {
           this.stopLoadingTimer();
           console.error('Error posting idea:', err);
-          const errorDetail = err.error?.message || 'Failed to post idea.';
+          const errorDetail = err.error.message || 'Failed to post idea.';
           this.messageService.add({ severity: 'error', summary: 'Error', detail: errorDetail });
         }
       });

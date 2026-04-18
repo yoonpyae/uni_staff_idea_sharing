@@ -332,7 +332,7 @@ export class StaffIdeaFeedComponent implements OnInit {
         this.router.navigate(['/login']);
       },
       error: (err) => {
-        const detail = err?.error?.message || err?.message || 'Logout failed';
+        const detail = err.error.message || err.message || 'Logout failed';
         this.messageService.add({
           severity: 'error',
           summary: 'Logout Failed',

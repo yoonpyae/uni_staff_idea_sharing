@@ -140,7 +140,7 @@ export class DepartmentComponent implements OnInit {
         },
         error: (err) => {
           console.error('Update department failed:', err);
-          this.messageService.add({ severity: 'error', summary: 'Update Failed', detail: err?.error?.message || 'Failed to update department' });
+          this.messageService.add({ severity: 'error', summary: 'Update Failed', detail: err.error.message || 'Failed to update department' });
         }
       });
     } else {
@@ -154,7 +154,7 @@ export class DepartmentComponent implements OnInit {
         },
         error: (err) => {
           console.error('Create department failed:', err);
-          this.messageService.add({ severity: 'error', summary: 'Create Failed', detail: err?.error?.message || 'Failed to create department' });
+          this.messageService.add({ severity: 'error', summary: 'Create Failed', detail: err.error.message || 'Failed to create department' });
         }
       });
     }
