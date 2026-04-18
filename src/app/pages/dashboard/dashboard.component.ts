@@ -9,13 +9,15 @@ import { DashboardService } from '../../core/services/dashboard.service';
 import { environment } from '../../../environments/environment';
 import { ClosureSettingService } from '../../core/services/closure-setting.service';
 import { AuthService } from '../../core/services/auth.service';
+import { DropdownModule } from 'primeng/dropdown';
+import { FormsModule } from '@angular/forms';
 
 Chart.register(...registerables);
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, ToastModule],
+  imports: [CommonModule, ToastModule, DropdownModule, FormsModule],
   providers: [MessageService],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
@@ -125,9 +127,9 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   onYearChange(event: any): void {
-    this.selectedSettingID = Number(event.target.value);
+    this.selectedSettingID = event.value;
     this.loadDashboardData();
-    this.fabOpen = false; // Add this
+    this.fabOpen = false;
   }
 
   loadDashboardData(): void {
@@ -311,7 +313,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
           this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Download started' });
         }
       },
-       error: (err) => {
+      error: (err) => {
         this.messageService.add({
           severity: 'error',
           summary: 'Failed',
